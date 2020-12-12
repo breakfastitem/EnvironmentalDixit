@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dixit</title>
+
+    <!-- CSS -->
+    <!-- Bootstrap links-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+
+    <!--Local Styles-->
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+</head>
+
+<body>
+    <h1>Dixit</h1>
+
+
+    <div class="container">
+        <div class="row">
+            <!-- score aside-->
+            <div class="col-2">
+                <h2>Scores</h2>
+                <hr>
+
+                <aside id="scoreBar">
+                    <!--Temp example board -->
+                    <p id="name-1">Player 1</p>
+                    <p>Score:<span id="score-1">12</span></p>
+                    <hr>
+                    <p id="name-1">Player 1</p>
+                    <p>Score:<span id="score-1">12</span></p>
+                </aside>
+
+            </div>
+
+            <div class="col-10">
+                <!---->
+                <div class="row">
+                    <div class="col-12">
+                        <section id="board">
+                            <form>
+
+                                <button id="join-button">Join Game</button>
+                                <input id="id-input" placeholder="Game Id"></input>
+                                <input id="name-input" placeholder="Player Name"></input>
+                            </form>
+                            <br>
+                            <button id="new-button">New Game</button>
+
+                        </section>
+                    </div>
+
+                </div>
+                <!-- player hand-->
+                <div class="row">
+                    <div class="col-12">
+                        <section id="hand">
+                            <img class="player-card" src="https://place-hold.it/100X200"></img>
+                            <img class="player-card" src="https://place-hold.it/100X200"></img>
+                            <img class="player-card" src="https://place-hold.it/100X200"></img>
+                            <img class="player-card" src="https://place-hold.it/100X200"></img>
+                            <img class="player-card" src="https://place-hold.it/100X200"></img>
+                            <img class="player-card" src="https://place-hold.it/100X200"></img>
+                        </section>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- jQuery and JS bundle w/ Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- jQuery and moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+    <!--Local-->
+    <script src="script.js"></script>
+
+</body>
+
+</html>

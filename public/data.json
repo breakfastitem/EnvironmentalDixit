@@ -1,0 +1,53 @@
+{
+    "GameIds": ["IIII","AAAA"],
+    "GameData":[
+        {
+            "gameId": "IIII",
+            "playerCount": "3",
+            "gameState": "pre",
+            "players": [
+                {
+                    "playerName": "mike",
+                    "playerScore": "0",
+                    "playerCards": []
+                },
+                {
+                    "playerName": "Jimmy",
+                    "playerScore": "0",
+                    "playerCards": []
+                },
+                {
+                    "playerName": "Bill",
+                    "playerScore": "0",
+                    "playerCards": []
+                }
+
+
+            ]
+        },
+        {
+            "gameId": "AAAA",
+            "playerCount": "3",
+            "gameState": "pre",
+            "players": [
+                {
+                    "playerName": "player1",
+                    "playerScore": "0",
+                    "playerCards": []
+                },
+                {
+                    "playerName": "player2",
+                    "playerScore": "0",
+                    "playerCards": []
+                },
+                {
+                    "playerName": "player3",
+                    "playerScore": "0",
+                    "playerCards": []
+                }
+
+
+            ]
+        }
+    ]
+}

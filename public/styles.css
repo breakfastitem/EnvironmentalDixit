@@ -1,0 +1,22 @@
+h1 {
+    background-color: black;
+    text-align: center;
+    color: green;
+}
+.player-card {
+    margin-left: 20px;
+}
+#board {
+    background-color: blanchedalmond;
+
+    height: 600px;
+    width: 100%;
+
+    margin-bottom: 10px;  
+}
+#hand {
+    background-color:lightblue;
+
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
