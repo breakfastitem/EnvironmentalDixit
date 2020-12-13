@@ -93,16 +93,18 @@ $("#board").on("click", function (event) {
                url: "/game/join",
                data: { gameId: gameID, playerName: playerName }
             }).then(function (response) {
+               if(response){
+                  GameObject = response;
 
-               console.log(response);
-
-               GameObject = response;
-
-               initializePlayerScores(GameObject.playerCount, GameObject.players);
-
-               initializeUpdateInterval();
-
-               displayJoinPhase(false);
+                  initializePlayerScores(GameObject.playerCount, GameObject.players);
+   
+                  initializeUpdateInterval();
+   
+                  displayJoinPhase(false);
+               }else{
+                  console.log("Game Is Full!");
+               }
+              
 
             });
          } else {

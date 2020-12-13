@@ -50,15 +50,23 @@ app.get("/game/join", (req, res) => {
 
         _playerCount = game[0].playerCount;
 
-        _players.push(_player);
-        _playerCount++;
+
+        if(_playerCount<7){
+            _players.push(_player);
+            _playerCount++;
 
 
-        Game.findOneAndUpdate({ gameID: req.query.gameId }, { playerCount: _playerCount, players: _players }, function (err, game) {
-            if (err) return console.error(err);
+            Game.findOneAndUpdate({ gameID: req.query.gameId }, { playerCount: _playerCount, players: _players }, function (err, game) {
+                if (err) return console.error(err);
 
-            res.send(game);
-        });
+                res.send(game);
+            });
+
+        }else{
+            res.send(undecided);
+        }
+
+        
     });
 
 });
