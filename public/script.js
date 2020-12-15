@@ -1,7 +1,7 @@
 /**
  * Static Vars
  */
-var GameObject = {
+let GameObject = {
    gameId: "",
    playerCount: "0",
    gameState: "pre",
@@ -10,17 +10,19 @@ var GameObject = {
 
 let gameID;
 
+let playerIndex;
+
 /**
 * Static Functions
 */
 function initializePlayerScores(playerCount, playerObjects) {
-   var scoreBar = $("#scoreBar");
+   const scoreBar = $("#scoreBar");
    scoreBar.empty();
 
-   for (var i = 0; i < playerCount; i++) {
-      var player = playerObjects[i];
+   for (let i = 0; i < playerCount; i++) {
+      let player = playerObjects[i];
 
-      var scoreInfo = $(`<p id="name-${i + 1}">${player.name}</p>
+      let scoreInfo = $(`<p id="name-${i + 1}">${player.name}</p>
       <p>Score: <span id="score-${i + 1}">${player.score}</span></p>
       <hr>`);
 
@@ -40,9 +42,21 @@ function initializeUpdateInterval() {
 
       }).then(function (response) {
 
-         GameObject = response;
+         if (GameObject != response) {
+            GameObject = response;
 
-         initializePlayerScores(GameObject.playerCount, GameObject.players);
+            switch (GameObject.gameState) {
+               case "join":
+                  initializePlayerScores(GameObject.playerCount, GameObject.players);
+                  break;
+
+               case "mainCard":
+                  //TODO :: If it is players turn to pick offer them a choice
+                  startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+                  break;
+            }
+
+         }
 
       });
 
@@ -51,11 +65,11 @@ function initializeUpdateInterval() {
 }
 
 function displayJoinPhase(isHost) {
+   
    const board = $("#board");
+   clearBoard();
 
    let display;
-
-   board.empty();
 
    if (isHost) {
       display = $(`<p>Start the game when all players have joined.</p>
@@ -64,6 +78,34 @@ function displayJoinPhase(isHost) {
    } else {
       display = $(`<p>Waiting For the Host...</p>`);
 
+   }
+
+   board.append(display);
+}
+
+function clearBoard() {
+   const board = $("#board");
+
+   board.empty();
+}
+
+function startNewRound(dealerIndex){
+
+   console.log("Hello");
+   clearBoard();
+   const board = $("#board");
+
+   let display;
+
+   if (dealerIndex==playerIndex) {
+      display = $(`<p>Choose an image, and write a clue related to said image.</p>
+      <form>
+      <input id="clue-input"></input>
+      <button id="submit">submit</button>
+      </form>`);
+
+   } else {
+      display = $(`<p>Waiting For Player ${dealerIndex} To submit clue and image...</p>`);
    }
 
    board.append(display);
@@ -93,18 +135,19 @@ $("#board").on("click", function (event) {
                url: "/game/join",
                data: { gameId: gameID, playerName: playerName }
             }).then(function (response) {
-               if(response){
+               if (response) {
                   GameObject = response;
+                  playerIndex = GameObject.playerCount - 1;
 
                   initializePlayerScores(GameObject.playerCount, GameObject.players);
-   
+
                   initializeUpdateInterval();
-   
+
                   displayJoinPhase(false);
-               }else{
+               } else {
                   console.log("Game Is Full!");
                }
-              
+
 
             });
          } else {
@@ -126,6 +169,7 @@ $("#board").on("click", function (event) {
             }).then(function (response) {
 
                GameObject = response;
+               playerIndex = 0;
 
                initializePlayerScores(GameObject.playerCount, GameObject.players);
                initializeUpdateInterval();
@@ -141,79 +185,37 @@ $("#board").on("click", function (event) {
          break;
 
       case "start-button":
-         console.log("Clicked");
+        
+         initializePlayerScores(GameObject.playerCount, GameObject.players);
+
+         //Initialize game TODO:: MAke sure game object is updated
+         let playerOrder =[GameObject.playerCount];
+         //TODO:: Make Random
+         for(let i=0;i<Number(GameObject.playerCount);i++){
+            playerOrder[i] = i;
+         };
+        
+
+         $.ajax({
+            method: "get",
+            url: "/game/start",
+            data: { gameId: gameID, playerOrder: playerOrder }
+         }).then(function (response) {
+            //Handle  A response
+   
+            GameObject=response;
+            console.log(GameObject);
+            startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+         });
 
          break;
 
    }
 
-
 });
-// $("#join-button").on("click", function (event) {
-//    event.preventDefault();
-
-//    gameID= $("#id-input").val();
-//    const  playerName =$("#name-input").val();
-
-//    //Get game from game id
-
-//    if(gameID != "" && playerName!=""){
-//       $.ajax({
-//          method: "get",
-//          url: "/game/join",
-//          data: {gameId: gameID, playerName: playerName}
-//       }).then(function (response) {
-
-//          console.log(response);
-
-//          GameObject=response;
-
-//          initializePlayerScores(GameObject.playerCount, GameObject.players);
-
-//          initializeUpdateInterval();
-
-//          displayJoinPhase(false);
-
-//       });
-//    }else{
-//       console.log("ERROR No input");
-//    }
-
-// });
-
-// $("#new-button").on("click", function(event){
-//    event.preventDefault();
-
-//    gameID= $("#id-input").val();
-//    const  playerName =$("#name-input").val();
-
-//    if(gameID != ""){
-
-//       $.ajax({
-//          method: "get",
-//          url: "/game/new",
-//          data: {gameId: gameID, playerName: playerName}
-
-//       }).then(function (response) {
-
-//          GameObject=response;
-
-//          initializePlayerScores(GameObject.playerCount, GameObject.players);
-//          initializeUpdateInterval();
-
-//          displayJoinPhase(true);
-
-//         //TODO:DO Something after creating game
-
-//       });
-//    }else{
-//       console.log("ERROR No input");
-//    }
-
-// });
 
 $("#id-input").on("change", function (event) {
-   var value = $("#id-input").val();
+   const value = $("#id-input").val();
 
    if (value.length > 4) {
       $("#id-input").val(value.substring(0, 4));

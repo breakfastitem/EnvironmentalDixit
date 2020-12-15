@@ -11,6 +11,8 @@ const gameData = new mongoose.Schema({
     playerCount: Number,
     gameState: String,
     players: [{ name: String, score: Number, cards: [String],host: Boolean }],
+    roundCount: Number,
+    turnOrder: [Number]
 });
 
 const Game = mongoose.model('Game', gameData);
@@ -74,7 +76,7 @@ app.get("/game/join", (req, res) => {
 //TODO: Create checks to see if game exists already
 app.get("/game/new", (req, res) => {
 
-    const _game = new Game({ gameID: req.query.gameId, playerCount: 1, gameState: "join", players: [{ name: req.query.playerName, score: 0, cards: [""] ,host: true}] });
+    const _game = new Game({ gameID: req.query.gameId, playerCount: 1, gameState: "join", players: [{ name: req.query.playerName, score: 0, cards: [""] ,host: true}],roundCount:0,turnOrder: [0] });
 
     _game.save(function (err) {
         if (err) return console.error(err);
@@ -94,6 +96,22 @@ app.get("/game/pull", (req, res) => {
     });
 });
 
+
+app.get("/game/start", (req, res) => {
+
+    Game.find({ gameID: req.query.gameId }, function (err, game) {
+
+        if (err) return console.error(err);
+
+        _gameState = game[0].gameState= "mainCard";
+
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, turnOrder: req.query.playerOrder}, function (err, game) {
+            if (err) return console.error(err);
+
+            res.send(game);
+        });
+    });
+});
 
 //start the server
 app.listen(8080);
