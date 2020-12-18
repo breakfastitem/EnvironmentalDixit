@@ -10,7 +10,7 @@ const gameData = new mongoose.Schema({
     gameID: String,
     playerCount: Number,
     gameState: String,
-    players: [{ name: String, score: Number, cards: [String],host: Boolean }],
+    players: [{ name: String, score: Number, cards: [String], cardCount: Number,host: Boolean }],
     roundCount: Number,
     turnOrder: [Number]
 });

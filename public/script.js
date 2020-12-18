@@ -1,6 +1,8 @@
 /**
  * Static Vars
  */
+const gameManager =require("./util/GameManager");
+
 let GameObject = {
    gameId: "",
    playerCount: "0",
@@ -105,7 +107,7 @@ function startNewRound(dealerIndex){
       </form>`);
 
    } else {
-      display = $(`<p>Waiting For Player ${dealerIndex} To submit clue and image...</p>`);
+      display = $(`<p>The StoryTeller will submit a clue and image shortly...</p>`);
    }
 
    board.append(display);
@@ -201,11 +203,13 @@ $("#board").on("click", function (event) {
             url: "/game/start",
             data: { gameId: gameID, playerOrder: playerOrder }
          }).then(function (response) {
-            //Handle  A response
+
+            //starts the first round
    
             GameObject=response;
             console.log(GameObject);
             startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+
          });
 
          break;
