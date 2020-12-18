@@ -1,7 +1,7 @@
 /**
  * Static Vars
  */
-const gameManager =require("./util/GameManager");
+
 
 let GameObject = {
    gameId: "",
@@ -14,10 +14,14 @@ let gameID;
 
 let playerIndex;
 
+let gameManager;
+
+let roundStarted=false;
+
 /**
 * Static Functions
 */
-function initializePlayerScores(playerCount, playerObjects) {
+function updatePlayerScores(playerCount, playerObjects) {
    const scoreBar = $("#scoreBar");
    scoreBar.empty();
 
@@ -34,6 +38,18 @@ function initializePlayerScores(playerCount, playerObjects) {
 
 }
 
+Array.prototype.shuffle = function() {
+   var i = this.length, j, temp;
+   if ( i == 0 ) return this;
+   while ( --i ) {
+      j = Math.floor( Math.random() * ( i + 1 ) );
+      temp = this[i];
+      this[i] = this[j];
+      this[j] = temp;
+   }
+   return this;
+ }
+
 function initializeUpdateInterval() {
    setInterval(() => {
 
@@ -49,12 +65,16 @@ function initializeUpdateInterval() {
 
             switch (GameObject.gameState) {
                case "join":
-                  initializePlayerScores(GameObject.playerCount, GameObject.players);
+                  updatePlayerScores(GameObject.playerCount, GameObject.players);
                   break;
 
                case "mainCard":
                   //TODO :: If it is players turn to pick offer them a choice
-                  startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+                  if(!roundStarted){
+                     startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+                     roundStarted=true;
+                  }
+                  
                   break;
             }
 
@@ -93,7 +113,6 @@ function clearBoard() {
 
 function startNewRound(dealerIndex){
 
-   console.log("Hello");
    clearBoard();
    const board = $("#board");
 
@@ -107,7 +126,7 @@ function startNewRound(dealerIndex){
       </form>`);
 
    } else {
-      display = $(`<p>The StoryTeller will submit a clue and image shortly...</p>`);
+      display = $(`<p> ${dealerIndex} The StoryTeller will submit a clue and image shortly...</p>`);
    }
 
    board.append(display);
@@ -141,7 +160,7 @@ $("#board").on("click", function (event) {
                   GameObject = response;
                   playerIndex = GameObject.playerCount - 1;
 
-                  initializePlayerScores(GameObject.playerCount, GameObject.players);
+                  updatePlayerScores(GameObject.playerCount, GameObject.players);
 
                   initializeUpdateInterval();
 
@@ -173,12 +192,13 @@ $("#board").on("click", function (event) {
                GameObject = response;
                playerIndex = 0;
 
-               initializePlayerScores(GameObject.playerCount, GameObject.players);
+
+               updatePlayerScores(GameObject.playerCount, GameObject.players);
                initializeUpdateInterval();
 
                displayJoinPhase(true);
 
-               //TODO:DO Something after creating game
+              
 
             });
          } else {
@@ -188,16 +208,18 @@ $("#board").on("click", function (event) {
 
       case "start-button":
         
-         initializePlayerScores(GameObject.playerCount, GameObject.players);
+         updatePlayerScores(GameObject.playerCount, GameObject.players);
 
          //Initialize game TODO:: MAke sure game object is updated
-         let playerOrder =[GameObject.playerCount];
-         //TODO:: Make Random
-         for(let i=0;i<Number(GameObject.playerCount);i++){
-            playerOrder[i] = i;
-         };
-        
+         let playerOrder=[];
 
+         for(let i=1;i<=GameObject.playerCount;i++){
+            playerOrder.push(i);
+         }
+
+         playerOrder.shuffle();
+         
+   
          $.ajax({
             method: "get",
             url: "/game/start",
