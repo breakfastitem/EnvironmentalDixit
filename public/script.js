@@ -90,9 +90,9 @@ function initializeUpdateInterval() {
                   break;
 
                case "mainCard":
-                  console.log(GameObject);
-                  //TODO :: If it is players turn to pick offer them a choice
                   
+                  //TODO :: If it is players turn to pick offer them a choice
+                  if(!roundStarted){
                      const hand = $("#hand");
                      hand.empty();
 
@@ -109,6 +109,9 @@ function initializeUpdateInterval() {
                      }
 
                      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+                     roundStarted=true;
+                  }
+                   
 
                   break;
             }
@@ -271,7 +274,7 @@ $("#board").on("click", function (event) {
 
        
 
-         for (let i = 1; i < GameObject.cardCount; i++) {
+         for (let i = 1; i <= GameObject.cardCount; i++) {
             cardOrder.push(i);
          }
          cardOrder.shuffle();
@@ -301,7 +304,7 @@ $("#board").on("click", function (event) {
    }
 
 });
-
+//Prevents more than for characters from being entered in id input
 $("#id-input").on("change", function (event) {
    const value = $("#id-input").val();
 
