@@ -9,8 +9,10 @@ mongoose.set("returnOriginal", false);
 const gameData = new mongoose.Schema({
     gameID: String,
     playerCount: Number,
+    cardCount: Number,
+    cardOrder: [Number],
     gameState: String,
-    players: [{ name: String, score: Number, cards: [String], cardCount: Number,host: Boolean }],
+    players: [{ name: String, score: Number, cards: [Number], handCount: Number,host: Boolean }],
     roundCount: Number,
     turnOrder: [Number]
 });
@@ -41,7 +43,7 @@ app.get("/", (request, response) => {
 //TODO::// only add if game is in join mode
 app.get("/game/join", (req, res) => {
     let _playerCount = 0;
-    let _player = { name: req.query.playerName, score: 0, cards: [""], host: false };
+    let _player = { name: req.query.playerName, score: 0, handCount: 0,cards: [], host: false };
 
     let _players = [];
 
@@ -76,7 +78,7 @@ app.get("/game/join", (req, res) => {
 //TODO: Create checks to see if game exists already
 app.get("/game/new", (req, res) => {
 
-    const _game = new Game({ gameID: req.query.gameId, playerCount: 1, gameState: "join", players: [{ name: req.query.playerName, score: 0, cards: [""] ,host: true}],roundCount:0,turnOrder: [0] });
+    const _game = new Game({ gameID: req.query.gameId, playerCount: 1,cardCount:18,cardOrder: [], gameState: "join", players: [{ name: req.query.playerName, score: 0, handCount: 0,cards: [], host: true}],roundCount:0,turnOrder: [0] });
 
     _game.save(function (err) {
         if (err) return console.error(err);
@@ -105,7 +107,7 @@ app.get("/game/start", (req, res) => {
 
         _gameState = game[0].gameState= "mainCard";
 
-        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, turnOrder: req.query.playerOrder}, function (err, game) {
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, players:req.query.players, turnOrder: req.query.playerOrder, cardOrder: req.query.cardOrder}, function (err, game) {
             if (err) return console.error(err);
 
             res.send(game);
