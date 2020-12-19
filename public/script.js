@@ -23,20 +23,20 @@ const imagesHtml = [`<img src="https://i.ibb.co/VLzCKBK/img-1.jpg" alt="img-1" b
 let GameObject = {
    gameId: "",
    playerCount: "0",
-   gameState: "pre",
+   gameState: "none",
    players: []
 }
-
+//Holds shuffled card values
 let cardOrder = [];
 
 let gameID;
-
+//PLayer index in players on gameobject
 let playerIndex;
 
 let gameManager;
-
+//precents gameobject from being updated if not needed
 let roundStarted = false;
-
+//Interval to be cleared and initialized
 let interval;
 
 /**
@@ -72,7 +72,7 @@ Array.prototype.shuffle = function () {
 }
 
 function initializeUpdateInterval() {
-   interval =setInterval(() => {
+   interval = setInterval(() => {
 
       $.ajax({
          method: "get",
@@ -90,28 +90,28 @@ function initializeUpdateInterval() {
                   break;
 
                case "mainCard":
-                  
+
                   //TODO :: If it is players turn to pick offer them a choice
-                  if(!roundStarted){
+                  if (!roundStarted) {
                      const hand = $("#hand");
                      hand.empty();
 
                      for (let i = 0; i < GameObject.players[playerIndex].handCount; i++) {
-                        
+
                         let imgIdentifier = GameObject.players[playerIndex].cards[i];
-                        let card = $(imagesHtml[imgIdentifier]);
+                        let card = $(imagesHtml[imgIdentifier - 1]);
 
                         card.attr("class", "playerCard");
-                        card.attr("id", `img-${imgIdentifier}`);
+                        card.attr("id", `img-${i}`);
 
-                        console.log(card + imgIdentifier);
+                        console.log(imgIdentifier);
                         hand.append(card);
                      }
 
                      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-                     roundStarted=true;
+                     roundStarted = true;
                   }
-                   
+
 
                   break;
             }
@@ -156,20 +156,31 @@ function startNewRound(dealerIndex) {
 
    let display;
 
-   if (dealerIndex == playerIndex) {
+   if (dealerIndex - 1 == playerIndex) {
       display = $(`<p>Choose an image, and write a clue related to said image.</p>
       <form>
       <input id="clue-input"></input>
       <button id="submit">submit</button>
       </form>`);
 
+      //Auto Displays first card in selcted area.
+      let card = $(imagesHtml[GameObject.players[playerIndex].cards[0]-1]);
+
+      card.attr("class", "playerCard");
+      card.attr("id", `selected-card`);
+      // img-${GameObject.players[playerIndex].cards[0]} 
+      //Appends information to board
+      board.append(display);
+      board.append(card);
+
    } else {
-      display = $(`<p> ${dealerIndex} The StoryTeller will submit a clue and image shortly...</p>`);
+      display = $(`<p> Player ${dealerIndex} The StoryTeller will submit a clue and image shortly...</p>`);
+      board.append(display);
    }
 
-   board.append(display);
 }
 
+//Always restart interval and push method after calling
 function dealCards() {
    clearInterval(interval);
 
@@ -183,10 +194,8 @@ function dealCards() {
          GameObject.players[i].cards.push(tempNum);
          GameObject.players[i].handCount++;
       }
-      console.log(GameObject.players[i].cards);
    }
-
-   //Push New Object
+   
 }
 
 /**
@@ -272,7 +281,7 @@ $("#board").on("click", function (event) {
          }
          playerOrder.shuffle();
 
-       
+
 
          for (let i = 1; i <= GameObject.cardCount; i++) {
             cardOrder.push(i);
@@ -285,10 +294,10 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "get",
             url: "/game/start",
-            data: { gameId: gameID, players: GameObject.players ,playerOrder: playerOrder, cardOrder: cardOrder }
+            data: { gameId: gameID, players: GameObject.players, playerOrder: playerOrder, cardOrder: cardOrder }
          }).then(function (response) {
 
-            
+
 
             //starts the first round
             GameObject = response;
@@ -304,6 +313,29 @@ $("#board").on("click", function (event) {
    }
 
 });
+
+$("#hand").on("click",  (event) =>{
+   if(GameObject.turnOrder[GameObject.roundCount]-1==playerIndex){
+      const targetID =event.target.id;
+      console.log(event.target.id);
+      let type= targetID.split("-")[0];
+      let handNum = targetID.split("-")[1];
+      if(type=="img"){
+         $("img").remove("#selected-card");
+         let card = $(imagesHtml[GameObject.players[playerIndex].cards[handNum]-1]);
+   
+         card.attr("class", "playerCard");
+         card.attr("id", `selected-card`);
+   
+         $("#board").append(card);
+      }
+     
+   }
+ 
+  
+});
+
+
 //Prevents more than for characters from being entered in id input
 $("#id-input").on("change", function (event) {
    const value = $("#id-input").val();
