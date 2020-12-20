@@ -14,7 +14,8 @@ const gameData = new mongoose.Schema({
     gameState: String,
     players: [{ name: String, score: Number, cards: [Number], handCount: Number,host: Boolean }],
     roundCount: Number,
-    turnOrder: [Number]
+    turnOrder: [Number],
+    roundData: {clue: String, cardArray: [{cardIdentifier: Number, votes: Number}]}
 });
 
 const Game = mongoose.model('Game', gameData);
@@ -30,6 +31,7 @@ db.on('error', console.error.bind(console, 'connection error:'));
 //use the application off of express.
 const app = express();
 
+//use files in public page
 app.use(express.static(__dirname + '/public'));
 
 //define the route for "/"
@@ -67,10 +69,9 @@ app.get("/game/join", (req, res) => {
             });
 
         }else{
-            res.send(undecided);
+            res.send(undefined);
         }
-
-        
+      
     });
 
 });
@@ -78,7 +79,7 @@ app.get("/game/join", (req, res) => {
 //TODO: Create checks to see if game exists already
 app.get("/game/new", (req, res) => {
 
-    const _game = new Game({ gameID: req.query.gameId, playerCount: 1,cardCount:18,cardOrder: [], gameState: "join", players: [{ name: req.query.playerName, score: 0, handCount: 0,cards: [], host: true}],roundCount:0,turnOrder: [0] });
+    const _game = new Game({ gameID: req.query.gameId, playerCount: 1,cardCount:18,cardOrder: [], gameState: "join", players: [{ name: req.query.playerName, score: 0, handCount: 0,cards: [], host: true}],roundCount:0,turnOrder: [0],roundData: {clue:"",cardArray:[]}});
 
     _game.save(function (err) {
         if (err) return console.error(err);
@@ -107,12 +108,28 @@ app.get("/game/start", (req, res) => {
 
         _gameState = game[0].gameState= "mainCard";
 
-        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, players:req.query.players, turnOrder: req.query.playerOrder, cardOrder: req.query.cardOrder}, function (err, game) {
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, players: req.query.players, turnOrder: req.query.playerOrder, cardOrder: req.query.cardOrder}, function (err, game) {
             if (err) return console.error(err);
 
             res.send(game);
         });
     });
+});
+
+app.get("/game/clue",(req,res)=>{
+    Game.find({ gameID: req.query.gameId }, function (err, game) {
+
+        if (err) return console.error(err);
+
+        _gameState = game[0].gameState= "fakeCards";
+
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState,roundData: req.query.roundData}, function (err, game) {
+            if (err) return console.error(err);
+
+            res.send(game);
+        });
+    });
+
 });
 
 //start the server

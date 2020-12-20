@@ -35,9 +35,12 @@ let playerIndex;
 
 let gameManager;
 //precents gameobject from being updated if not needed
-let roundStarted = false;
+let boardInstantiated = 0;
 //Interval to be cleared and initialized
 let interval;
+
+//whichever card thats selected in round window is here, Identifies this cards position in imageshtml array
+let cardIdentifier;
 
 /**
 * Static Functions
@@ -92,7 +95,7 @@ function initializeUpdateInterval() {
                case "mainCard":
 
                   //TODO :: If it is players turn to pick offer them a choice
-                  if (!roundStarted) {
+                  if (boardInstantiated <1) {
                      const hand = $("#hand");
                      hand.empty();
 
@@ -109,9 +112,32 @@ function initializeUpdateInterval() {
                      }
 
                      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-                     roundStarted = true;
+                     boardInstantiated ++;
                   }
 
+                  break;
+               case "fakeCards":
+                  //Everyone but dealer has this display
+                  if (boardInstantiated <2&& GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+                    //Display board info
+                    let board = $("#board");
+                    board.empty();
+
+                    let display = $(`<p>Pick an image that matches the clue.</p>
+                    <h2>${GameObject.roundData.clue}</h2>
+                     `);
+
+                     cardIdentifier = GameObject.players[playerIndex].cards[0]-1;
+                     let card = $(imagesHtml[cardIdentifier]);
+
+                     card.attr("class", "playerCard");
+                     card.attr("id", `selected-card`);
+
+                     board.append(display);
+                     board.append(card);
+                     
+                     boardInstantiated ++;
+                  }
 
                   break;
             }
@@ -160,11 +186,12 @@ function startNewRound(dealerIndex) {
       display = $(`<p>Choose an image, and write a clue related to said image.</p>
       <form>
       <input id="clue-input"></input>
-      <button id="submit">submit</button>
+      <button id="submit-clue">submit</button>
       </form>`);
 
       //Auto Displays first card in selcted area.
-      let card = $(imagesHtml[GameObject.players[playerIndex].cards[0]-1]);
+      cardIdentifier=GameObject.players[playerIndex].cards[0] - 1;
+      let card = $(imagesHtml[cardIdentifier]);
 
       card.attr("class", "playerCard");
       card.attr("id", `selected-card`);
@@ -195,7 +222,7 @@ function dealCards() {
          GameObject.players[i].handCount++;
       }
    }
-   
+
 }
 
 /**
@@ -297,8 +324,6 @@ $("#board").on("click", function (event) {
             data: { gameId: gameID, players: GameObject.players, playerOrder: playerOrder, cardOrder: cardOrder }
          }).then(function (response) {
 
-
-
             //starts the first round
             GameObject = response;
 
@@ -310,29 +335,69 @@ $("#board").on("click", function (event) {
 
          break;
 
+      case "submit-clue":
+         //Stop interval to prevent overwriting push data
+         clearInterval(interval);
+         const clue =$("#clue-input").val().trim();
+
+         console.log("clue: "+clue);
+
+         const roundData ={clue: clue, cardArray:[{cardIdentifier: cardIdentifier, votes:0}]};
+
+         console.log("roundData: " +roundData);
+         
+         $.ajax({
+            method: "get",
+            url: "/game/clue",
+            data: { gameId: gameID, roundData: roundData }
+         }).then(function (response) {
+            
+            GameObject = response;
+
+            //Update story teller display
+            let board =$("#board");
+
+            board.empty();
+
+            let display = $("<p>All other playings are selecting cards to match your clue...</p>");
+            board.append(display);
+
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
+
+         });
+         
+         
+
+
+         break;
+
    }
 
 });
 
-$("#hand").on("click",  (event) =>{
-   if(GameObject.turnOrder[GameObject.roundCount]-1==playerIndex){
-      const targetID =event.target.id;
+$("#hand").on("click", (event) => {
+   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex&& GameObject.gameState==="mainCard")||(GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex&& GameObject.gameState==="fakeCards")) {
+      const targetID = event.target.id;
       console.log(event.target.id);
-      let type= targetID.split("-")[0];
+      let type = targetID.split("-")[0];
       let handNum = targetID.split("-")[1];
-      if(type=="img"){
+
+      if (type == "img") {
          $("img").remove("#selected-card");
-         let card = $(imagesHtml[GameObject.players[playerIndex].cards[handNum]-1]);
-   
+
+         cardIdentifier=GameObject.players[playerIndex].cards[handNum] - 1;
+         let card = $(imagesHtml[cardIdentifier]);
+
          card.attr("class", "playerCard");
          card.attr("id", `selected-card`);
-   
+
          $("#board").append(card);
       }
-     
+
    }
- 
-  
+
+
 });
 
 
