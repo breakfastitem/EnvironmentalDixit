@@ -95,7 +95,7 @@ function initializeUpdateInterval() {
                case "mainCard":
 
                   //TODO :: If it is players turn to pick offer them a choice
-                  if (boardInstantiated <1) {
+                  if (boardInstantiated < 1) {
                      const hand = $("#hand");
                      hand.empty();
 
@@ -112,22 +112,23 @@ function initializeUpdateInterval() {
                      }
 
                      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-                     boardInstantiated ++;
+                     boardInstantiated++;
                   }
 
                   break;
                case "fakeCards":
                   //Everyone but dealer has this display
-                  if (boardInstantiated <2&& GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
-                    //Display board info
-                    let board = $("#board");
-                    board.empty();
+                  if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+                     //Display board info
+                     let board = $("#board");
+                     board.empty();
 
-                    let display = $(`<p>Pick an image that matches the clue.</p>
+                     let display = $(`<p>Pick an image that matches the clue.</p>
                     <h2>${GameObject.roundData.clue}</h2>
+                    <button id="submit-fake">Submit</button>
                      `);
 
-                     cardIdentifier = GameObject.players[playerIndex].cards[0]-1;
+                     cardIdentifier = GameObject.players[playerIndex].cards[0] - 1;
                      let card = $(imagesHtml[cardIdentifier]);
 
                      card.attr("class", "playerCard");
@@ -135,8 +136,8 @@ function initializeUpdateInterval() {
 
                      board.append(display);
                      board.append(card);
-                     
-                     boardInstantiated ++;
+
+                     boardInstantiated++;
                   }
 
                   break;
@@ -190,7 +191,7 @@ function startNewRound(dealerIndex) {
       </form>`);
 
       //Auto Displays first card in selcted area.
-      cardIdentifier=GameObject.players[playerIndex].cards[0] - 1;
+      cardIdentifier = GameObject.players[playerIndex].cards[0] - 1;
       let card = $(imagesHtml[cardIdentifier]);
 
       card.attr("class", "playerCard");
@@ -338,24 +339,24 @@ $("#board").on("click", function (event) {
       case "submit-clue":
          //Stop interval to prevent overwriting push data
          clearInterval(interval);
-         const clue =$("#clue-input").val().trim();
+         const clue = $("#clue-input").val().trim();
 
-         console.log("clue: "+clue);
+         console.log("clue: " + clue);
 
-         const roundData ={clue: clue, cardArray:[{cardIdentifier: cardIdentifier, votes:0}]};
+         const roundData = { playersActed: 1, clue: clue, cardArray: [{playerIndex:playerIndex, cardIdentifier: cardIdentifier, votes: 0 }] };
 
-         console.log("roundData: " +roundData);
-         
+         console.log("roundData: " + roundData);
+
          $.ajax({
             method: "get",
             url: "/game/clue",
-            data: { gameId: gameID, roundData: roundData }
+            data: { gameId: gameID, roundData: roundData}
          }).then(function (response) {
-            
+
             GameObject = response;
 
             //Update story teller display
-            let board =$("#board");
+            let board = $("#board");
 
             board.empty();
 
@@ -366,10 +367,32 @@ $("#board").on("click", function (event) {
             initializeUpdateInterval();
 
          });
-         
-         
 
+         break;
 
+      case "submit-fake":
+         clearInterval(interval);
+
+         $.ajax({
+            method: "get",
+            url: "/game/fake",
+            data: { gameId: gameID, cardIdentifier: cardIdentifier,playerIndex:playerIndex }
+         }).then(function (response) {
+
+            GameObject = response;
+
+            //Update story teller display
+            let board = $("#board");
+
+            board.empty();
+
+            let display = $("<p>Other playings are still selecting card...</p>");
+            board.append(display);
+
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
+
+         });
          break;
 
    }
@@ -377,7 +400,7 @@ $("#board").on("click", function (event) {
 });
 
 $("#hand").on("click", (event) => {
-   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex&& GameObject.gameState==="mainCard")||(GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex&& GameObject.gameState==="fakeCards")) {
+   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards")) {
       const targetID = event.target.id;
       console.log(event.target.id);
       let type = targetID.split("-")[0];
@@ -386,7 +409,7 @@ $("#hand").on("click", (event) => {
       if (type == "img") {
          $("img").remove("#selected-card");
 
-         cardIdentifier=GameObject.players[playerIndex].cards[handNum] - 1;
+         cardIdentifier = GameObject.players[playerIndex].cards[handNum] - 1;
          let card = $(imagesHtml[cardIdentifier]);
 
          card.attr("class", "playerCard");

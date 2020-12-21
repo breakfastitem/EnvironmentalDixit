@@ -15,7 +15,7 @@ const gameData = new mongoose.Schema({
     players: [{ name: String, score: Number, cards: [Number], handCount: Number,host: Boolean }],
     roundCount: Number,
     turnOrder: [Number],
-    roundData: {clue: String, cardArray: [{cardIdentifier: Number, votes: Number}]}
+    roundData: {playersActed:Number,clue: String, cardArray: [{playerIndex:Number,cardIdentifier: Number, votes: Number}]}
 });
 
 const Game = mongoose.model('Game', gameData);
@@ -79,7 +79,7 @@ app.get("/game/join", (req, res) => {
 //TODO: Create checks to see if game exists already
 app.get("/game/new", (req, res) => {
 
-    const _game = new Game({ gameID: req.query.gameId, playerCount: 1,cardCount:18,cardOrder: [], gameState: "join", players: [{ name: req.query.playerName, score: 0, handCount: 0,cards: [], host: true}],roundCount:0,turnOrder: [0],roundData: {clue:"",cardArray:[]}});
+    const _game = new Game({ gameID: req.query.gameId, playerCount: 1,cardCount:18,cardOrder: [], gameState: "join", players: [{ name: req.query.playerName, score: 0, handCount: 0,cards: [], host: true}],roundCount:0,turnOrder: [0],roundData: {playersActed: 0, clue:"",cardArray:[]}});
 
     _game.save(function (err) {
         if (err) return console.error(err);
@@ -130,6 +130,30 @@ app.get("/game/clue",(req,res)=>{
         });
     });
 
+});
+
+app.get("/game/fake", (req,res)=>{
+    Game.find({ gameID: req.query.gameId }, function (err, game) {
+
+        if (err) return console.error(err);
+
+        let roundData = game[0].roundData;
+        let _gameState = "fakeCards"
+
+        roundData.playersActed++;
+        let cardObject = {playerIndex: req.query.playerIndex ,cardIdentifier: req.query.cardIdentifier, votes: 0};
+        roundData.cardArray.push(cardObject);
+
+        if(roundData.playersActed == game.playerCount){
+            _gameState = "vote";
+        }
+
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState,roundData: roundData}, function (err, game) {
+            if (err) return console.error(err);
+
+            res.send(game);
+        });
+    });
 });
 
 //start the server
