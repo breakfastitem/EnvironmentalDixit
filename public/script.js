@@ -41,6 +41,11 @@ let interval;
 
 //whichever card thats selected in round window is here, Identifies this cards position in imageshtml array
 let cardIdentifier;
+//same as cardidentifier excpet for the vote
+let voteCardIdentifier;
+
+//For fake card sellection
+let fakeCardSubmited = false;
 
 /**
 * Static Functions
@@ -141,6 +146,61 @@ function initializeUpdateInterval() {
                   }
 
                   break;
+               case "vote":
+                  if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+                     //Display board info
+                     let board = $("#board");
+                     board.empty();
+
+                     let display = $(`<p>Vote for the image you most think represents the clue.</p>
+                    <h2>${GameObject.roundData.clue}</h2>
+                    <button id="submit-vote">Submit</button>
+                     `);
+                     board.append(display);
+                     //TODO:: Make cards that are displayed random
+                     for (let i = 0; i < GameObject.roundData.cardArray.length; i++) {
+                        let card = $(imagesHtml[GameObject.roundData.cardArray[i].cardIdentifier]);
+                        card.attr("class", "voteCard");
+                        card.attr("id", `vote-${i}`);
+
+                        board.append(card);
+
+                     }
+
+                     board.append("<hr>");
+
+                     let card = $(imagesHtml[GameObject.roundData.cardArray[0].cardIdentifier]);
+
+                     card.attr("class", "playerCard");
+                     card.attr("id", `selected-card`);
+
+                     voteCardIdentifier = 0;
+
+                     board.append(card);
+
+
+
+                     boardInstantiated++;
+                  } else if (GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+                     let board = $("#board");
+                     board.empty();
+
+                     let display = $(`<p> The other players are voting. </p>`);
+                     board.append(display);
+
+                     //TODO:: Make cards that are displayed randomLY
+                     for (let i = 0; i < GameObject.roundData.cardArray.length; i++) {
+                        let card = $(imagesHtml[GameObject.roundData.cardArray[i].cardIdentifier]);
+                        card.attr("class", "playerCard");
+                        card.attr("id", `vote-${i}`);
+
+                        board.append(card);
+
+                     }
+                     boardInstantiated++;
+                  }
+                  break;
+
             }
 
          }
@@ -194,7 +254,7 @@ function startNewRound(dealerIndex) {
       cardIdentifier = GameObject.players[playerIndex].cards[0] - 1;
       let card = $(imagesHtml[cardIdentifier]);
 
-      card.attr("class", "playerCard");
+      card.attr("class", "voteCard");
       card.attr("id", `selected-card`);
       // img-${GameObject.players[playerIndex].cards[0]} 
       //Appends information to board
@@ -224,17 +284,35 @@ function dealCards() {
       }
    }
 
-}
+};
+function displayVoteSelection(cardIndex) {
+
+   //if random var will from different variable
+
+   voteCardIdentifier = GameObject.roundData.cardArray[cardIndex].cardIdentifier;
+
+   $("img").remove("#selected-card");
+
+   let card = $(imagesHtml[voteCardIdentifier]);
+
+   card.attr("class", "playerCard");
+   card.attr("id", `selected-card`);
+
+   $("#board").append(card);
+};
 
 /**
  * Event Listeners
  */
+
 
 $("#board").on("click", function (event) {
    event.preventDefault();
    const id = event.target.id;
 
    let playerName;
+
+   console.log(event.target.class);
 
    switch (id) {
 
@@ -343,14 +421,14 @@ $("#board").on("click", function (event) {
 
          console.log("clue: " + clue);
 
-         const roundData = { playersActed: 1, clue: clue, cardArray: [{playerIndex:playerIndex, cardIdentifier: cardIdentifier, votes: 0 }] };
+         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardIdentifier, votes: 0 }] };
 
          console.log("roundData: " + roundData);
 
          $.ajax({
             method: "get",
             url: "/game/clue",
-            data: { gameId: gameID, roundData: roundData}
+            data: { gameId: gameID, roundData: roundData }
          }).then(function (response) {
 
             GameObject = response;
@@ -376,8 +454,11 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "get",
             url: "/game/fake",
-            data: { gameId: gameID, cardIdentifier: cardIdentifier,playerIndex:playerIndex }
+            data: { gameId: gameID, cardIdentifier: cardIdentifier, playerIndex: playerIndex }
          }).then(function (response) {
+
+            //To prevent selected cards appending
+            fakeCardSubmited = true;
 
             GameObject = response;
 
@@ -395,14 +476,33 @@ $("#board").on("click", function (event) {
          });
          break;
 
+      case "vote-0":
+         displayVoteSelection(0);
+         break;
+      case "vote-1":
+         displayVoteSelection(1);
+         break;
+      case "vote-2":
+         displayVoteSelection(2);
+         break;
+      case "vote-3":
+         displayVoteSelection(3);
+         break;
+      case "vote-4":
+         displayVoteSelection(4);
+         break;
+      case "vote-5":
+         displayVoteSelection(5);
+         break;
+
    }
 
 });
 
 $("#hand").on("click", (event) => {
-   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards")) {
+   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
       const targetID = event.target.id;
-      console.log(event.target.id);
+
       let type = targetID.split("-")[0];
       let handNum = targetID.split("-")[1];
 

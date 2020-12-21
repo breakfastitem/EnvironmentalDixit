@@ -144,7 +144,8 @@ app.get("/game/fake", (req,res)=>{
         let cardObject = {playerIndex: req.query.playerIndex ,cardIdentifier: req.query.cardIdentifier, votes: 0};
         roundData.cardArray.push(cardObject);
 
-        if(roundData.playersActed == game.playerCount){
+        if(roundData.playersActed == game[0].playerCount){
+            
             _gameState = "vote";
         }
 
