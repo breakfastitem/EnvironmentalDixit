@@ -188,6 +188,24 @@ app.get("/game/vote", (req, res) => {
     });
 });
 
+app.get("/game/next", (req, res) => {
+    Game.find({ gameID: req.query.gameId }, function (err, game) {
+
+        if (err) return console.error(err);
+
+        _gameState = game[0].gameState = "mainCard";
+        _roundCount= game[0].roundCount+1;
+
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, roundCount: _roundCount }, function (err, game) {
+            if (err) return console.error(err);
+
+            res.send(game);
+        });
+    });
+
+});
+
+
 //returns players array with updated scores
 function determineScores(players, roundData) {
     //find host card

@@ -101,6 +101,8 @@ function initializeUpdateInterval() {
 
                   //TODO :: If it is players turn to pick offer them a choice
                   if (boardInstantiated < 1) {
+
+                     fakeCardSubmited=false;
                      const hand = $("#hand");
                      hand.empty();
 
@@ -118,6 +120,10 @@ function initializeUpdateInterval() {
 
                      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
                      boardInstantiated++;
+                  }
+
+                  if(boardInstantiated ==3){
+                     boardInstantiated=0;
                   }
 
                   break;
@@ -218,6 +224,11 @@ function initializeUpdateInterval() {
                      }
                      
                      updatePlayerScores(GameObject.playerCount,GameObject.players);
+                     //if host
+                     if(GameObject.turnOrder[GameObject.roundCount]-1==playerIndex){
+                        let button =$(`<button id="new-Round">next round</button>`);
+                        board.append(button);
+                     }
                     
                   break;
 
@@ -290,7 +301,7 @@ function startNewRound(dealerIndex) {
 
 //Always restart interval and push method after calling
 function dealCards() {
-   clearInterval(interval);
+   
 
    //for each player
    for (let i = 0; i < GameObject.playerCount; i++) {
@@ -416,6 +427,7 @@ $("#board").on("click", function (event) {
          cardOrder.shuffle();
 
          //Deal Cards
+         clearInterval(interval);
          dealCards();
 
          $.ajax({
@@ -523,6 +535,25 @@ $("#board").on("click", function (event) {
 
          });
 
+         break;
+      case "new-Round":
+         clearInterval(interval)
+         dealCards();
+         boardInstantiated=0;
+         fakeCardSubmited=false;
+
+         $.ajax({
+            method: "get",
+            url: "/game/next",
+            data: { gameId: gameID }
+         }).then(function (response) {
+
+            GameObject =response;
+
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
+
+         });
          break;
 
       case "vote-0":
