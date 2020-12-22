@@ -138,7 +138,7 @@ app.get("/game/fake", (req,res)=>{
         if (err) return console.error(err);
 
         let roundData = game[0].roundData;
-        let _gameState = "fakeCards"
+        let _gameState = "fakeCards";
 
         roundData.playersActed++;
         let cardObject = {playerIndex: req.query.playerIndex ,cardIdentifier: req.query.cardIdentifier, votes: 0};
@@ -147,6 +147,7 @@ app.get("/game/fake", (req,res)=>{
         if(roundData.playersActed == game[0].playerCount){
             
             _gameState = "vote";
+            roundData.playersActed=0;
         }
 
         Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState,roundData: roundData}, function (err, game) {
@@ -156,6 +157,32 @@ app.get("/game/fake", (req,res)=>{
         });
     });
 });
+
+app.get("/game/vote", (req,res)=>{
+    Game.find({ gameID: req.query.gameId }, function (err, game) {
+
+        if (err) return console.error(err);
+
+        let roundData = game[0].roundData;
+        let _gameState = "vote";
+
+        roundData.playersActed++;
+
+        roundData.cardArray[req.query.cardIndex].votes++;
+
+        if(roundData.playersActed == game[0].playerCount-1){
+            
+            _gameState = "endDisplay";
+        }
+
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState,roundData: roundData}, function (err, game) {
+            if (err) return console.error(err);
+
+            res.send(game);
+        });
+    });
+});
+
 
 //start the server
 app.listen(8080);

@@ -41,8 +41,8 @@ let interval;
 
 //whichever card thats selected in round window is here, Identifies this cards position in imageshtml array
 let cardIdentifier;
-//same as cardidentifier excpet for the vote
-let voteCardIdentifier;
+//same as cardidentifier excpet for the vote, the index is the index in round data card array
+let voteCardIndex;
 
 //For fake card sellection
 let fakeCardSubmited = false;
@@ -174,14 +174,14 @@ function initializeUpdateInterval() {
                      card.attr("class", "playerCard");
                      card.attr("id", `selected-card`);
 
-                     voteCardIdentifier = 0;
+                     cardIndex=0;
 
                      board.append(card);
 
 
 
                      boardInstantiated++;
-                  } else if (GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+                  } else if (boardInstantiated <3 &&GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
                      let board = $("#board");
                      board.empty();
 
@@ -199,6 +199,12 @@ function initializeUpdateInterval() {
                      }
                      boardInstantiated++;
                   }
+                  break;
+
+                  case "endDisplay":
+                     let display=$(`<p>End Results </p>`);
+                     $("#board").empty();
+                     $("#board").append(display);
                   break;
 
             }
@@ -285,34 +291,35 @@ function dealCards() {
    }
 
 };
-function displayVoteSelection(cardIndex) {
+function displayVoteSelection(cardRoundIndex) {
+   //clicks are only enabled when the player is not a dealer
+   if(GameObject.turnOrder[GameObject.roundCount]-1 != playerIndex){
+          //if random var will from different variable
+          cardIndex= cardRoundIndex;
 
-   //if random var will from different variable
+          let voteCardIdentifier = GameObject.roundData.cardArray[cardRoundIndex].cardIdentifier;
+    
+          $("img").remove("#selected-card");
+    
+          let card = $(imagesHtml[voteCardIdentifier]);
+    
+          card.attr("class", "playerCard");
+          card.attr("id", `selected-card`);
 
-   voteCardIdentifier = GameObject.roundData.cardArray[cardIndex].cardIdentifier;
+          $("#board").append(card);
+   }
 
-   $("img").remove("#selected-card");
-
-   let card = $(imagesHtml[voteCardIdentifier]);
-
-   card.attr("class", "playerCard");
-   card.attr("id", `selected-card`);
-
-   $("#board").append(card);
 };
 
 /**
  * Event Listeners
  */
 
-
 $("#board").on("click", function (event) {
    event.preventDefault();
    const id = event.target.id;
 
    let playerName;
-
-   console.log(event.target.class);
 
    switch (id) {
 
@@ -474,6 +481,34 @@ $("#board").on("click", function (event) {
             initializeUpdateInterval();
 
          });
+         break;
+
+      case "submit-vote":
+         clearInterval(interval);
+         $.ajax({
+            method: "get",
+            url: "/game/vote",
+            data: { gameId: gameID, cardIndex: cardIndex, playerIndex: playerIndex }
+         }).then(function (response) {
+
+            //To prevent selected cards appending
+            fakeCardSubmited = true;
+
+            GameObject = response;
+
+            //Update story teller display
+            let board = $("#board");
+
+            board.empty();
+
+            let display = $("<p>Other playings are still voting...</p>");
+            board.append(display);
+
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
+
+         });
+
          break;
 
       case "vote-0":
