@@ -3,11 +3,17 @@ h1 {
     text-align: center;
     color: green;
 }
+img {
+    height:200px;
+    width:100px;
+    margin-left:10px;
+}
 .player-card {
     margin-left: 20px;
 }
 #board {
     background-color: blanchedalmond;
+    position: relative;
 
     height: 600px;
     width: 100%;
@@ -20,8 +26,6 @@ h1 {
     padding-top: 10px;
     padding-bottom: 10px;
 }
-img {
-    height:200px;
-    width:100px;
-    margin-left:10px;
+#result{
+    float: left;
 }

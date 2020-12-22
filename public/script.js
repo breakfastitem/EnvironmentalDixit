@@ -202,9 +202,23 @@ function initializeUpdateInterval() {
                   break;
 
                   case "endDisplay":
-                     let display=$(`<p>End Results </p>`);
-                     $("#board").empty();
-                     $("#board").append(display);
+                     let board = $("#board");
+
+                     board.empty();
+
+                     let header =$(`<h2>End Results</h2>`);
+                     board.append(header);
+
+                     //Display cards with owner and votes
+                     for(let i=0; i< GameObject.playerCount;i++){
+                        let cardData = GameObject.roundData.cardArray[i];
+                        let display=$(`<div id="result"><p>${GameObject.players[cardData.playerIndex].name}</p> ${imagesHtml[cardData.cardIdentifier]}<p> ${cardData.votes}</p></div>`);
+
+                        $("#board").append(display);
+                     }
+                     
+                     updatePlayerScores(GameObject.playerCount,GameObject.players);
+                    
                   break;
 
             }
@@ -428,7 +442,7 @@ $("#board").on("click", function (event) {
 
          console.log("clue: " + clue);
 
-         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardIdentifier, votes: 0 }] };
+         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardIdentifier, votes: 0, voterIndexes: [] }] };
 
          console.log("roundData: " + roundData);
 

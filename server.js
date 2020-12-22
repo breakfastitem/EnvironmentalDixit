@@ -12,10 +12,10 @@ const gameData = new mongoose.Schema({
     cardCount: Number,
     cardOrder: [Number],
     gameState: String,
-    players: [{ name: String, score: Number, cards: [Number], handCount: Number,host: Boolean }],
+    players: [{ name: String, score: Number, cards: [Number], handCount: Number, host: Boolean }],
     roundCount: Number,
     turnOrder: [Number],
-    roundData: {playersActed:Number,clue: String, cardArray: [{playerIndex:Number,cardIdentifier: Number, votes: Number}]}
+    roundData: { playersActed: Number, clue: String, cardArray: [{ playerIndex: Number, cardIdentifier: Number, votes: Number, voterIndexes: [Number] }] }
 });
 
 const Game = mongoose.model('Game', gameData);
@@ -34,6 +34,7 @@ const app = express();
 //use files in public page
 app.use(express.static(__dirname + '/public'));
 
+
 //define the route for "/"
 app.get("/", (request, response) => {
     //show this file when the "/" is requested
@@ -45,7 +46,7 @@ app.get("/", (request, response) => {
 //TODO::// only add if game is in join mode
 app.get("/game/join", (req, res) => {
     let _playerCount = 0;
-    let _player = { name: req.query.playerName, score: 0, handCount: 0,cards: [], host: false };
+    let _player = { name: req.query.playerName, score: 0, handCount: 0, cards: [], host: false };
 
     let _players = [];
 
@@ -57,7 +58,7 @@ app.get("/game/join", (req, res) => {
         _playerCount = game[0].playerCount;
 
 
-        if(_playerCount<7){
+        if (_playerCount < 7) {
             _players.push(_player);
             _playerCount++;
 
@@ -68,10 +69,10 @@ app.get("/game/join", (req, res) => {
                 res.send(game);
             });
 
-        }else{
+        } else {
             res.send(undefined);
         }
-      
+
     });
 
 });
@@ -79,7 +80,7 @@ app.get("/game/join", (req, res) => {
 //TODO: Create checks to see if game exists already
 app.get("/game/new", (req, res) => {
 
-    const _game = new Game({ gameID: req.query.gameId, playerCount: 1,cardCount:18,cardOrder: [], gameState: "join", players: [{ name: req.query.playerName, score: 0, handCount: 0,cards: [], host: true}],roundCount:0,turnOrder: [0],roundData: {playersActed: 0, clue:"",cardArray:[]}});
+    const _game = new Game({ gameID: req.query.gameId, playerCount: 1, cardCount: 18, cardOrder: [], gameState: "join", players: [{ name: req.query.playerName, score: 0, handCount: 0, cards: [], host: true }], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
 
     _game.save(function (err) {
         if (err) return console.error(err);
@@ -106,9 +107,9 @@ app.get("/game/start", (req, res) => {
 
         if (err) return console.error(err);
 
-        _gameState = game[0].gameState= "mainCard";
+        _gameState = game[0].gameState = "mainCard";
 
-        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, players: req.query.players, turnOrder: req.query.playerOrder, cardOrder: req.query.cardOrder}, function (err, game) {
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, players: req.query.players, turnOrder: req.query.playerOrder, cardOrder: req.query.cardOrder }, function (err, game) {
             if (err) return console.error(err);
 
             res.send(game);
@@ -116,14 +117,14 @@ app.get("/game/start", (req, res) => {
     });
 });
 
-app.get("/game/clue",(req,res)=>{
+app.get("/game/clue", (req, res) => {
     Game.find({ gameID: req.query.gameId }, function (err, game) {
 
         if (err) return console.error(err);
 
-        _gameState = game[0].gameState= "fakeCards";
+        _gameState = game[0].gameState = "fakeCards";
 
-        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState,roundData: req.query.roundData}, function (err, game) {
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, roundData: req.query.roundData }, function (err, game) {
             if (err) return console.error(err);
 
             res.send(game);
@@ -132,7 +133,7 @@ app.get("/game/clue",(req,res)=>{
 
 });
 
-app.get("/game/fake", (req,res)=>{
+app.get("/game/fake", (req, res) => {
     Game.find({ gameID: req.query.gameId }, function (err, game) {
 
         if (err) return console.error(err);
@@ -141,16 +142,16 @@ app.get("/game/fake", (req,res)=>{
         let _gameState = "fakeCards";
 
         roundData.playersActed++;
-        let cardObject = {playerIndex: req.query.playerIndex ,cardIdentifier: req.query.cardIdentifier, votes: 0};
+        let cardObject = { playerIndex: req.query.playerIndex, cardIdentifier: req.query.cardIdentifier, votes: 0 };
         roundData.cardArray.push(cardObject);
 
-        if(roundData.playersActed == game[0].playerCount){
-            
+        if (roundData.playersActed == game[0].playerCount) {
+
             _gameState = "vote";
-            roundData.playersActed=0;
+            roundData.playersActed = 0;
         }
 
-        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState,roundData: roundData}, function (err, game) {
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, roundData: roundData }, function (err, game) {
             if (err) return console.error(err);
 
             res.send(game);
@@ -158,7 +159,7 @@ app.get("/game/fake", (req,res)=>{
     });
 });
 
-app.get("/game/vote", (req,res)=>{
+app.get("/game/vote", (req, res) => {
     Game.find({ gameID: req.query.gameId }, function (err, game) {
 
         if (err) return console.error(err);
@@ -169,13 +170,17 @@ app.get("/game/vote", (req,res)=>{
         roundData.playersActed++;
 
         roundData.cardArray[req.query.cardIndex].votes++;
-
-        if(roundData.playersActed == game[0].playerCount-1){
-            
+        roundData.cardArray[req.query.cardIndex].voterIndexes.push(req.query.playerIndex);
+        let _players;
+        if (roundData.playersActed == game[0].playerCount - 1) {
+            //Determin scores with game state information
+            _players = determineScores(game[0].players, game[0].roundData);
             _gameState = "endDisplay";
+        } else {
+            _players = game[0].players;
         }
 
-        Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState,roundData: roundData}, function (err, game) {
+        Game.findOneAndUpdate({ gameID: req.query.gameId }, { players: _players, gameState: _gameState, roundData: roundData }, function (err, game) {
             if (err) return console.error(err);
 
             res.send(game);
@@ -183,6 +188,45 @@ app.get("/game/vote", (req,res)=>{
     });
 });
 
+//returns players array with updated scores
+function determineScores(players, roundData) {
+    //find host card
+    let hostIndex = roundData.cardArray[0].playerIndex;
+    //If host fails
+    if (roundData.cardArray[0].votes == 0 || roundData.cardArray[0].votes == players.length - 1) {
+        for (let i = 0; i < players.length; i++) {
+            //add otehr score points
+            if (i != hostIndex) {
+                players[i].score += 2;
+                for (let j = 1; j < roundData.cardArray.length; j++) {
+                    if (roundData.cardArray[j].playerIndex == i) {
+                        players[i].score += roundData.cardArray[j].votes;
+                    }
+                }
+            }
+        }
+    } else {
+        players[hostIndex].score += 3;
+        let voterIndexes = roundData.cardArray[0].voterIndexes;
+        //Everyone who voted for correct card also gets points
+        for (let i = 0; i < voterIndexes.length; i++) {
+            players[voterIndexes[i]].score += 3;
+
+        }
+        //add other score points
+        for (let i = 0; i < players.length; i++) {
+            if (i != hostIndex) {
+                for (let j = 1; j < roundData.cardArray.length; j++) {
+                    if (roundData.cardArray[j].playerIndex == i) {
+                        players[i].score += roundData.cardArray[j].votes;
+                    }
+                }
+            }
+        }
+
+    }
+    return players;
+};
 
 //start the server
 app.listen(8080);
