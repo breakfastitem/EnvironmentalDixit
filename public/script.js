@@ -355,22 +355,28 @@ $("#board").on("click", function (event) {
 
          if (gameID != "" && playerName != "") {
             $.ajax({
-               method: "get",
+               method: "put",
                url: "/game/join",
                data: { gameId: gameID, playerName: playerName }
-            }).then(function (response) {
-               if (response) {
-                  GameObject = response;
-                  playerIndex = GameObject.playerCount - 1;
+            }).then(function () {
+               $.ajax({
+                  method: "get",
+                  url: `/game/pull/${gameID}`
 
-                  updatePlayerScores(GameObject.playerCount, GameObject.players);
+               }).then(function (response) {
+                  if (response) {
+                     GameObject = response;
+                     playerIndex = GameObject.playerCount - 1;
 
-                  initializeUpdateInterval();
+                     updatePlayerScores(GameObject.playerCount, GameObject.players);
 
-                  displayJoinPhase(false);
-               } else {
-                  console.log("Game Is Full!");
-               }
+                     initializeUpdateInterval();
+
+                     displayJoinPhase(false);
+                  } else {
+                     console.log("Game Is Full!");
+                  }
+               });
 
 
             });
@@ -636,7 +642,6 @@ $("#hand").on("click", (event) => {
 
 
 });
-
 
 //Prevents more than for characters from being entered in id input
 $("#id-input").on("change", function (event) {
