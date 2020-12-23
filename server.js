@@ -4,6 +4,10 @@ const mongoose = require('mongoose');
 mongoose.connect('mongodb+srv://ehrman:dixit@cluster0.jfqke.mongodb.net/GameData?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
 mongoose.set("returnOriginal", false);
 
+//for Heroku
+const PORT =  process.env.PORT  || 8080;
+
+
 
 //Game Data schema
 const gameData = new mongoose.Schema({
@@ -213,7 +217,7 @@ function determineScores(players, roundData) {
     //If host fails
     if (roundData.cardArray[0].votes == 0 || roundData.cardArray[0].votes == players.length - 1) {
         for (let i = 0; i < players.length; i++) {
-            //add otehr score points
+            //add other score points
             if (i != hostIndex) {
                 players[i].score += 2;
                 for (let j = 1; j < roundData.cardArray.length; j++) {
@@ -247,6 +251,6 @@ function determineScores(players, roundData) {
 };
 
 //start the server
-app.listen(8080);
+app.listen(PORT);
 
 console.log("server at http://localhost:8080  ...");
