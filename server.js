@@ -53,7 +53,7 @@ app.get("/game/pull/:gameid", (req, res) => {
     let gameId = req.params.gameid
     Game.find({ gameID: gameId }, function (err, game) {
 
-        if (err) return console.error(err);
+        if (err) return res.sendStatus(404);
         //TODO:: Instead of this emit a web socket broadcast
         res.send(game[0]);
     });
@@ -64,13 +64,13 @@ app.get("/game/pull/:gameid", (req, res) => {
 //POST Functions
 app.post("/game/new", (req, res) => {
 
-    const _game = new Game({ gameID: req.body.gameId, playerCount: 1, cardCount: 18, cardOrder: [], gameState: "join", players: [{ name: req.body.playerName, score: 0, handCount: 0, cards: [], host: true }], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
+    const _game = new Game({ gameID: req.body.gameId, playerCount: 1, cardCount: 45, cardOrder: [], gameState: "join", players: [{ name: req.body.playerName, score: 0, handCount: 0, cards: [], host: true }], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
 
     _game.save(function (err) {
-        if (err) return console.error(err);
+        if (err) return  res.sendStatus(500);
     });
     //TODO:: Instead of this emit a web socket broadcast
-    res.send(_game);
+    res.sendStatus(200);
 
 });
 app.put("/game/:funct", (req, res) => {
@@ -81,12 +81,12 @@ app.put("/game/:funct", (req, res) => {
 
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return console.error(err);
+                if (err) return  res.sendStatus(404);
 
                 _gameState = game[0].gameState = "mainCard";
 
                 Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, players: req.body.players, turnOrder: req.body.playerOrder, cardOrder: req.body.cardOrder }, function (err, game) {
-                    if (err) return console.error(err);
+                    if (err) return  res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
@@ -95,12 +95,12 @@ app.put("/game/:funct", (req, res) => {
         case "clue":
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return console.error(err);
+                if (err) return  res.sendStatus(404);
 
                 _gameState = game[0].gameState = "fakeCards";
 
                 Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: req.body.roundData }, function (err, game) {
-                    if (err) return console.error(err);
+                    if (err) return  res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
@@ -110,7 +110,7 @@ app.put("/game/:funct", (req, res) => {
         case "fake":
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return console.error(err);
+                if (err) return  res.sendStatus(404);
 
                 let roundData = game[0].roundData;
                 let _gameState = "fakeCards";
@@ -135,7 +135,7 @@ app.put("/game/:funct", (req, res) => {
         case "vote":
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return console.error(err);
+                if (err) return  res.sendStatus(404);
 
                 let roundData = game[0].roundData;
                 let _gameState = "vote";
@@ -154,7 +154,7 @@ app.put("/game/:funct", (req, res) => {
                 }
 
                 Game.findOneAndUpdate({ gameID: req.body.gameId }, { players: _players, gameState: _gameState, roundData: roundData }, function (err, game) {
-                    if (err) return console.error(err);
+                    if (err) return  res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
@@ -163,13 +163,13 @@ app.put("/game/:funct", (req, res) => {
         case "next":
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return console.error(err);
+                if (err) return  res.sendStatus(404);
 
                 _gameState = game[0].gameState = "mainCard";
                 _roundCount = game[0].roundCount + 1;
 
                 Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundCount: _roundCount }, function (err, game) {
-                    if (err) return console.error(err);
+                    if (err) return  res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
@@ -182,7 +182,7 @@ app.put("/game/:funct", (req, res) => {
             let _players = [];
 
             Game.find({ gameID: req.body.gameId }, function (err, game) {
-                if (err) return console.error(err);
+                if (err) return  res.sendStatus(404);
 
                 _players = game[0].players;
 
@@ -195,7 +195,7 @@ app.put("/game/:funct", (req, res) => {
 
 
                     Game.findOneAndUpdate({ gameID: req.body.gameId }, { playerCount: _playerCount, players: _players }, function (err, game) {
-                        if (err) return console.error(err);
+                        if (err) return  res.sendStatus(500);
 
                         //TODO:: Instead of this emit a web socket broadcast
                         res.sendStatus(200);
@@ -209,153 +209,7 @@ app.put("/game/:funct", (req, res) => {
             });
             break;
     }
-
-
 });
-
-// //PUT FUNCTIONS
-// app.put("/game/start", (req, res) => {
-
-//     Game.find({ gameID: req.body.gameId }, function (err, game) {
-
-//         if (err) return console.error(err);
-
-//         _gameState = game[0].gameState = "mainCard";
-
-//         Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, players: req.body.players, turnOrder: req.body.playerOrder, cardOrder: req.body.cardOrder }, function (err, game) {
-//             if (err) return console.error(err);
-//             //TODO:: Instead of this emit a web socket broadcast
-//             res.sendStatus(200);
-//         });
-//     });
-// });
-
-// //adds player to the game object
-// //TODO:// if playername already exists dont add new player
-// //TODO::// only add if game is in join mode
-// app.put("/game/join", (req, res) => {
-//     let _playerCount = 0;
-//     let _player = { name: req.body.playerName, score: 0, handCount: 0, cards: [], host: false };
-
-//     let _players = [];
-
-//     Game.find({ gameID: req.body.gameId }, function (err, game) {
-//         if (err) return console.error(err);
-
-//         _players = game[0].players;
-
-//         _playerCount = game[0].playerCount;
-
-
-//         if (_playerCount < 7) {
-//             _players.push(_player);
-//             _playerCount++;
-
-
-//             Game.findOneAndUpdate({ gameID: req.body.gameId }, { playerCount: _playerCount, players: _players }, function (err, game) {
-//                 if (err) return console.error(err);
-
-//                 //TODO:: Instead of this emit a web socket broadcast
-//                 res.sendStatus(200);
-//             });
-
-//         } else {
-//             //TODO:: Instead of this emit a web socket broadcast
-//             res.sendStatus(404);
-//         }
-
-//     });
-
-// });
-
-
-// app.put("/game/clue", (req, res) => {
-//     Game.find({ gameID: req.body.gameId }, function (err, game) {
-
-//         if (err) return console.error(err);
-
-//         _gameState = game[0].gameState = "fakeCards";
-
-//         Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: req.body.roundData }, function (err, game) {
-//             if (err) return console.error(err);
-//             //TODO:: Instead of this emit a web socket broadcast
-//             res.sendStatus(200);
-//         });
-//     });
-
-// });
-
-// app.put("/game/fake", (req, res) => {
-//     Game.find({ gameID: req.body.gameId }, function (err, game) {
-
-//         if (err) return console.error(err);
-
-//         let roundData = game[0].roundData;
-//         let _gameState = "fakeCards";
-
-//         roundData.playersActed++;
-//         let cardObject = { playerIndex: req.body.playerIndex, cardIdentifier: req.body.cardIdentifier, votes: 0 };
-//         roundData.cardArray.push(cardObject);
-
-//         if (roundData.playersActed == game[0].playerCount) {
-
-//             _gameState = "vote";
-//             roundData.playersActed = 0;
-//         }
-
-//         Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: roundData }, function (err, game) {
-//             if (err) return console.error(err);
-//             //TODO:: Instead of this emit a web socket broadcast
-//             res.sendStatus(200);
-//         });
-//     });
-// });
-
-// app.put("/game/vote", (req, res) => {
-//     Game.find({ gameID: req.body.gameId }, function (err, game) {
-
-//         if (err) return console.error(err);
-
-//         let roundData = game[0].roundData;
-//         let _gameState = "vote";
-
-//         roundData.playersActed++;
-
-//         roundData.cardArray[req.body.cardIndex].votes++;
-//         roundData.cardArray[req.body.cardIndex].voterIndexes.push(req.body.playerIndex);
-//         let _players;
-//         if (roundData.playersActed == game[0].playerCount - 1) {
-//             //Determin scores with game state information
-//             _players = determineScores(game[0].players, game[0].roundData);
-//             _gameState = "endDisplay";
-//         } else {
-//             _players = game[0].players;
-//         }
-
-//         Game.findOneAndUpdate({ gameID: req.body.gameId }, { players: _players, gameState: _gameState, roundData: roundData }, function (err, game) {
-//             if (err) return console.error(err);
-//             //TODO:: Instead of this emit a web socket broadcast
-//             res.sendStatus(200);
-//         });
-//     });
-// });
-
-// app.put("/game/next", (req, res) => {
-//     Game.find({ gameID: req.body.gameId }, function (err, game) {
-
-//         if (err) return console.error(err);
-
-//         _gameState = game[0].gameState = "mainCard";
-//         _roundCount = game[0].roundCount + 1;
-
-//         Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundCount: _roundCount }, function (err, game) {
-//             if (err) return console.error(err);
-//             //TODO:: Instead of this emit a web socket broadcast
-//             res.sendStatus(200);
-//         });
-//     });
-
-// });
 
 
 //returns players array with updated scores
@@ -397,7 +251,7 @@ function determineScores(players, roundData) {
     }
     return players;
 };
-console.log(PORT);
+
 //start the server
 app.listen(PORT);
 
