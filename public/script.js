@@ -101,7 +101,7 @@ function initializeUpdateInterval() {
                   //TODO :: If it is players turn to pick offer them a choice
                   if (boardInstantiated < 1) {
 
-                     fakeCardSubmited=false;
+                     fakeCardSubmited = false;
                      const hand = $("#hand");
                      hand.empty();
 
@@ -121,8 +121,8 @@ function initializeUpdateInterval() {
                      boardInstantiated++;
                   }
 
-                  if(boardInstantiated ==3){
-                     boardInstantiated=0;
+                  if (boardInstantiated == 3) {
+                     boardInstantiated = 0;
                   }
 
                   break;
@@ -179,14 +179,14 @@ function initializeUpdateInterval() {
                      card.attr("class", "playerCard");
                      card.attr("id", `selected-card`);
 
-                     cardIndex=0;
+                     cardIndex = 0;
 
                      board.append(card);
 
 
 
                      boardInstantiated++;
-                  } else if (boardInstantiated <3 &&GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+                  } else if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
                      let board = $("#board");
                      board.empty();
 
@@ -206,29 +206,29 @@ function initializeUpdateInterval() {
                   }
                   break;
 
-                  case "endDisplay":
-                     let board = $("#board");
+               case "endDisplay":
+                  let board = $("#board");
 
-                     board.empty();
+                  board.empty();
 
-                     let header =$(`<h2>End Results</h2>`);
-                     board.append(header);
+                  let header = $(`<h2>End Results</h2>`);
+                  board.append(header);
 
-                     //Display cards with owner and votes
-                     for(let i=0; i< GameObject.playerCount;i++){
-                        let cardData = GameObject.roundData.cardArray[i];
-                        let display=$(`<div id="result"><p>${GameObject.players[cardData.playerIndex].name}</p> ${imagesHtml[cardData.cardIdentifier]}<p> ${cardData.votes}</p></div>`);
+                  //Display cards with owner and votes
+                  for (let i = 0; i < GameObject.playerCount; i++) {
+                     let cardData = GameObject.roundData.cardArray[i];
+                     let display = $(`<div id="result"><p>${GameObject.players[cardData.playerIndex].name}</p> ${imagesHtml[cardData.cardIdentifier]}<p> ${cardData.votes}</p></div>`);
 
-                        $("#board").append(display);
-                     }
-                     
-                     updatePlayerScores(GameObject.playerCount,GameObject.players);
-                     //if host
-                     if(GameObject.turnOrder[GameObject.roundCount]-1==playerIndex){
-                        let button =$(`<button id="new-Round">next round</button>`);
-                        board.append(button);
-                     }
-                    
+                     $("#board").append(display);
+                  }
+
+                  updatePlayerScores(GameObject.playerCount, GameObject.players);
+                  //if host
+                  if (GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+                     let button = $(`<button id="new-Round">next round</button>`);
+                     board.append(button);
+                  }
+
                   break;
 
             }
@@ -300,7 +300,7 @@ function startNewRound(dealerIndex) {
 
 //Always restart interval and push method after calling
 function dealCards() {
-   
+
 
    //for each player
    for (let i = 0; i < GameObject.playerCount; i++) {
@@ -317,20 +317,20 @@ function dealCards() {
 };
 function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
-   if(GameObject.turnOrder[GameObject.roundCount]-1 != playerIndex){
-          //if random var will from different variable
-          cardIndex= cardRoundIndex;
+   if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+      //if random var will from different variable
+      cardIndex = cardRoundIndex;
 
-          let voteCardIdentifier = GameObject.roundData.cardArray[cardRoundIndex].cardIdentifier;
-    
-          $("img").remove("#selected-card");
-    
-          let card = $(imagesHtml[voteCardIdentifier]);
-    
-          card.attr("class", "playerCard");
-          card.attr("id", `selected-card`);
+      let voteCardIdentifier = GameObject.roundData.cardArray[cardRoundIndex].cardIdentifier;
 
-          $("#board").append(card);
+      $("img").remove("#selected-card");
+
+      let card = $(imagesHtml[voteCardIdentifier]);
+
+      card.attr("class", "playerCard");
+      card.attr("id", `selected-card`);
+
+      $("#board").append(card);
    }
 
 };
@@ -391,10 +391,19 @@ $("#board").on("click", function (event) {
                data: { gameId: gameID, playerName: playerName }
 
             }).then(function () {
-               playerIndex=0;
-               initializeUpdateInterval();
+               $.ajax({
+                  method: "get",
+                  url: `/game/pull/${gameID}`
 
-               displayJoinPhase(true);
+               }).then(function (response) {
+                  playerIndex = 0;
+                  GameObject = response;
+
+                  updatePlayerScores(GameObject.playerCount, GameObject.players);
+                  initializeUpdateInterval();
+
+                  displayJoinPhase(true);
+               });
 
             });
          } else {
@@ -426,17 +435,23 @@ $("#board").on("click", function (event) {
          dealCards();
 
          $.ajax({
-            method: "get",
+            method: "put",
             url: "/game/start",
             data: { gameId: gameID, players: GameObject.players, playerOrder: playerOrder, cardOrder: cardOrder }
-         }).then(function (response) {
+         }).then(function () {
 
-            //starts the first round
-            GameObject = response;
+            $.ajax({
+               method: "get",
+               url: `/game/pull/${gameID}`
 
-            startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-            //Start the update interval that was paused to deal cards
-            initializeUpdateInterval();
+            }).then(function (response) {
+               //starts the first round
+               GameObject = response;
+
+               startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+               //Start the update interval that was paused to deal cards
+               initializeUpdateInterval();
+            });
 
          });
 
@@ -454,23 +469,28 @@ $("#board").on("click", function (event) {
          console.log("roundData: " + roundData);
 
          $.ajax({
-            method: "get",
+            method: "put",
             url: "/game/clue",
             data: { gameId: gameID, roundData: roundData }
-         }).then(function (response) {
+         }).then(function () {
+            $.ajax({
+               method: "get",
+               url: `/game/pull/${gameID}`
 
-            GameObject = response;
+            }).then(function (response) {
+               GameObject = response;
 
-            //Update story teller display
-            let board = $("#board");
+               //Update story teller display
+               let board = $("#board");
 
-            board.empty();
+               board.empty();
 
-            let display = $("<p>All other playings are selecting cards to match your clue...</p>");
-            board.append(display);
+               let display = $("<p>All other playings are selecting cards to match your clue...</p>");
+               board.append(display);
 
-            //Start the update interval that was paused to deal cards
-            initializeUpdateInterval();
+               //Start the update interval that was paused to deal cards
+               initializeUpdateInterval();
+            });
 
          });
 
@@ -480,26 +500,33 @@ $("#board").on("click", function (event) {
          clearInterval(interval);
 
          $.ajax({
-            method: "get",
+            method: "put",
             url: "/game/fake",
             data: { gameId: gameID, cardIdentifier: cardIdentifier, playerIndex: playerIndex }
-         }).then(function (response) {
+         }).then(function () {
 
-            //To prevent selected cards appending
-            fakeCardSubmited = true;
+            $.ajax({
+               method: "get",
+               url: `/game/pull/${gameID}`
 
-            GameObject = response;
+            }).then(function (response) {
 
-            //Update story teller display
-            let board = $("#board");
+               //To prevent selected cards appending
+               fakeCardSubmited = true;
 
-            board.empty();
+               GameObject = response;
 
-            let display = $("<p>Other playings are still selecting card...</p>");
-            board.append(display);
+               //Update story teller display
+               let board = $("#board");
 
-            //Start the update interval that was paused to deal cards
-            initializeUpdateInterval();
+               board.empty();
+
+               let display = $("<p>Other playings are still selecting card...</p>");
+               board.append(display);
+
+               //Start the update interval that was paused to deal cards
+               initializeUpdateInterval();
+            });
 
          });
          break;
@@ -507,26 +534,32 @@ $("#board").on("click", function (event) {
       case "submit-vote":
          clearInterval(interval);
          $.ajax({
-            method: "get",
+            method: "put",
             url: "/game/vote",
             data: { gameId: gameID, cardIndex: cardIndex, playerIndex: playerIndex }
-         }).then(function (response) {
+         }).then(function () {
 
-            //To prevent selected cards appending
-            fakeCardSubmited = true;
+            $.ajax({
+               method: "get",
+               url: `/game/pull/${gameID}`
 
-            GameObject = response;
+            }).then(function (response) {
+               //To prevent selected cards appending
+               fakeCardSubmited = true;
 
-            //Update story teller display
-            let board = $("#board");
+               GameObject = response;
 
-            board.empty();
+               //Update story teller display
+               let board = $("#board");
 
-            let display = $("<p>Other playings are still voting...</p>");
-            board.append(display);
+               board.empty();
 
-            //Start the update interval that was paused to deal cards
-            initializeUpdateInterval();
+               let display = $("<p>Other playings are still voting...</p>");
+               board.append(display);
+
+               //Start the update interval that was paused to deal cards
+               initializeUpdateInterval();
+            });
 
          });
 
@@ -534,19 +567,25 @@ $("#board").on("click", function (event) {
       case "new-Round":
          clearInterval(interval)
          dealCards();
-         boardInstantiated=0;
-         fakeCardSubmited=false;
+         boardInstantiated = 0;
+         fakeCardSubmited = false;
 
          $.ajax({
-            method: "get",
+            method: "put",
             url: "/game/next",
             data: { gameId: gameID }
-         }).then(function (response) {
+         }).then(function () {
+            $.ajax({
+               method: "get",
+               url: `/game/pull/${gameID}`
 
-            GameObject =response;
+            }).then(function (response) {
 
-            //Start the update interval that was paused to deal cards
-            initializeUpdateInterval();
+               GameObject = response;
+
+               //Start the update interval that was paused to deal cards
+               initializeUpdateInterval();
+            });
 
          });
          break;
