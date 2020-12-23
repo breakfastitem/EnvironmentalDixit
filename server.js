@@ -5,7 +5,7 @@ mongoose.connect('mongodb+srv://ehrman:dixit@cluster0.jfqke.mongodb.net/GameData
 mongoose.set("returnOriginal", false);
 
 //for Heroku
-const PORT =  process.env.PORT  || 8080;
+const PORT = process.env.PORT || 5000;
 
 
 
@@ -31,9 +31,12 @@ db.on('error', console.error.bind(console, 'connection error:'));
 //     // we're connected!
 // });
 
-
 //use the application off of express.
 const app = express();
+
+//middleWare
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 //use files in public page
 app.use(express.static(__dirname + '/public'));
@@ -43,6 +46,17 @@ app.use(express.static(__dirname + '/public'));
 app.get("/", (request, response) => {
     //show this file when the "/" is requested
     response.sendFile(__dirname + "/index.html");
+});
+
+//Get Functions
+app.get("/game/pull/:gameid", (req, res) => {
+    let gameId = req.params.gameid
+    Game.find({ gameID: gameId }, function (err, game) {
+
+        if (err) return console.error(err);
+        //TODO:: Instead of this emit a web socket broadcast
+        res.send(game[0]);
+    });
 });
 
 //adds player to the game object
@@ -70,10 +84,12 @@ app.get("/game/join", (req, res) => {
             Game.findOneAndUpdate({ gameID: req.query.gameId }, { playerCount: _playerCount, players: _players }, function (err, game) {
                 if (err) return console.error(err);
 
+                //TODO:: Instead of this emit a web socket broadcast
                 res.send(game);
             });
 
         } else {
+              //TODO:: Instead of this emit a web socket broadcast
             res.send(undefined);
         }
 
@@ -82,29 +98,21 @@ app.get("/game/join", (req, res) => {
 });
 
 //TODO: Create checks to see if game exists already
-app.get("/game/new", (req, res) => {
+//POST Functions
+app.post("/game/new", (req, res) => {
 
-    const _game = new Game({ gameID: req.query.gameId, playerCount: 1, cardCount: 18, cardOrder: [], gameState: "join", players: [{ name: req.query.playerName, score: 0, handCount: 0, cards: [], host: true }], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
+    const _game = new Game({ gameID: req.body.gameId, playerCount: 1, cardCount: 18, cardOrder: [], gameState: "join", players: [{ name: req.body.playerName, score: 0, handCount: 0, cards: [], host: true }], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
 
     _game.save(function (err) {
         if (err) return console.error(err);
     });
-
+    //TODO:: Instead of this emit a web socket broadcast
     res.send(_game);
 
 });
 
-app.get("/game/pull", (req, res) => {
 
-    Game.find({ gameID: req.query.gameId }, function (err, game) {
-
-        if (err) return console.error(err);
-
-        res.send(game[0]);
-    });
-});
-
-
+//PUT FUNCTIONS
 app.get("/game/start", (req, res) => {
 
     Game.find({ gameID: req.query.gameId }, function (err, game) {
@@ -115,7 +123,7 @@ app.get("/game/start", (req, res) => {
 
         Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, players: req.query.players, turnOrder: req.query.playerOrder, cardOrder: req.query.cardOrder }, function (err, game) {
             if (err) return console.error(err);
-
+            //TODO:: Instead of this emit a web socket broadcast
             res.send(game);
         });
     });
@@ -130,7 +138,7 @@ app.get("/game/clue", (req, res) => {
 
         Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, roundData: req.query.roundData }, function (err, game) {
             if (err) return console.error(err);
-
+            //TODO:: Instead of this emit a web socket broadcast
             res.send(game);
         });
     });
@@ -157,7 +165,7 @@ app.get("/game/fake", (req, res) => {
 
         Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, roundData: roundData }, function (err, game) {
             if (err) return console.error(err);
-
+            //TODO:: Instead of this emit a web socket broadcast
             res.send(game);
         });
     });
@@ -186,7 +194,7 @@ app.get("/game/vote", (req, res) => {
 
         Game.findOneAndUpdate({ gameID: req.query.gameId }, { players: _players, gameState: _gameState, roundData: roundData }, function (err, game) {
             if (err) return console.error(err);
-
+            //TODO:: Instead of this emit a web socket broadcast
             res.send(game);
         });
     });
@@ -198,11 +206,11 @@ app.get("/game/next", (req, res) => {
         if (err) return console.error(err);
 
         _gameState = game[0].gameState = "mainCard";
-        _roundCount= game[0].roundCount+1;
+        _roundCount = game[0].roundCount + 1;
 
         Game.findOneAndUpdate({ gameID: req.query.gameId }, { gameState: _gameState, roundCount: _roundCount }, function (err, game) {
             if (err) return console.error(err);
-
+            //TODO:: Instead of this emit a web socket broadcast
             res.send(game);
         });
     });
@@ -249,8 +257,8 @@ function determineScores(players, roundData) {
     }
     return players;
 };
-
+console.log(PORT);
 //start the server
 app.listen(PORT);
 
-console.log("server at http://localhost:8080  ...");
+console.log(`server at http://localhost:${PORT}  ...`);

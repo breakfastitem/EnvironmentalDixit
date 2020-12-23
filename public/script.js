@@ -84,8 +84,7 @@ function initializeUpdateInterval() {
 
       $.ajax({
          method: "get",
-         url: "/game/pull",
-         data: { gameId: gameID }
+         url: `/game/pull/${gameID}`
 
       }).then(function (response) {
 
@@ -387,16 +386,12 @@ $("#board").on("click", function (event) {
          if (gameID != "") {
 
             $.ajax({
-               method: "get",
+               method: "POST",
                url: "/game/new",
                data: { gameId: gameID, playerName: playerName }
 
-            }).then(function (response) {
-
-               GameObject = response;
-               playerIndex = 0;
-
-               updatePlayerScores(GameObject.playerCount, GameObject.players);
+            }).then(function () {
+               playerIndex=0;
                initializeUpdateInterval();
 
                displayJoinPhase(true);
