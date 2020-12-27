@@ -109,6 +109,21 @@ Array.prototype.shuffle = function () {
    return this;
 }
 
+function displayCards() {
+   const hand = $("#hand");
+   hand.empty();
+
+   for (let i = 0; i < GameObject.players[playerIndex].handCount; i++) {
+
+      let imgIdentifier = GameObject.players[playerIndex].cards[i];
+      let card = $(imagesHtml[imgIdentifier]);
+
+      card.attr("class", "playerCard");
+      card.attr("id", `img-${i}`);
+      hand.append(card);
+   }
+}
+
 function initializeUpdateInterval() {
    interval = setInterval(() => {
 
@@ -132,20 +147,8 @@ function initializeUpdateInterval() {
                   if (boardInstantiated < 1) {
 
                      fakeCardSubmited = false;
-                     const hand = $("#hand");
-                     hand.empty();
 
-                     for (let i = 0; i < GameObject.players[playerIndex].handCount; i++) {
-
-                        let imgIdentifier = GameObject.players[playerIndex].cards[i];
-                        let card = $(imagesHtml[imgIdentifier]);
-
-                        card.attr("class", "playerCard");
-                        card.attr("id", `img-${i}`);
-
-                        console.log(imgIdentifier);
-                        hand.append(card);
-                     }
+                     displayCards(); 
 
                      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
                      boardInstantiated++;
@@ -330,7 +333,6 @@ function startNewRound(dealerIndex) {
 
 //Always restart interval and push method after calling
 function dealCards() {
-
 
    //for each player
    for (let i = 0; i < GameObject.playerCount; i++) {
@@ -614,15 +616,21 @@ $("#board").on("click", function (event) {
 
          break;
       case "new-Round":
-         clearInterval(interval)
+         clearInterval(interval);
+
+       
+
          dealCards();
+
+         
+
          boardInstantiated = 0;
          fakeCardSubmited = false;
 
          $.ajax({
             method: "put",
             url: "/game/next",
-            data: { gameId: gameID }
+            data: { gameId: gameID, players: GameObject.players , cardOrder: GameObject.cardOrder}
          }).then(function () {
             $.ajax({
                method: "get",
@@ -631,6 +639,8 @@ $("#board").on("click", function (event) {
             }).then(function (response) {
 
                GameObject = response;
+
+               displayCards(); 
 
                //Start the update interval that was paused to deal cards
                initializeUpdateInterval();

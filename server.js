@@ -101,7 +101,7 @@ app.put("/game/:funct", (req, res) => {
 
                 //removes clue card from players hand
                 let _players =game[0].players;
-                _players[req.body.playerIndex].handCount--;
+                _players[req.body.playerIndex].handCount= _players[req.body.playerIndex].handCount-1;
                 
                 _players[req.body.playerIndex].cards = _players[req.body.playerIndex].cards.filter(card => card!=req.body.roundData.cardArray[0].cardIdentifier);
          
@@ -134,7 +134,7 @@ app.put("/game/:funct", (req, res) => {
                 }
 
                 let _players =game[0].players;
-                _players[req.body.playerIndex].handCount--;
+                _players[req.body.playerIndex].handCount= _players[req.body.playerIndex].handCount-1;
                 _players[req.body.playerIndex].cards = _players[req.body.playerIndex].cards.filter(card => card != req.body.cardIdentifier);
                 
 
@@ -181,7 +181,7 @@ app.put("/game/:funct", (req, res) => {
                 _gameState = game[0].gameState = "mainCard";
                 _roundCount = game[0].roundCount + 1;
 
-                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundCount: _roundCount }, function (err, game) {
+                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundCount: _roundCount, players: req.body.players,cardOrder:req.body.cardOrder }, function (err, game) {
                     if (err) return  res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
