@@ -97,13 +97,21 @@ app.put("/game/:funct", (req, res) => {
 
                 if (err) return  res.sendStatus(404);
 
-                _gameState = game[0].gameState = "fakeCards";
+                let _gameState = game[0].gameState = "fakeCards";
 
-                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: req.body.roundData }, function (err, game) {
+                //removes clue card from players hand
+                let _players =game[0].players;
+                _players[req.body.playerIndex].handCount--;
+                
+                _players[req.body.playerIndex].cards = _players[req.body.playerIndex].cards.filter(card => card!=req.body.roundData.cardArray[0].cardIdentifier);
+         
+                
+                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: req.body.roundData, players: _players }, function (err, game) {
                     if (err) return  res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
+
             });
 
             break;
@@ -125,7 +133,12 @@ app.put("/game/:funct", (req, res) => {
                     roundData.playersActed = 0;
                 }
 
-                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: roundData }, function (err, game) {
+                let _players =game[0].players;
+                _players[req.body.playerIndex].handCount--;
+                _players[req.body.playerIndex].cards = _players[req.body.playerIndex].cards.filter(card => card != req.body.cardIdentifier);
+                
+
+                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: roundData, players:_players }, function (err, game) {
                     if (err) return console.error(err);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
