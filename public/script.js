@@ -148,7 +148,7 @@ function initializeUpdateInterval() {
 
                      fakeCardSubmited = false;
 
-                     displayCards(); 
+                     displayCards();
 
                      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
                      boardInstantiated++;
@@ -386,8 +386,8 @@ $("#board").on("click", function (event) {
          //Get game from game id
 
          if (gameID != "" && playerName != "") {
-             //Update code display
-             $("#code").text(gameID);
+            //Update code display
+            $("#code").text(gameID);
 
             $.ajax({
                method: "put",
@@ -421,38 +421,40 @@ $("#board").on("click", function (event) {
          break;
 
       case "new-button":
-         gameID = $("#id-input").val();
+
          playerName = $("#name-input").val();
 
-         if (gameID != "") {
 
-            //Update code display
-            $("#code").text(gameID);
+         $.ajax({
+            method: "POST",
+            url: "/game/new",
+            data: { playerName: playerName }
 
+         }).then(function () {
             $.ajax({
-               method: "POST",
-               url: "/game/new",
-               data: { gameId: gameID, playerName: playerName }
+               method: "get",
+               url: `/game/pull/new`
 
-            }).then(function () {
-               $.ajax({
-                  method: "get",
-                  url: `/game/pull/${gameID}`
+            }).then(function (response) {
+      
+               playerIndex = 0;
+               GameObject = response;
 
-               }).then(function (response) {
-                  playerIndex = 0;
-                  GameObject = response;
+               //Get gameId from server
+               gameID=GameObject.gameID;
 
-                  updatePlayerScores(GameObject.playerCount, GameObject.players);
-                  initializeUpdateInterval();
+               //Update code display
+               $("#code").text(gameID);
 
-                  displayJoinPhase(true);
-               });
 
+               updatePlayerScores(GameObject.playerCount, GameObject.players);
+               initializeUpdateInterval();
+
+               displayJoinPhase(true);
             });
-         } else {
-            console.log("ERROR No input");
-         }
+
+         });
+
          break;
 
       case "start-button":
@@ -516,7 +518,7 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/clue",
-            data: { gameId: gameID, roundData: roundData ,playerIndex: playerIndex }
+            data: { gameId: gameID, roundData: roundData, playerIndex: playerIndex }
          }).then(function () {
             $.ajax({
                method: "get",
@@ -524,7 +526,7 @@ $("#board").on("click", function (event) {
 
             }).then(function (response) {
                GameObject = response;
-               
+
                //update hand with removed card
                $("img").remove(`#img-${handNum}`);
 
@@ -618,11 +620,11 @@ $("#board").on("click", function (event) {
       case "new-Round":
          clearInterval(interval);
 
-       
+
 
          dealCards();
 
-         
+
 
          boardInstantiated = 0;
          fakeCardSubmited = false;
@@ -630,7 +632,7 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/next",
-            data: { gameId: gameID, players: GameObject.players , cardOrder: GameObject.cardOrder}
+            data: { gameId: gameID, players: GameObject.players, cardOrder: GameObject.cardOrder }
          }).then(function () {
             $.ajax({
                method: "get",
@@ -640,7 +642,7 @@ $("#board").on("click", function (event) {
 
                GameObject = response;
 
-               displayCards(); 
+               displayCards();
 
                //Start the update interval that was paused to deal cards
                initializeUpdateInterval();

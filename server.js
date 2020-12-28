@@ -1,3 +1,4 @@
+const { response } = require("express");
 const express = require("express");
 const mongoose = require('mongoose');
 
@@ -6,6 +7,9 @@ mongoose.set("returnOriginal", false);
 
 //for Heroku
 const PORT = process.env.PORT || 5000;
+
+
+let ids = [];
 
 
 
@@ -50,13 +54,33 @@ app.get("/", (request, response) => {
 
 //Get Functions
 app.get("/game/pull/:gameid", (req, res) => {
-    let gameId = req.params.gameid
-    Game.find({ gameID: gameId }, function (err, game) {
+    let gameId;
 
-        if (err) return res.sendStatus(404);
-        //TODO:: Instead of this emit a web socket broadcast
-        res.send(game[0]);
-    });
+    switch (req.params.gameid) {
+        case "new":
+            gameId = ids[ids.length-1];
+            
+            Game.find({ gameID: gameId }, function (err, game) {
+
+                if (err) return res.sendStatus(404);
+                //TODO:: Instead of this emit a web socket broadcast
+
+                res.send(game[0]);
+            });
+            break;
+
+        default:
+            gameId = req.params.gameid;
+            Game.find({ gameID: gameId }, function (err, game) {
+
+                if (err) return res.sendStatus(404);
+                //TODO:: Instead of this emit a web socket broadcast
+                res.send(game[0]);
+            });
+            break;
+
+    }
+
 });
 
 
@@ -64,10 +88,14 @@ app.get("/game/pull/:gameid", (req, res) => {
 //POST Functions
 app.post("/game/new", (req, res) => {
 
-    const _game = new Game({ gameID: req.body.gameId, playerCount: 1, cardCount: 45, cardOrder: [], gameState: "join", players: [{ name: req.body.playerName, score: 0, handCount: 0, cards: [], host: true }], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
+    _gameID = generateID();
+
+    console.log(_gameID);
+
+    const _game = new Game({ gameID: _gameID, playerCount: 1, cardCount: 45, cardOrder: [], gameState: "join", players: [{ name: req.body.playerName, score: 0, handCount: 0, cards: [], host: true }], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
 
     _game.save(function (err) {
-        if (err) return  res.sendStatus(500);
+        if (err) return res.sendStatus(500);
     });
     //TODO:: Instead of this emit a web socket broadcast
     res.sendStatus(200);
@@ -81,12 +109,12 @@ app.put("/game/:funct", (req, res) => {
 
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return  res.sendStatus(404);
+                if (err) return res.sendStatus(404);
 
                 _gameState = game[0].gameState = "mainCard";
 
                 Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, players: req.body.players, turnOrder: req.body.playerOrder, cardOrder: req.body.cardOrder }, function (err, game) {
-                    if (err) return  res.sendStatus(500);
+                    if (err) return res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
@@ -95,19 +123,19 @@ app.put("/game/:funct", (req, res) => {
         case "clue":
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return  res.sendStatus(404);
+                if (err) return res.sendStatus(404);
 
                 let _gameState = game[0].gameState = "fakeCards";
 
                 //removes clue card from players hand
-                let _players =game[0].players;
-                _players[req.body.playerIndex].handCount= _players[req.body.playerIndex].handCount-1;
-                
-                _players[req.body.playerIndex].cards = _players[req.body.playerIndex].cards.filter(card => card!=req.body.roundData.cardArray[0].cardIdentifier);
-         
-                
+                let _players = game[0].players;
+                _players[req.body.playerIndex].handCount = _players[req.body.playerIndex].handCount - 1;
+
+                _players[req.body.playerIndex].cards = _players[req.body.playerIndex].cards.filter(card => card != req.body.roundData.cardArray[0].cardIdentifier);
+
+
                 Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: req.body.roundData, players: _players }, function (err, game) {
-                    if (err) return  res.sendStatus(500);
+                    if (err) return res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
@@ -118,7 +146,7 @@ app.put("/game/:funct", (req, res) => {
         case "fake":
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return  res.sendStatus(404);
+                if (err) return res.sendStatus(404);
 
                 let roundData = game[0].roundData;
                 let _gameState = "fakeCards";
@@ -133,12 +161,12 @@ app.put("/game/:funct", (req, res) => {
                     roundData.playersActed = 0;
                 }
 
-                let _players =game[0].players;
-                _players[req.body.playerIndex].handCount= _players[req.body.playerIndex].handCount-1;
+                let _players = game[0].players;
+                _players[req.body.playerIndex].handCount = _players[req.body.playerIndex].handCount - 1;
                 _players[req.body.playerIndex].cards = _players[req.body.playerIndex].cards.filter(card => card != req.body.cardIdentifier);
-                
 
-                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: roundData, players:_players }, function (err, game) {
+
+                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundData: roundData, players: _players }, function (err, game) {
                     if (err) return console.error(err);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
@@ -148,7 +176,7 @@ app.put("/game/:funct", (req, res) => {
         case "vote":
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return  res.sendStatus(404);
+                if (err) return res.sendStatus(404);
 
                 let roundData = game[0].roundData;
                 let _gameState = "vote";
@@ -167,7 +195,7 @@ app.put("/game/:funct", (req, res) => {
                 }
 
                 Game.findOneAndUpdate({ gameID: req.body.gameId }, { players: _players, gameState: _gameState, roundData: roundData }, function (err, game) {
-                    if (err) return  res.sendStatus(500);
+                    if (err) return res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
@@ -176,13 +204,13 @@ app.put("/game/:funct", (req, res) => {
         case "next":
             Game.find({ gameID: req.body.gameId }, function (err, game) {
 
-                if (err) return  res.sendStatus(404);
+                if (err) return res.sendStatus(404);
 
                 _gameState = game[0].gameState = "mainCard";
                 _roundCount = game[0].roundCount + 1;
 
-                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundCount: _roundCount, players: req.body.players,cardOrder:req.body.cardOrder }, function (err, game) {
-                    if (err) return  res.sendStatus(500);
+                Game.findOneAndUpdate({ gameID: req.body.gameId }, { gameState: _gameState, roundCount: _roundCount, players: req.body.players, cardOrder: req.body.cardOrder }, function (err, game) {
+                    if (err) return res.sendStatus(500);
                     //TODO:: Instead of this emit a web socket broadcast
                     res.sendStatus(200);
                 });
@@ -195,7 +223,7 @@ app.put("/game/:funct", (req, res) => {
             let _players = [];
 
             Game.find({ gameID: req.body.gameId }, function (err, game) {
-                if (err) return  res.sendStatus(404);
+                if (err) return res.sendStatus(404);
 
                 _players = game[0].players;
 
@@ -208,7 +236,7 @@ app.put("/game/:funct", (req, res) => {
 
 
                     Game.findOneAndUpdate({ gameID: req.body.gameId }, { playerCount: _playerCount, players: _players }, function (err, game) {
-                        if (err) return  res.sendStatus(500);
+                        if (err) return res.sendStatus(500);
 
                         //TODO:: Instead of this emit a web socket broadcast
                         res.sendStatus(200);
@@ -223,8 +251,30 @@ app.put("/game/:funct", (req, res) => {
             break;
     }
 });
+//Generates a unique string of four capital letters
+function generateID() {
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+    let id = "";
+    let validId=false;
+
+    while (!validId) {
+        while (id.length < 4) {
+            let index = Math.floor(Math.random() * alphabet.length);
+
+            id += alphabet[index];
+
+        }
+        validId = ids.indexOf(id)==-1;
+    }
 
 
+    //TODO::// Check and add to a id list so there are no double ids
+    ids.push(id);
+
+    return id;
+
+}
 //returns players array with updated scores
 function determineScores(players, roundData) {
     //find host card
