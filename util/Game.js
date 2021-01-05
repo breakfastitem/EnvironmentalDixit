@@ -27,10 +27,10 @@ class Game {
         this.playerCount = 1;
 
         this.gameState = "join";
-        
-        this.roundData= {};
-        
-        this.roundCount=0;
+
+        this.roundData = {};
+
+        this.roundCount = 0;
 
     }
 
@@ -87,9 +87,9 @@ class Game {
 
     }
 
-    recieveClue(playerIndex,cardID, clue){
-        if(this.gameState=="mainCard"){
-            this.roundData = {playersActed:1,clue: clue,cardArray:[{playerIndex: playerIndex,cardIdentifier: cardID, votes: 0,voterIndexes: []}]};
+    recieveClue(playerIndex, cardID, clue) {
+        if (this.gameState == "mainCard") {
+            this.roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardID, votes: 0, voterIndexes: [] }] };
 
             this.gameState = "fakeCards";
 
@@ -100,27 +100,58 @@ class Game {
 
     }
 
-    recieveFake(playerIndex,cardID){
-        if(this.gameState =="fakeCards"){
-            this.roundData.playersActed= this.roundData.playersActed+1;
-            let card = {playerIndex: playerIndex,cardIdentifier: cardID, votes: 0,voterIndexes: []}
+    recieveFake(playerIndex, cardID) {
+        if (this.gameState == "fakeCards") {
+            this.roundData.playersActed = this.roundData.playersActed + 1;
+            let card = { playerIndex: playerIndex, cardIdentifier: cardID, votes: 0, voterIndexes: [] }
             this.roundData.cardArray.push(card);
 
-            if(this.roundData.playersActed==this.playerCount){
+            if (this.roundData.playersActed == this.playerCount) {
                 //Randomizes so host card isnt displayed first 
-                
-                this.roundData.cardArray= Utility.shuffle(this.roundData.cardArray);
-                this.roundData.playersActed =1;
+
+                this.roundData.cardArray = Utility.shuffle(this.roundData.cardArray);
+                this.roundData.playersActed = 1;
                 this.gameState = "vote";
             }
-           
+
             return true;
         }
 
         return false;
 
     }
-    
+
+    recieveVote(playerIndex, cardIndex) {
+        if (this.gameState == "vote") {
+            this.roundData.playersActed = this.roundData.playersActed + 1;
+
+            this.roundData.cardArray[cardIndex].votes++;
+            this.roundData.cardArray[cardIndex].voterIndexes.push(playerIndex);
+
+            if (this.roundData.playersActed == this.playerCount) {
+
+                this.gameState = "endDisplay";
+            }
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    newRound() {
+        if (this.gameState == "endDisplay") {
+            this.roundCount = this.roundCount + 1;
+            this.dealCards();
+            this.gameState = "mainCard";
+
+            return true;
+        }
+
+        return false;
+    }
+
     //Always restart interval and push method after calling
     dealCards() {
 

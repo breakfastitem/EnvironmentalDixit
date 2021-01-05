@@ -207,6 +207,50 @@ describe("Game", () => {
 
 
         });
+        
+        describe("newRound()",()=>{
+            let game = new Game("AAAA", "jimmy", 45);
+            game.addPlayer("Billy");
+            game.addPlayer("Johnny");
+
+            let settings = { deckID: "DeckIdentifier" };
+            game.startGame(settings);
+
+            game.recieveClue(0,2, "clue");
+            game.recieveFake(1,3);
+            game.recieveFake(2,4);
+
+            game.recieveVote(2,0);
+            game.recieveVote(1,0);
+
+            let isValid;
+
+            it("Changes game state to clue phase, if valid",()=>{
+                game.newRound();
+                let actual = game.gameState;
+                let expected=  "mainCard";  
+                
+                expect(actual).toBe(expected);
+            });
+
+            it("Increments RoundCount",()=>{
+                let actual = game.roundCount;
+                let expected=  1;  
+                
+                expect(actual).toBe(expected);
+            });
+
+            it("Returns False if game is not in endDisplay phase", ()=>{
+                isValid= game.newRound();
+
+                let actual = isValid;
+                let expected= false;  
+                
+                expect(actual).toBe(expected);
+            });
+            
+
+        });
 
     });
     describe("Get Functions", () => {
