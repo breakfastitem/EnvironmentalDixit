@@ -1,5 +1,9 @@
 const Game = require("../util/Game");
 
+describe("Mock test",()=>{
+
+})
+
 describe("Game", () => {
     describe("Constructor", () => {
         it("Constructor creates object.", () => {
@@ -80,7 +84,7 @@ describe("Game", () => {
             });
         });
 
-        describe("recieveClue(cardID,clue)", () => {
+        describe("recieveClue(playerIndex,cardID,clue)", () => {
 
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
@@ -88,12 +92,64 @@ describe("Game", () => {
             game.addPlayer("Andrew");
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
-            
+
+            game.recieveClue(0,2, "clue");
+
             it("Must add clue to round data.", () => {
-                game.recieveClue(2, "clue");
+               
                 let actual = game.roundData.clue;
                 let expected = "clue";
                 expect(actual).toBe(expected);
+            });
+            it("Must change gamestate to fakecards", () => {
+               
+                let expected = "fakeCards";
+                expect(game.gameState).toBe(expected);
+            });
+            it("Must fail if gamestate is not main card",()=>{
+                let actual = game.recieveClue(0,2,"clue");
+                let expected =false;
+
+                expect(actual).toBe(expected);
+            });
+
+        });
+
+        describe("recieveFake(playerIndex,cardID)", ()=>{
+            let game = new Game("AAAA", "jimmy", 45);
+            game.addPlayer("Billy");
+            game.addPlayer("Johnny");
+
+            let settings = { deckID: "DeckIdentifier" };
+            game.startGame(settings);
+
+            game.recieveClue(0,2, "clue");
+
+            it("tracks players acted", ()=>{
+                game.recieveFake(1,3);
+                let actual = game.roundData.playersActed;
+                let expected= 2;
+
+                expect(expected).tobe(actual);
+            });
+            it("tracks Card Data", ()=>{
+                let actual = game.roundData.cardArray[1];
+                let expected =3;
+
+                expect(expected).tobe(actual);
+            });
+            it("if all players acted change game state", ()=>{
+                game.recieveFake(2,4);
+                let actual = game.gameState;
+                let expected= "vote";
+
+                expect(expected).tobe(actual);
+            });
+            it("if Not in fake card phase returns false", ()=>{ 
+                let actual = game.recieveFake(2,4);
+                let expected= false;
+
+                expect(actual).tobe(expected);
             });
 
         });

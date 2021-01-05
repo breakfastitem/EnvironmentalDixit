@@ -27,6 +27,10 @@ class Game {
         this.playerCount = 1;
 
         this.gameState = "join";
+        
+        this.roundData= {};
+        
+        this.roundCount=0;
 
     }
 
@@ -82,6 +86,19 @@ class Game {
         return false;
 
     }
+
+    recieveClue(playerIndex,cardID, clue){
+        if(this.gameState=="mainCard"){
+            this.roundData={playersActed:1,clue: clue,cardArray:[{playerIndex: /*Get from input*/playerIndex,cardIdentifier: cardID, votes: 0,voterIndexes: []}]};
+
+            this.gameState = "fakeCards";
+            return true;
+        }
+
+        return false;
+
+    }
+    
     //Always restart interval and push method after calling
     dealCards() {
 
