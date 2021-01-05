@@ -20,9 +20,9 @@ class Game {
 
         this.gameID = gameID;
 
-        this.player = new Player(playerName, true);
+        let player = new Player(playerName, true);
 
-        this.players = [this.player];
+        this.players = [player];
 
         this.playerCount = 1;
 
@@ -57,7 +57,7 @@ class Game {
         this.settings = settings;
         this.deckID = settings.deckID;
 
-        if (this.playerCount > 3) {
+        if (this.playerCount >= 3) {
 
             let playerOrder = [];
             let cardOrder = [];
@@ -89,9 +89,31 @@ class Game {
 
     recieveClue(playerIndex,cardID, clue){
         if(this.gameState=="mainCard"){
-            this.roundData={playersActed:1,clue: clue,cardArray:[{playerIndex: /*Get from input*/playerIndex,cardIdentifier: cardID, votes: 0,voterIndexes: []}]};
+            this.roundData = {playersActed:1,clue: clue,cardArray:[{playerIndex: playerIndex,cardIdentifier: cardID, votes: 0,voterIndexes: []}]};
 
             this.gameState = "fakeCards";
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    recieveFake(playerIndex,cardID){
+        if(this.gameState =="fakeCards"){
+            this.roundData.playersActed= this.roundData.playersActed+1;
+            let card = {playerIndex: playerIndex,cardIdentifier: cardID, votes: 0,voterIndexes: []}
+            this.roundData.cardArray.push(card);
+
+            if(this.roundData.playersActed==this.playerCount){
+                //Randomizes so host card isnt displayed first 
+                
+                this.roundData.cardArray= Utility.shuffle(this.roundData.cardArray);
+                this.roundData.playersActed =1;
+                this.gameState = "vote";
+            }
+           
             return true;
         }
 

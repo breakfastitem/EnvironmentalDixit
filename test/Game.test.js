@@ -94,7 +94,7 @@ describe("Game", () => {
             game.startGame(settings);
 
             game.recieveClue(0,2, "clue");
-
+           
             it("Must add clue to round data.", () => {
                
                 let actual = game.roundData.clue;
@@ -125,32 +125,86 @@ describe("Game", () => {
 
             game.recieveClue(0,2, "clue");
 
-            it("tracks players acted", ()=>{
-                game.recieveFake(1,3);
-                let actual = game.roundData.playersActed;
-                let expected= 2;
 
-                expect(expected).tobe(actual);
+            game.recieveFake(1,3);
+
+            it("tracks players acted", ()=>{
+              
+                let actual = game.roundData.playersActed;
+                let expected = 2;
+
+                expect(actual).toBe(expected);
             });
+
             it("tracks Card Data", ()=>{
-                let actual = game.roundData.cardArray[1];
+                let actual = game.roundData.cardArray[1].cardIdentifier;
                 let expected =3;
 
-                expect(expected).tobe(actual);
+                expect(actual).toBe(expected);
             });
+            
             it("if all players acted change game state", ()=>{
                 game.recieveFake(2,4);
+
                 let actual = game.gameState;
                 let expected= "vote";
 
-                expect(expected).tobe(actual);
+                expect(actual).toBe(expected);
             });
             it("if Not in fake card phase returns false", ()=>{ 
                 let actual = game.recieveFake(2,4);
                 let expected= false;
 
-                expect(actual).tobe(expected);
+                expect(actual).toBe(expected);
             });
+            it("After phase is over reset playersActed for voting",()=>{
+                let actual = game.roundData.playersActed;
+                let expected= 1;
+                
+                expect(actual).toBe(expected);
+            });
+
+        });
+
+        describe("recieveVote(playerIndex,cardIndex)",()=>{
+            let game = new Game("AAAA", "jimmy", 45);
+            game.addPlayer("Billy");
+            game.addPlayer("Johnny");
+
+            let settings = { deckID: "DeckIdentifier" };
+            game.startGame(settings);
+
+            game.recieveClue(0,2, "clue");
+            game.recieveFake(1,3);
+            game.recieveFake(2,4);
+
+            game.recieveVote(2,0);
+
+            it("tally votes in card object",()=>{
+
+                let actual = game.roundData.cardArray[0].votes;
+                let expected =1;
+
+                expect(actual).toBe(expected);
+
+            });
+            it("when all votes are tallied update gameState to end display",()=>{
+                game.recieveVote(1,0);
+                let actual = game.gameState;
+                let expected ="endDisplay";
+
+                expect(actual).toBe(expected);
+
+            });
+            it("Only tallie when gamestate is vote",()=>{
+                let actual = game.recieveVote(1,0);
+
+                let expected =false;
+
+                expect(actual).toBe(expected);
+
+            });
+
 
         });
 
