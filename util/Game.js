@@ -110,6 +110,7 @@ class Game {
                 //Randomizes so host card isnt displayed first 
 
                 this.roundData.cardArray = Utility.shuffle(this.roundData.cardArray);
+               
                 this.roundData.playersActed = 1;
                 this.gameState = "vote";
             }
@@ -129,6 +130,7 @@ class Game {
             this.roundData.cardArray[cardIndex].voterIndexes.push(playerIndex);
 
             if (this.roundData.playersActed == this.playerCount) {
+                //Update score
 
                 this.gameState = "endDisplay";
             }
@@ -150,6 +152,60 @@ class Game {
         }
 
         return false;
+    }
+    sendData(playerIndex){
+        let data;
+        switch(this.gameState){
+            case "join":
+                data= { gameState: this.gameState, playerCount:this.playerCount, players: []};
+
+                for(let i=0;i<this.playerCount;i++){
+                    data.players.push({name: this.players[i].name, score: this.players[i].score});
+                }
+
+                break;
+            case "mainCard":
+                data = { gameState: this.gameState, playerCount:this.playerCount, players: []};
+                for(let i=0;i<this.playerCount;i++){
+                    data.players.push({name: this.players[i].name, score: this.players[i].score});
+                }
+
+                data.hand= this.players[playerIndex].cards;
+                data.playerOrder= this.playerOrder;
+                break;
+            case "fakeCards":
+                data = { gameState: this.gameState, clue: this.roundData.clue};
+            
+                data.hand = this.players[playerIndex].cards;
+                data.playerOrder= this.playerOrder;
+
+                break;
+            case "vote":
+                data = { gameState: this.gameState};
+
+                let tempArray= this.roundData.cardArray;
+
+                let filtered = tempArray.filter(card=>card.playerIndex != playerIndex);
+                
+                data.roundCards=[];
+
+                for(let i=0; i<filtered.length;i++){
+                    data.roundCards.push(filtered[i].cardIdentifier);
+                }
+
+                break;
+
+            case "endDisplay":
+                data= { gameState: this.gameState,players: []};
+                for(let i=0;i<this.playerCount;i++){
+                    data.players.push({name: this.players[i].name, score: this.players[i].score});
+                }
+                break;
+
+        }
+
+        return data;
+        
     }
 
     //Always restart interval and push method after calling

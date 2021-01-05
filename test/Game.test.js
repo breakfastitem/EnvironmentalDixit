@@ -1,6 +1,6 @@
 const Game = require("../util/Game");
 
-describe("Mock test",()=>{
+describe("Mock test", () => {
 
 })
 
@@ -93,29 +93,29 @@ describe("Game", () => {
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
 
-            game.recieveClue(0,2, "clue");
-           
+            game.recieveClue(0, 2, "clue");
+
             it("Must add clue to round data.", () => {
-               
+
                 let actual = game.roundData.clue;
                 let expected = "clue";
                 expect(actual).toBe(expected);
             });
             it("Must change gamestate to fakecards", () => {
-               
+
                 let expected = "fakeCards";
                 expect(game.gameState).toBe(expected);
             });
-            it("Must fail if gamestate is not main card",()=>{
-                let actual = game.recieveClue(0,2,"clue");
-                let expected =false;
+            it("Must fail if gamestate is not main card", () => {
+                let actual = game.recieveClue(0, 2, "clue");
+                let expected = false;
 
                 expect(actual).toBe(expected);
             });
 
         });
 
-        describe("recieveFake(playerIndex,cardID)", ()=>{
+        describe("recieveFake(playerIndex,cardID)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             game.addPlayer("Johnny");
@@ -123,50 +123,50 @@ describe("Game", () => {
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
 
-            game.recieveClue(0,2, "clue");
+            game.recieveClue(0, 2, "clue");
 
 
-            game.recieveFake(1,3);
+            game.recieveFake(1, 3);
 
-            it("tracks players acted", ()=>{
-              
+            it("tracks players acted", () => {
+
                 let actual = game.roundData.playersActed;
                 let expected = 2;
 
                 expect(actual).toBe(expected);
             });
 
-            it("tracks Card Data", ()=>{
+            it("tracks Card Data", () => {
                 let actual = game.roundData.cardArray[1].cardIdentifier;
-                let expected =3;
+                let expected = 3;
 
                 expect(actual).toBe(expected);
             });
-            
-            it("if all players acted change game state", ()=>{
-                game.recieveFake(2,4);
+
+            it("if all players acted change game state", () => {
+                game.recieveFake(2, 4);
 
                 let actual = game.gameState;
-                let expected= "vote";
+                let expected = "vote";
 
                 expect(actual).toBe(expected);
             });
-            it("if Not in fake card phase returns false", ()=>{ 
-                let actual = game.recieveFake(2,4);
-                let expected= false;
+            it("if Not in fake card phase returns false", () => {
+                let actual = game.recieveFake(2, 4);
+                let expected = false;
 
                 expect(actual).toBe(expected);
             });
-            it("After phase is over reset playersActed for voting",()=>{
+            it("After phase is over reset playersActed for voting", () => {
                 let actual = game.roundData.playersActed;
-                let expected= 1;
-                
+                let expected = 1;
+
                 expect(actual).toBe(expected);
             });
 
         });
 
-        describe("recieveVote(playerIndex,cardIndex)",()=>{
+        describe("recieveVote(playerIndex,cardIndex)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             game.addPlayer("Johnny");
@@ -174,32 +174,50 @@ describe("Game", () => {
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
 
-            game.recieveClue(0,2, "clue");
-            game.recieveFake(1,3);
-            game.recieveFake(2,4);
+            game.recieveClue(game.playerOrder[0],11,"Clue");
+            game.recieveFake(game.playerOrder[1],12);
+            game.recieveFake(game.playerOrder[2],13);
 
-            game.recieveVote(2,0);
+            game.recieveVote(game.playerOrder[1], 0);
 
-            it("tally votes in card object",()=>{
+            it("tally votes in card object", () => {
 
                 let actual = game.roundData.cardArray[0].votes;
-                let expected =1;
+                let expected = 1;
 
                 expect(actual).toBe(expected);
 
             });
-            it("when all votes are tallied update gameState to end display",()=>{
-                game.recieveVote(1,0);
+            it("when all votes are tallied update gameState to end display", () => {
+                game.recieveVote(game.playerOrder[2], 0);
                 let actual = game.gameState;
-                let expected ="endDisplay";
+                let expected = "endDisplay";
 
                 expect(actual).toBe(expected);
 
             });
-            it("Only tallie when gamestate is vote",()=>{
-                let actual = game.recieveVote(1,0);
+            it("properly calculates the score", ()=>{
+                let tempArray = game.roundData.cardArray.filter(card=> card.playerIndex == game.playerOrder[0]);
+                let hostIndex= tempArray[0].playerIndex;
+            
+                let expected;
+                if(hostIndex ==0){
+                    expected=5;
+                }else{
+                    expected=4;
+                }
+                
 
-                let expected =false;
+                let actual= game.players[game.playerOrder[0]-1].score;
+
+                expect(actual).toBe(expected);
+
+            });
+            
+            it("Only tallie when gamestate is vote", () => {
+                let actual = game.recieveVote(1, 0);
+
+                let expected = false;
 
                 expect(actual).toBe(expected);
 
@@ -207,8 +225,8 @@ describe("Game", () => {
 
 
         });
-        
-        describe("newRound()",()=>{
+
+        describe("newRound()", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             game.addPlayer("Johnny");
@@ -216,39 +234,39 @@ describe("Game", () => {
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
 
-            game.recieveClue(0,2, "clue");
-            game.recieveFake(1,3);
-            game.recieveFake(2,4);
+            game.recieveClue(0, 2, "clue");
+            game.recieveFake(1, 3);
+            game.recieveFake(2, 4);
 
-            game.recieveVote(2,0);
-            game.recieveVote(1,0);
+            game.recieveVote(2, 0);
+            game.recieveVote(1, 0);
 
             let isValid;
 
-            it("Changes game state to clue phase, if valid",()=>{
+            it("Changes game state to clue phase, if valid", () => {
                 game.newRound();
                 let actual = game.gameState;
-                let expected=  "mainCard";  
-                
+                let expected = "mainCard";
+
                 expect(actual).toBe(expected);
             });
 
-            it("Increments RoundCount",()=>{
+            it("Increments RoundCount", () => {
                 let actual = game.roundCount;
-                let expected=  1;  
-                
+                let expected = 1;
+
                 expect(actual).toBe(expected);
             });
 
-            it("Returns False if game is not in endDisplay phase", ()=>{
-                isValid= game.newRound();
+            it("Returns False if game is not in endDisplay phase", () => {
+                isValid = game.newRound();
 
                 let actual = isValid;
-                let expected= false;  
-                
+                let expected = false;
+
                 expect(actual).toBe(expected);
             });
-            
+
 
         });
 
@@ -258,25 +276,94 @@ describe("Game", () => {
         describe("Send Data (playerIndex)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
+            let data;
+
             it("In join phase player recieves player count and there own player object. Host Player.", () => {
 
-                let data = game.sendData(0);
+                data = game.sendData(0);
 
-                expect(data).toBe({ gameState: "join", playerCount: 2, players: [{ name: "jimmy", score: 0 }, { name: "Billy", score: 0 }] });
+                expect(data).toStrictEqual({ gameState: "join", playerCount: 2, players: [{ name: "jimmy", score: 0 }, { name: "Billy", score: 0 }] });
             });
-            game.addPlayer("Johnny");
-            game.addPlayer("Andrew");
 
-            let settings = "settings";
-            game.startGame(settings);
 
-            it("In main card phase senddata sends player hand ids.", () => {
+            it("In main card phase senddata sends player there own hand", () => {
+                game.addPlayer("Johnny");
 
-                let data = game.sendData(0);
-                let actual = data.cards != undefined;
-                let expected = true;
+                let settings = "settings";
+                game.startGame(settings);
+                data = game.sendData(0);
+
+                let actual = data.hand;
+                let expected = game.players[0].cards;
 
                 expect(actual).toBe(expected);
+
+            });
+            it("In main card phase senddata sends player there own hand part(2)", () => {
+
+                data = game.sendData(1);
+
+                let actual = data.hand;
+                let expected = game.players[1].cards;
+
+                expect(actual).toBe(expected);
+
+            });
+
+            it("In the fakeCards phase sends clue",()=>{
+                game.recieveClue(game.playerOrder[0],11,"Clue");
+
+                data= game.sendData(0);
+
+                let actual= data.clue;
+                let expected = "Clue";
+
+                expect(actual).toBe(expected);
+                
+            });
+
+            it("In the vote phase the player recieves the cardIds of all other's cards",()=>{
+                game.recieveFake(game.playerOrder[1],12);
+                game.recieveFake(game.playerOrder[2],13);
+
+                data = game.sendData(game.playerOrder[0]);
+
+                let actual = data.roundCards;
+                let testArray = game.roundData.cardArray;
+                
+                let filtered = testArray.filter(card => card.playerIndex != game.playerOrder[0]);
+                
+
+                let expected = [filtered[0].cardIdentifier,filtered[1].cardIdentifier];
+
+                expect(actual).toStrictEqual(expected);
+            });
+
+            it("In the vote phase the player recieves the cardIds of all other's cards part 2",()=>{
+
+                data = game.sendData(game.playerOrder[1]);
+
+                let actual = data.roundCards;
+                let testArray = game.roundData.cardArray;
+                
+                let filtered = testArray.filter(card => card.playerIndex != game.playerOrder[1]);
+                
+
+                let expected = [filtered[0].cardIdentifier,filtered[1].cardIdentifier];
+
+                expect(actual).toStrictEqual(expected);
+            });
+
+            it("In endDisplay Phase player Recieves full round array information and card totals",()=>{
+                game.recieveVote(game.playerOrder[1],1);
+                game.recieveVote(game.playerOrder[2],1);
+
+                data=game.sendData(0);
+
+                let actual=[data.players[0].score,data.players[1].score,data.players[2].score];
+                let expected= [0,4,2];
+
+                expect(actual).toStrictEqual(expected);
 
             });
         });
