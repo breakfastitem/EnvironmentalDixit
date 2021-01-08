@@ -107,12 +107,17 @@ class Game {
             this.roundData.cardArray.push(card);
 
             if (this.roundData.playersActed == this.playerCount) {
+
                 //Randomizes so host card isnt displayed first 
+
+                this.roundData.playersActed = 1;
+                this.gameState = "vote";
 
                 this.roundData.cardArray = Utility.shuffle(this.roundData.cardArray);
                
-                this.roundData.playersActed = 1;
-                this.gameState = "vote";
+                
+
+                
             }
 
             return true;
@@ -131,6 +136,10 @@ class Game {
 
             if (this.roundData.playersActed == this.playerCount) {
                 //Update score
+                
+                
+                this.players = Utility.determineScores(this.players,this.roundData,this.playerOrder[this.roundCount]-1);
+
 
                 this.gameState = "endDisplay";
             }

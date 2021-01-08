@@ -1,9 +1,5 @@
 const Game = require("../util/Game");
 
-describe("Mock test", () => {
-
-})
-
 describe("Game", () => {
     describe("Constructor", () => {
         it("Constructor creates object.", () => {
@@ -174,9 +170,9 @@ describe("Game", () => {
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
 
-            game.recieveClue(game.playerOrder[0],11,"Clue");
-            game.recieveFake(game.playerOrder[1],12);
-            game.recieveFake(game.playerOrder[2],13);
+            game.recieveClue(game.playerOrder[0], 11, "Clue");
+            game.recieveFake(game.playerOrder[1], 12);
+            game.recieveFake(game.playerOrder[2], 13);
 
             game.recieveVote(game.playerOrder[1], 0);
 
@@ -196,24 +192,27 @@ describe("Game", () => {
                 expect(actual).toBe(expected);
 
             });
-            it("properly calculates the score", ()=>{
-                let tempArray = game.roundData.cardArray.filter(card=> card.playerIndex == game.playerOrder[0]);
-                let hostIndex= tempArray[0].playerIndex;
-            
-                let expected;
-                if(hostIndex ==0){
-                    expected=5;
-                }else{
-                    expected=4;
-                }
-                
+            it("properly calculates the score", () => {
+                game.recieveVote(game.playerOrder[2], 1);
+                let tempArray = game.roundData.cardArray.filter(card => card.playerIndex == game.playerOrder[0]);
+                let hostVotes = tempArray[0].votes;
 
-                let actual= game.players[game.playerOrder[0]-1].score;
+
+                let expected;
+                if (hostVotes == 1) {
+                    expected = 3;
+                } else {
+                    expected = 0;
+                }
+
+
+                let actual = game.players[game.playerOrder[0] - 1].score;
+
 
                 expect(actual).toBe(expected);
 
             });
-            
+
             it("Only tallie when gamestate is vote", () => {
                 let actual = game.recieveVote(1, 0);
 
@@ -234,12 +233,12 @@ describe("Game", () => {
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
 
-            game.recieveClue(0, 2, "clue");
-            game.recieveFake(1, 3);
-            game.recieveFake(2, 4);
+            game.recieveClue(game.playerOrder[0], 11, "Clue");
+            game.recieveFake(game.playerOrder[1], 12);
+            game.recieveFake(game.playerOrder[2], 13);
 
-            game.recieveVote(2, 0);
-            game.recieveVote(1, 0);
+            game.recieveVote(game.playerOrder[1], 0);
+            game.recieveVote(game.playerOrder[2], 0);
 
             let isValid;
 
@@ -310,62 +309,74 @@ describe("Game", () => {
 
             });
 
-            it("In the fakeCards phase sends clue",()=>{
-                game.recieveClue(game.playerOrder[0],11,"Clue");
+            it("In the fakeCards phase sends clue", () => {
+                game.recieveClue(game.playerOrder[0], 11, "Clue");
 
-                data= game.sendData(0);
+                data = game.sendData(0);
 
-                let actual= data.clue;
+                let actual = data.clue;
                 let expected = "Clue";
 
                 expect(actual).toBe(expected);
-                
+
             });
 
-            it("In the vote phase the player recieves the cardIds of all other's cards",()=>{
-                game.recieveFake(game.playerOrder[1],12);
-                game.recieveFake(game.playerOrder[2],13);
+            it("In the vote phase the player recieves the cardIds of all other's cards", () => {
+                game.recieveFake(game.playerOrder[1], 12);
+                game.recieveFake(game.playerOrder[2], 13);
 
                 data = game.sendData(game.playerOrder[0]);
 
                 let actual = data.roundCards;
                 let testArray = game.roundData.cardArray;
-                
-                let filtered = testArray.filter(card => card.playerIndex != game.playerOrder[0]);
-                
 
-                let expected = [filtered[0].cardIdentifier,filtered[1].cardIdentifier];
+                let filtered = testArray.filter(card => card.playerIndex != game.playerOrder[0]);
+
+
+                let expected = [filtered[0].cardIdentifier, filtered[1].cardIdentifier];
 
                 expect(actual).toStrictEqual(expected);
             });
 
-            it("In the vote phase the player recieves the cardIds of all other's cards part 2",()=>{
+            it("In the vote phase the player recieves the cardIds of all other's cards part 2", () => {
 
                 data = game.sendData(game.playerOrder[1]);
 
                 let actual = data.roundCards;
                 let testArray = game.roundData.cardArray;
-                
+
                 let filtered = testArray.filter(card => card.playerIndex != game.playerOrder[1]);
-                
 
-                let expected = [filtered[0].cardIdentifier,filtered[1].cardIdentifier];
+
+                let expected = [filtered[0].cardIdentifier, filtered[1].cardIdentifier];
 
                 expect(actual).toStrictEqual(expected);
             });
 
-            it("In endDisplay Phase player Recieves full round array information and card totals",()=>{
-                game.recieveVote(game.playerOrder[1],1);
-                game.recieveVote(game.playerOrder[2],1);
+            it("In endDisplay If both players vote for teller or against tellerthe score is resolved", () => {
+                let expected;
 
-                data=game.sendData(0);
+                if (game.roundData.cardArray[0].playerIndex == game.playerOrder[0]) {
+                    expected = [2, 2, 2];
+                    expected[game.playerOrder[0]-1]=0;
+                } else{
+                    expected=[2,2,2];
+                    expected[game.playerOrder[0]-1]=0;
+                    expected[game.roundData.cardArray[0].playerIndex-1]=4;
+                }
 
-                let actual=[data.players[0].score,data.players[1].score,data.players[2].score];
-                let expected= [0,4,2];
+                game.recieveVote(game.playerOrder[1], 0);
+                game.recieveVote(game.playerOrder[2], 0);
+
+                data = game.sendData(0);
+
+                let actual = [data.players[0].score, data.players[1].score, data.players[2].score];
+
 
                 expect(actual).toStrictEqual(expected);
 
             });
+
         });
 
 
