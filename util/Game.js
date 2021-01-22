@@ -32,6 +32,8 @@ class Game {
 
         this.roundCount = 0;
 
+        this.turnOrder=[];
+
     }
 
 
@@ -59,13 +61,12 @@ class Game {
 
         if (this.playerCount >= 3) {
 
-            let playerOrder = [];
             let cardOrder = [];
 
             for (let i = 1; i <= this.playerCount; i++) {
-                playerOrder.push(i);
+                this.turnOrder.push(i);
             }
-            playerOrder = Utility.shuffle(playerOrder);
+            this.turnOrder = Utility.shuffle(this.turnOrder);
 
 
 
@@ -74,7 +75,7 @@ class Game {
             }
             cardOrder = Utility.shuffle(cardOrder);
 
-            this.playerOrder = playerOrder;
+        
             this.cardOrder = cardOrder;
             this.gameState = "mainCard";
 
@@ -114,9 +115,6 @@ class Game {
                 this.gameState = "vote";
 
                 this.roundData.cardArray = Utility.shuffle(this.roundData.cardArray);
-               
-                
-
                 
             }
 
@@ -129,16 +127,23 @@ class Game {
 
     recieveVote(playerIndex, cardIndex) {
         if (this.gameState == "vote") {
+            let tempArray= this.roundData.cardArray;
+
+            //Parses index response to account for the user submiting the missing card
+            let filtered = tempArray.filter(card=>card.playerIndex != playerIndex);
+            let unfilteredCardIndex= this.roundData.cardArray.findIndex(card => card.cardIdentifier == filtered[cardIndex].cardIdentifier);
+
+
             this.roundData.playersActed = this.roundData.playersActed + 1;
 
-            this.roundData.cardArray[cardIndex].votes++;
-            this.roundData.cardArray[cardIndex].voterIndexes.push(playerIndex);
+            this.roundData.cardArray[unfilteredCardIndex].votes++;
+            this.roundData.cardArray[unfilteredCardIndex].voterIndexes.push(playerIndex);
 
             if (this.roundData.playersActed == this.playerCount) {
                 //Update score
                 
                 
-                this.players = Utility.determineScores(this.players,this.roundData,this.playerOrder[this.roundCount]-1);
+                this.players = Utility.determineScores(this.players,this.roundData,this.turnOrder[this.roundCount]-1);
 
 
                 this.gameState = "endDisplay";
@@ -166,7 +171,7 @@ class Game {
         let data;
         switch(this.gameState){
             case "join":
-                data= { gameState: this.gameState, playerCount:this.playerCount, players: []};
+                data= { gameID:this.gameID,gameState: this.gameState, playerCount:this.playerCount, players: []};
 
                 for(let i=0;i<this.playerCount;i++){
                     data.players.push({name: this.players[i].name, score: this.players[i].score});
@@ -174,23 +179,23 @@ class Game {
 
                 break;
             case "mainCard":
-                data = { gameState: this.gameState, playerCount:this.playerCount, players: []};
+                data = { gameState: this.gameState, playerCount:this.playerCount, players: [], roundCount: this.roundCount};
                 for(let i=0;i<this.playerCount;i++){
                     data.players.push({name: this.players[i].name, score: this.players[i].score});
                 }
 
                 data.hand= this.players[playerIndex].cards;
-                data.playerOrder= this.playerOrder;
+                data.turnOrder= this.turnOrder;
                 break;
             case "fakeCards":
                 data = { gameState: this.gameState, clue: this.roundData.clue};
             
                 data.hand = this.players[playerIndex].cards;
-                data.playerOrder= this.playerOrder;
+                data.turnOrder= this.turnOrder;
 
                 break;
             case "vote":
-                data = { gameState: this.gameState};
+                data = { gameState: this.gameState, turnOrder: this.turnOrder,roundCount: this.roundCount};
 
                 let tempArray= this.roundData.cardArray;
 
@@ -205,7 +210,7 @@ class Game {
                 break;
 
             case "endDisplay":
-                data= { gameState: this.gameState,players: []};
+                data= { gameState: this.gameState,players: [], roundData: this.roundData, roundCount: this.roundCount};
                 for(let i=0;i<this.playerCount;i++){
                     data.players.push({name: this.players[i].name, score: this.players[i].score});
                 }

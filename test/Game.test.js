@@ -170,11 +170,11 @@ describe("Game", () => {
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
 
-            game.recieveClue(game.playerOrder[0]-1, 11, "Clue");
-            game.recieveFake(game.playerOrder[1]-1, 12);
-            game.recieveFake(game.playerOrder[2]-1, 13);
+            game.recieveClue(game.turnOrder[0]-1, 11, "Clue");
+            game.recieveFake(game.turnOrder[1]-1, 12);
+            game.recieveFake(game.turnOrder[2]-1, 13);
 
-            game.recieveVote(game.playerOrder[1]-1, 0);
+            game.recieveVote(game.turnOrder[1]-1, 0);
 
             it("tally votes in card object", () => {
 
@@ -185,7 +185,7 @@ describe("Game", () => {
 
             });
             it("when all votes are tallied update gameState to end display", () => {
-                game.recieveVote(game.playerOrder[2]-1, 0);
+                game.recieveVote(game.turnOrder[2]-1, 0);
                 let actual = game.gameState;
                 let expected = "endDisplay";
 
@@ -193,8 +193,8 @@ describe("Game", () => {
 
             });
             it("properly calculates the score", () => {
-                game.recieveVote(game.playerOrder[2]-1, 1);
-                let tempArray = game.roundData.cardArray.filter(card => card.playerIndex == game.playerOrder[0]-1);
+                game.recieveVote(game.turnOrder[2]-1, 1);
+                let tempArray = game.roundData.cardArray.filter(card => card.playerIndex == game.turnOrder[0]-1);
                 let hostVotes = tempArray[0].votes;
 
 
@@ -206,7 +206,7 @@ describe("Game", () => {
                 }
 
 
-                let actual = game.players[game.playerOrder[0] - 1].score;
+                let actual = game.players[game.turnOrder[0] - 1].score;
 
 
                 expect(actual).toBe(expected);
@@ -233,12 +233,12 @@ describe("Game", () => {
             let settings = { deckID: "DeckIdentifier" };
             game.startGame(settings);
 
-            game.recieveClue(game.playerOrder[0]-1, 11, "Clue");
-            game.recieveFake(game.playerOrder[1]-1, 12);
-            game.recieveFake(game.playerOrder[2]-1, 13);
+            game.recieveClue(game.turnOrder[0]-1, 11, "Clue");
+            game.recieveFake(game.turnOrder[1]-1, 12);
+            game.recieveFake(game.turnOrder[2]-1, 13);
 
-            game.recieveVote(game.playerOrder[1]-1, 0);
-            game.recieveVote(game.playerOrder[2]-1, 0);
+            game.recieveVote(game.turnOrder[1]-1, 0);
+            game.recieveVote(game.turnOrder[2]-1, 0);
 
             let isValid;
 
@@ -281,7 +281,9 @@ describe("Game", () => {
 
                 data = game.sendData(0);
 
-                expect(data).toStrictEqual({ gameState: "join", playerCount: 2, players: [{ name: "jimmy", score: 0 }, { name: "Billy", score: 0 }] });
+                console.log(data);
+
+                expect(data).toStrictEqual({gameID:"AAAA", gameState: "join", playerCount: 2, players: [{ name: "jimmy", score: 0 }, { name: "Billy", score: 0 }] });
             });
 
 
@@ -310,7 +312,7 @@ describe("Game", () => {
             });
 
             it("In the fakeCards phase sends clue", () => {
-                game.recieveClue(game.playerOrder[0]-1, 11, "Clue");
+                game.recieveClue(game.turnOrder[0]-1, 11, "Clue");
 
                 data = game.sendData(0);
 
@@ -322,15 +324,15 @@ describe("Game", () => {
             });
 
             it("In the vote phase the player recieves the cardIds of all other's cards", () => {
-                game.recieveFake(game.playerOrder[1]-1, 12);
-                game.recieveFake(game.playerOrder[2]-1, 13);
+                game.recieveFake(game.turnOrder[1]-1, 12);
+                game.recieveFake(game.turnOrder[2]-1, 13);
 
-                data = game.sendData(game.playerOrder[0]-1);
+                data = game.sendData(game.turnOrder[0]-1);
 
                 let actual = data.roundCards;
                 let testArray = game.roundData.cardArray;
 
-                let filtered = testArray.filter(card => card.playerIndex != game.playerOrder[0]-1);
+                let filtered = testArray.filter(card => card.playerIndex != game.turnOrder[0]-1);
 
 
                 let expected = [filtered[0].cardIdentifier, filtered[1].cardIdentifier];
@@ -340,12 +342,12 @@ describe("Game", () => {
 
             it("In the vote phase the player recieves the cardIds of all other's cards part 2", () => {
 
-                data = game.sendData(game.playerOrder[1]-1);
+                data = game.sendData(game.turnOrder[1]-1);
 
                 let actual = data.roundCards;
                 let testArray = game.roundData.cardArray;
 
-                let filtered = testArray.filter(card => card.playerIndex != game.playerOrder[1]-1);
+                let filtered = testArray.filter(card => card.playerIndex != game.turnOrder[1]-1);
 
 
                 let expected = [filtered[0].cardIdentifier, filtered[1].cardIdentifier];
@@ -356,17 +358,17 @@ describe("Game", () => {
             it("In endDisplay If both players vote for teller or against tellerthe score is resolved", () => {
                 let expected;
 
-                if (game.roundData.cardArray[0].playerIndex == game.playerOrder[0]-1) {
+                if (game.roundData.cardArray[0].playerIndex == game.turnOrder[0]-1) {
                     expected = [2, 2, 2];
-                    expected[game.playerOrder[0]-1]=0;
+                    expected[game.turnOrder[0]-1]=0;
                 } else{
                     expected=[2,2,2];
-                    expected[game.playerOrder[0]-1]=0;
+                    expected[game.turnOrder[0]-1]=0;
                     expected[game.roundData.cardArray[0].playerIndex]=4;
                 }
 
-                game.recieveVote(game.playerOrder[1]-1, 0);
-                game.recieveVote(game.playerOrder[2]-1, 0);
+                game.recieveVote(game.turnOrder[1]-1, 0);
+                game.recieveVote(game.turnOrder[2]-1, 0);
 
                 data = game.sendData(0);
 
