@@ -80,6 +80,17 @@ let handNum;
 /**
 * Static Functions
 */
+function updateGameObjectFromResponse(serverResponse){
+   let keys = Object.keys(serverResponse);
+              
+   for(let i=0; i<keys.length;i++){
+      GameObject[keys[i]]=serverResponse[keys[i]];
+   }
+
+}
+
+
+
 function updatePlayerScores(playerCount, playerObjects) {
    const scoreBar = $("#scoreBar");
    scoreBar.empty();
@@ -113,9 +124,9 @@ function displayCards() {
    const hand = $("#hand");
    hand.empty();
 
-   for (let i = 0; i < GameObject.players[playerIndex].handCount; i++) {
+   for (let i = 0; i < GameObject.hand.length; i++) {
 
-      let imgIdentifier = GameObject.players[playerIndex].cards[i];
+      let imgIdentifier = GameObject.hand[i];
       let card = $(imagesHtml[imgIdentifier]);
 
       card.attr("class", "playerCard");
@@ -129,15 +140,18 @@ function initializeUpdateInterval() {
 
       $.ajax({
          method: "get",
-         url: `/game/pull/${gameID}`
+         url: `/game/pull/${gameID}/${playerIndex}`
 
       }).then(function (response) {
-
+        
+         //TODO:: Varable indicating change
          if (GameObject != response) {
-            GameObject = response;
+            updateGameObjectFromResponse(response);      
 
             switch (GameObject.gameState) {
                case "join":
+                  //Add Response data to game object
+                  gameID= GameObject.gameID;
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   break;
 
@@ -160,6 +174,7 @@ function initializeUpdateInterval() {
 
                   break;
                case "fakeCards":
+               
                   //Everyone but dealer has this display
                   if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
                      //Display board info
@@ -167,11 +182,11 @@ function initializeUpdateInterval() {
                      board.empty();
 
                      let display = $(`<p>Pick an image that matches the clue.</p>
-                    <h2>${GameObject.roundData.clue}</h2>
+                    <h2>${GameObject.clue}</h2>
                     <button id="submit-fake">Submit</button>
                      `);
 
-                     cardIdentifier = GameObject.players[playerIndex].cards[0];
+                     cardIdentifier = GameObject.hand[0];
                      let card = $(imagesHtml[cardIdentifier]);
 
                      card.attr("class", "playerCard");
@@ -191,13 +206,13 @@ function initializeUpdateInterval() {
                      board.empty();
 
                      let display = $(`<p>Vote for the image you most think represents the clue.</p>
-                    <h2>${GameObject.roundData.clue}</h2>
+                    <h2>${GameObject.clue}</h2>
                     <button id="submit-vote">Submit</button>
                      `);
                      board.append(display);
                      //TODO:: Make cards that are displayed random
-                     for (let i = 0; i < GameObject.roundData.cardArray.length; i++) {
-                        let card = $(imagesHtml[GameObject.roundData.cardArray[i].cardIdentifier]);
+                     for (let i = 0; i < GameObject.roundCards.length; i++) {
+                        let card = $(imagesHtml[GameObject.roundCards[i]]);
                         card.attr("class", "voteCard");
                         card.attr("id", `vote-${i}`);
 
@@ -207,12 +222,12 @@ function initializeUpdateInterval() {
 
                      board.append("<hr>");
 
-                     let card = $(imagesHtml[GameObject.roundData.cardArray[0].cardIdentifier]);
+                     let card = $(imagesHtml[GameObject.roundCards[0]]);
 
                      card.attr("class", "playerCard");
                      card.attr("id", `selected-card`);
 
-                     cardIndex = 0;
+                     voteCardIndex = 0;
 
                      board.append(card);
 
@@ -227,8 +242,8 @@ function initializeUpdateInterval() {
                      board.append(display);
 
                      //TODO:: Make cards that are displayed randomLY
-                     for (let i = 0; i < GameObject.roundData.cardArray.length; i++) {
-                        let card = $(imagesHtml[GameObject.roundData.cardArray[i].cardIdentifier]);
+                     for (let i = 0; i < GameObject.roundCards.length; i++) {
+                        let card = $(imagesHtml[GameObject.roundCards[i]]);
                         card.attr("class", "playerCard");
                         card.attr("id", `vote-${i}`);
 
@@ -257,7 +272,7 @@ function initializeUpdateInterval() {
 
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   //if host
-                  if (GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+                  if (playerIndex ==0) {
                      let button = $(`<button id="new-Round">next round</button>`);
                      board.append(button);
                   }
@@ -314,7 +329,7 @@ function startNewRound(dealerIndex) {
       </form>`);
 
       //Auto Displays first card in selcted area.
-      cardIdentifier = GameObject.players[playerIndex].cards[0];
+      cardIdentifier = GameObject.hand[0];
       let card = $(imagesHtml[cardIdentifier]);
 
       card.attr("class", "voteCard");
@@ -351,9 +366,9 @@ function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
    if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
       //if random var will from different variable
-      cardIndex = cardRoundIndex;
+      voteCardIndex = cardRoundIndex;
 
-      let voteCardIdentifier = GameObject.roundData.cardArray[cardRoundIndex].cardIdentifier;
+      let voteCardIdentifier = GameObject.roundCards[cardRoundIndex];
 
       $("img").remove("#selected-card");
 
@@ -396,11 +411,12 @@ $("#board").on("click", function (event) {
             }).then(function () {
                $.ajax({
                   method: "get",
-                  url: `/game/pull/${gameID}`
+                  url: `/game/pull/${gameID}/25`
 
                }).then(function (response) {
                   if (response) {
-                     GameObject = response;
+                     updateGameObjectFromResponse(response);      
+
                      playerIndex = GameObject.playerCount - 1;
 
                      updatePlayerScores(GameObject.playerCount, GameObject.players);
@@ -433,12 +449,13 @@ $("#board").on("click", function (event) {
          }).then(function () {
             $.ajax({
                method: "get",
-               url: `/game/pull/new`
+               url: `/game/pull/new/25`
 
             }).then(function (response) {
       
                playerIndex = 0;
-               GameObject = response;
+               
+               updateGameObjectFromResponse(response);    
 
                //Get gameId from server
                gameID=GameObject.gameID;
@@ -461,40 +478,22 @@ $("#board").on("click", function (event) {
 
          updatePlayerScores(GameObject.playerCount, GameObject.players);
 
-         //Initialize game TODO:: MAke sure game object is updated
-         let playerOrder = [];
-
-         for (let i = 1; i <= GameObject.playerCount; i++) {
-            playerOrder.push(i);
-         }
-         playerOrder.shuffle();
-
-
-
-         for (let i = 0; i < GameObject.cardCount; i++) {
-            cardOrder.push(i);
-         }
-         cardOrder.shuffle();
-
-         //Deal Cards
-         clearInterval(interval);
-         dealCards();
-
          $.ajax({
             method: "put",
             url: "/game/start",
-            data: { gameId: gameID, players: GameObject.players, playerOrder: playerOrder, cardOrder: cardOrder }
+            data: { gameId: gameID}
          }).then(function () {
 
             $.ajax({
                method: "get",
-               url: `/game/pull/${gameID}`
+               url: `/game/pull/${gameID}/${playerIndex}`
 
             }).then(function (response) {
-               //starts the first round
-               GameObject = response;
+           
+               updateGameObjectFromResponse(response);      
 
                startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+               
                //Start the update interval that was paused to deal cards
                initializeUpdateInterval();
             });
@@ -508,11 +507,8 @@ $("#board").on("click", function (event) {
          clearInterval(interval);
          const clue = $("#clue-input").val().trim();
 
-         console.log("clue: " + clue);
-
          const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardIdentifier, votes: 0, voterIndexes: [] }] };
 
-         console.log("roundData: " + roundData);
 
 
          $.ajax({
@@ -522,10 +518,10 @@ $("#board").on("click", function (event) {
          }).then(function () {
             $.ajax({
                method: "get",
-               url: `/game/pull/${gameID}`
+               url: `/game/pull/${gameID}/${playerIndex}`
 
             }).then(function (response) {
-               GameObject = response;
+               updateGameObjectFromResponse(response);      
 
                //update hand with removed card
                $("img").remove(`#img-${handNum}`);
@@ -557,14 +553,15 @@ $("#board").on("click", function (event) {
 
             $.ajax({
                method: "get",
-               url: `/game/pull/${gameID}`
+               url: `/game/pull/${gameID}/${playerIndex}`
 
             }).then(function (response) {
 
                //To prevent selected cards appending
                fakeCardSubmited = true;
 
-               GameObject = response;
+               updateGameObjectFromResponse(response);      
+
 
                //update hand with removed card
                $("img").remove(`#img-${handNum}`);
@@ -589,18 +586,19 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/vote",
-            data: { gameId: gameID, cardIndex: cardIndex, playerIndex: playerIndex }
+            data: { gameId: gameID, cardIndex:voteCardIndex, playerIndex: playerIndex }
          }).then(function () {
 
             $.ajax({
                method: "get",
-               url: `/game/pull/${gameID}`
+               url: `/game/pull/${gameID}/${playerIndex}`
 
             }).then(function (response) {
                //To prevent selected cards appending
                fakeCardSubmited = true;
 
-               GameObject = response;
+               updateGameObjectFromResponse(response);      
+
 
                //Update story teller display
                let board = $("#board");
@@ -620,11 +618,7 @@ $("#board").on("click", function (event) {
       case "new-Round":
          clearInterval(interval);
 
-
-
          dealCards();
-
-
 
          boardInstantiated = 0;
          fakeCardSubmited = false;
@@ -636,11 +630,11 @@ $("#board").on("click", function (event) {
          }).then(function () {
             $.ajax({
                method: "get",
-               url: `/game/pull/${gameID}`
+               url: `/game/pull/${gameID}/${playerIndex}`
 
             }).then(function (response) {
 
-               GameObject = response;
+               updateGameObjectFromResponse(response);      
 
                displayCards();
 
@@ -684,7 +678,7 @@ $("#hand").on("click", (event) => {
       if (type == "img") {
          $("img").remove("#selected-card");
 
-         cardIdentifier = GameObject.players[playerIndex].cards[handNum];
+         cardIdentifier = GameObject.hand[handNum];
          let card = $(imagesHtml[cardIdentifier]);
 
          card.attr("class", "playerCard");
