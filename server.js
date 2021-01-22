@@ -88,7 +88,7 @@ app.post("/game/new", (req, res) => {
 
     _gameID = Utility.generateID(ids);
 
-    let game = new GameObject(_gameID, req.body.playerName, 45);
+    let game = new GameObject(_gameID, req.body.playerName, 27);
     games.push(game);
 
     console.log(_gameID);
