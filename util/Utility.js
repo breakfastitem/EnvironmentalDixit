@@ -52,6 +52,29 @@ function determineScores(players, roundData, tellerIndex) {
     }
     return players;
 };
+//Generates a unique string of four capital letters
+function generateID(ids) {
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+    let id = "";
+    let validId = false;
+
+    while (!validId) {
+        while (id.length < 4) {
+            let index = Math.floor(Math.random() * alphabet.length);
+
+            id += alphabet[index];
+
+        }
+        validId = ids.indexOf(id) == -1;
+    }
+
+    //TODO::// Check and add to a id list so there are no double ids
+    ids.push(id);
+
+    return id;
+
+}
 
 
-module.exports = { shuffle, determineScores };
+module.exports = { shuffle, determineScores,generateID };

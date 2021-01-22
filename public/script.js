@@ -89,8 +89,6 @@ function updateGameObjectFromResponse(serverResponse){
 
 }
 
-
-
 function updatePlayerScores(playerCount, playerObjects) {
    const scoreBar = $("#scoreBar");
    scoreBar.empty();
@@ -106,18 +104,6 @@ function updatePlayerScores(playerCount, playerObjects) {
 
    }
 
-}
-
-Array.prototype.shuffle = function () {
-   var i = this.length, j, temp;
-   if (i == 0) return this;
-   while (--i) {
-      j = Math.floor(Math.random() * (i + 1));
-      temp = this[i];
-      this[i] = this[j];
-      this[j] = temp;
-   }
-   return this;
 }
 
 function displayCards() {
@@ -346,22 +332,6 @@ function startNewRound(dealerIndex) {
 
 }
 
-//Always restart interval and push method after calling
-function dealCards() {
-
-   //for each player
-   for (let i = 0; i < GameObject.playerCount; i++) {
-      //Give the player 6 cards
-      while (GameObject.players[i].handCount < 6) {
-
-         let tempNum = cardOrder.pop();
-
-         GameObject.players[i].cards.push(tempNum);
-         GameObject.players[i].handCount++;
-      }
-   }
-
-};
 function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
    if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
@@ -617,8 +587,6 @@ $("#board").on("click", function (event) {
          break;
       case "new-Round":
          clearInterval(interval);
-
-         dealCards();
 
          boardInstantiated = 0;
          fakeCardSubmited = false;
