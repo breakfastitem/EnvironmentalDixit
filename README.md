@@ -20,6 +20,8 @@ Download the respository. In directory run npm install.
 ## Usage
 After installation run node server.js or npm run start. Then navigate to the port the server is looking at. The first player that connects creates the lobby, which generates a roomcode. All subsequent players connect to the room code. 
 
+Deployed to https://peaceful-dusk-06372.herokuapp.com/ for test usage.
+
 ## Testing
 
 run the test script in the json package. npm run test.
