@@ -158,6 +158,7 @@ class Game {
 
     newRound() {
         if (this.gameState == "endDisplay") {
+            this.removeUsedCardsFromHand();
             this.roundCount = this.roundCount + 1;
             this.dealCards();
             this.gameState = "mainCard";
@@ -219,6 +220,21 @@ class Game {
         }
 
         return data;
+        
+    }
+
+    removeUsedCardsFromHand(){
+        //for each player remove selected card from hand
+        this.roundData.cardArray.forEach((card)=>{
+            this.players[card.playerIndex].cards = this.players[card.playerIndex].cards.filter(id => id!=card.cardIdentifier);
+            
+            if( this.players[card.playerIndex].cards==6){
+                console.error("Used Card Not removed properly. "+this.players[card.playerIndex].cards+" "+card.cardIdentifier );
+            }else{
+                this.players[card.playerIndex].handCount= this.players[card.playerIndex].handCount-1;
+            }
+           
+        });
         
     }
 
