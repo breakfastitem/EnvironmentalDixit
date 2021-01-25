@@ -108,10 +108,13 @@ function initializeUpdateInterval() {
 
       $.ajax({
          method: "get",
-         url: `/game/pull/${gameID}/${playerIndex}`
+         url: `/game/pull/${gameID}/${playerIndex}`,
+         error: ()=>{
+            location.reload();
+         }
 
       }).then(function (response) {
-        
+
          //TODO:: Varable indicating change
          if (GameObject != response) {
             updateGameObjectFromResponse(response);      

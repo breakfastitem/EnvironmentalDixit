@@ -72,12 +72,15 @@ app.get("/game/pull/:gameid/:playerIndex", (req, res) => {
 
     let tempArray = games.filter(game => game.gameID == gameId);
 
+    if(tempArray.length==0){
+        res.sendStatus(400,"Game"+gameId+" Not Found");
+    }else{
+        let game = tempArray[0];
 
-    let game = tempArray[0];
-
-    let data = game.sendData(req.params.playerIndex);
-
-    res.send(data);
+        let data = game.sendData(req.params.playerIndex);
+    
+        res.send(data);
+    }   
 
 });
 
