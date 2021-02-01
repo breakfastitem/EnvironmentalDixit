@@ -63,6 +63,7 @@ hr {
 
 #lightBox {
     position: absolute;
+    padding: 10px;
     top: 5px;
     height: 1700px;
     width: 100%;
@@ -70,7 +71,7 @@ hr {
 }
 
 #img-viewer img {
-    margin-left: 70px;
+    margin-left: 20px;
     height: 1600px;
-    width: 960px;
+    width: 95%;
 }
