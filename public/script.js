@@ -62,11 +62,19 @@ let handNum;
 /**
 * Static Functions
 */
-function updateGameObjectFromResponse(serverResponse){
+function displayImageInViewer(cardId) {
+
+   $("#img-viewer").empty();
+   let card = $(imagesHtml[cardId]);
+   $("#img-viewer").append(card);
+
+}
+
+function updateGameObjectFromResponse(serverResponse) {
    let keys = Object.keys(serverResponse);
-              
-   for(let i=0; i<keys.length;i++){
-      GameObject[keys[i]]=serverResponse[keys[i]];
+
+   for (let i = 0; i < keys.length; i++) {
+      GameObject[keys[i]] = serverResponse[keys[i]];
    }
 
 }
@@ -97,7 +105,7 @@ function displayCards() {
       let imgIdentifier = GameObject.hand[i];
       let card = $(imagesHtml[imgIdentifier]);
 
-      card.attr("class", "playerCard");
+      card.attr("class", "player-card");
       card.attr("id", `img-${i}`);
       hand.append(card);
    }
@@ -109,7 +117,7 @@ function initializeUpdateInterval() {
       $.ajax({
          method: "get",
          url: `/game/pull/${gameID}/${playerIndex}`,
-         error: ()=>{
+         error: () => {
             location.reload();
          }
 
@@ -117,12 +125,12 @@ function initializeUpdateInterval() {
 
          //TODO:: Varable indicating change
          if (GameObject != response) {
-            updateGameObjectFromResponse(response);      
+            updateGameObjectFromResponse(response);
 
             switch (GameObject.gameState) {
                case "join":
                   //Add Response data to game object
-                  gameID= GameObject.gameID;
+                  gameID = GameObject.gameID;
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   break;
 
@@ -145,7 +153,7 @@ function initializeUpdateInterval() {
 
                   break;
                case "fakeCards":
-               
+
                   //Everyone but dealer has this display
                   if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
                      //Display board info
@@ -160,7 +168,7 @@ function initializeUpdateInterval() {
                      cardIdentifier = GameObject.hand[0];
                      let card = $(imagesHtml[cardIdentifier]);
 
-                     card.attr("class", "playerCard");
+                     card.attr("class", "player-card");
                      card.attr("id", `selected-card`);
 
                      board.append(display);
@@ -195,7 +203,7 @@ function initializeUpdateInterval() {
 
                      let card = $(imagesHtml[GameObject.roundCards[0]]);
 
-                     card.attr("class", "playerCard");
+                     card.attr("class", "player-card");
                      card.attr("id", `selected-card`);
 
                      voteCardIndex = 0;
@@ -215,7 +223,7 @@ function initializeUpdateInterval() {
                      //TODO:: Make cards that are displayed randomLY
                      for (let i = 0; i < GameObject.roundCards.length; i++) {
                         let card = $(imagesHtml[GameObject.roundCards[i]]);
-                        card.attr("class", "playerCard");
+                        card.attr("class", "player-card");
                         card.attr("id", `vote-${i}`);
 
                         board.append(card);
@@ -243,7 +251,7 @@ function initializeUpdateInterval() {
 
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   //if host
-                  if (playerIndex ==0) {
+                  if (playerIndex == 0) {
                      let button = $(`<button id="new-Round">next round</button>`);
                      board.append(button);
                   }
@@ -291,6 +299,8 @@ function startNewRound(dealerIndex) {
    const board = $("#board");
 
    let display;
+   cardIdentifier = GameObject.hand[0];
+   displayImageInViewer(cardIdentifier);
 
    if (dealerIndex - 1 == playerIndex) {
       display = $(`<p>Choose an image, and write a clue related to said image.</p>
@@ -300,7 +310,6 @@ function startNewRound(dealerIndex) {
       </form>`);
 
       //Auto Displays first card in selcted area.
-      cardIdentifier = GameObject.hand[0];
       let card = $(imagesHtml[cardIdentifier]);
 
       card.attr("class", "voteCard");
@@ -329,7 +338,7 @@ function displayVoteSelection(cardRoundIndex) {
 
       let card = $(imagesHtml[voteCardIdentifier]);
 
-      card.attr("class", "playerCard");
+      card.attr("class", "player-card");
       card.attr("id", `selected-card`);
 
       $("#board").append(card);
@@ -370,7 +379,7 @@ $("#board").on("click", function (event) {
 
                }).then(function (response) {
                   if (response) {
-                     updateGameObjectFromResponse(response);      
+                     updateGameObjectFromResponse(response);
 
                      playerIndex = GameObject.playerCount - 1;
 
@@ -407,13 +416,13 @@ $("#board").on("click", function (event) {
                url: `/game/pull/new/25`
 
             }).then(function (response) {
-      
+
                playerIndex = 0;
-               
-               updateGameObjectFromResponse(response);    
+
+               updateGameObjectFromResponse(response);
 
                //Get gameId from server
-               gameID=GameObject.gameID;
+               gameID = GameObject.gameID;
 
                //Update code display
                $("#code").text(gameID);
@@ -436,7 +445,7 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/start",
-            data: { gameId: gameID}
+            data: { gameId: gameID }
          }).then(function () {
 
             $.ajax({
@@ -444,11 +453,11 @@ $("#board").on("click", function (event) {
                url: `/game/pull/${gameID}/${playerIndex}`
 
             }).then(function (response) {
-           
-               updateGameObjectFromResponse(response);      
+
+               updateGameObjectFromResponse(response);
 
                startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-               
+
                //Start the update interval that was paused to deal cards
                initializeUpdateInterval();
             });
@@ -476,7 +485,7 @@ $("#board").on("click", function (event) {
                url: `/game/pull/${gameID}/${playerIndex}`
 
             }).then(function (response) {
-               updateGameObjectFromResponse(response);      
+               updateGameObjectFromResponse(response);
 
                //update hand with removed card
                $("img").remove(`#img-${handNum}`);
@@ -515,7 +524,7 @@ $("#board").on("click", function (event) {
                //To prevent selected cards appending
                fakeCardSubmited = true;
 
-               updateGameObjectFromResponse(response);      
+               updateGameObjectFromResponse(response);
 
 
                //update hand with removed card
@@ -541,7 +550,7 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/vote",
-            data: { gameId: gameID, cardIndex:voteCardIndex, playerIndex: playerIndex }
+            data: { gameId: gameID, cardIndex: voteCardIndex, playerIndex: playerIndex }
          }).then(function () {
 
             $.ajax({
@@ -552,7 +561,7 @@ $("#board").on("click", function (event) {
                //To prevent selected cards appending
                fakeCardSubmited = true;
 
-               updateGameObjectFromResponse(response);      
+               updateGameObjectFromResponse(response);
 
 
                //Update story teller display
@@ -587,7 +596,7 @@ $("#board").on("click", function (event) {
 
             }).then(function (response) {
 
-               updateGameObjectFromResponse(response);      
+               updateGameObjectFromResponse(response);
 
                displayCards();
 
@@ -622,19 +631,24 @@ $("#board").on("click", function (event) {
 });
 
 $("#hand").on("click", (event) => {
-   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
-      const targetID = event.target.id;
+   const targetID = event.target.id;
 
-      let type = targetID.split("-")[0];
-      handNum = targetID.split("-")[1];
+   let type = targetID.split("-")[0];
+   handNum = targetID.split("-")[1];
+   if(type=="img"){
+      cardIdentifier = GameObject.hand[handNum];
+      displayImageInViewer(cardIdentifier);
+   }
+
+   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
+     
 
       if (type == "img") {
          $("img").remove("#selected-card");
 
-         cardIdentifier = GameObject.hand[handNum];
          let card = $(imagesHtml[cardIdentifier]);
 
-         card.attr("class", "playerCard");
+         card.attr("class", "player-card");
          card.attr("id", `selected-card`);
 
          $("#board").append(card);
