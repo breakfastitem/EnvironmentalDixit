@@ -1,48 +1,76 @@
-body{
+/*General Stylings*/
+
+body {
     background-color: black;
     color: white;
 }
+
 h1 {
     background-color: black;
     text-align: center;
     color: green;
     position: relative;
 }
+
 img {
-    height:200px;
-    width:100px;
-    margin-left:10px;
+    height: 200px;
+    width: 120px;
 }
-hr{ 
+
+hr {
     border-color: white;
 }
+
+/*Class Stylings*/
+
 .player-card {
     margin-left: 20px;
 }
 
+/*Specific ID stylings*/
+
 #board {
     position: relative;
-
     height: 600px;
     width: 100%;
-
     margin-bottom: 10px;
-
     padding: 10px;
-    
     border-left-style: solid;
     border-left-color: white;
-    border-left-width:2px;
+    border-left-width: 2px;
 }
-#hand {
 
+#hand {
     padding-top: 10px;
     padding-bottom: 10px;
 }
-#result{
+
+#result {
     float: left;
 }
-#code{
+
+#code {
     position: absolute;
     right: 1%;
+}
+
+#selected-card {
+    height: 400px;
+    width: 315px;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+#lightBox {
+    position: absolute;
+    top: 5px;
+    height: 1700px;
+    width: 100%;
+    background-color: azure;
+}
+
+#img-viewer img {
+    margin-left: 70px;
+    height: 1600px;
+    width: 960px;
 }
