@@ -54,7 +54,7 @@ function determineScores(players, roundData, tellerIndex) {
 };
 //Generates a unique string of four capital letters
 function generateID(ids) {
-    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const alphabet = "ABCDEGHJKLMOPQRSTUVWXYZ".split("");
 
     let id = "";
     let validId = false;
