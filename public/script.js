@@ -199,16 +199,16 @@ function initializeUpdateInterval() {
 
                      }
 
-                     board.append("<hr>");
+                     // board.append("<hr>");
 
-                     let card = $(imagesHtml[GameObject.roundCards[0]]);
+                     // let card = $(imagesHtml[GameObject.roundCards[0]]);
 
-                     card.attr("class", "player-card");
-                     card.attr("id", `selected-card`);
+                     // card.attr("class", "player-card");
+                     // card.attr("id", `selected-card`);
 
-                     voteCardIndex = 0;
+                     // voteCardIndex = 0;
 
-                     board.append(card);
+                     // board.append(card);
 
 
 
@@ -305,7 +305,7 @@ function startNewRound(dealerIndex) {
    if (dealerIndex - 1 == playerIndex) {
       display = $(`<p>Choose an image, and write a clue related to said image.</p>
       <form>
-      <input id="clue-input"></input>
+      <textarea id="clue-input" rows="4" cols="50"></textarea>
       <button id="submit-clue">submit</button>
       </form>`);
 
@@ -343,12 +343,15 @@ function displayVoteSelection(cardRoundIndex) {
 
       $("#board").append(card);
    }
-
+   c
 };
 
 /**
  * Event Listeners
  */
+$("#exit-button").on("click", function (event) {
+   $("#lightBox").hide();
+});
 
 $("#board").on("click", function (event) {
    event.preventDefault();
@@ -635,13 +638,13 @@ $("#hand").on("click", (event) => {
 
    let type = targetID.split("-")[0];
    handNum = targetID.split("-")[1];
-   if(type=="img"){
+   if (type == "img") {
       cardIdentifier = GameObject.hand[handNum];
       displayImageInViewer(cardIdentifier);
    }
 
    if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
-     
+
 
       if (type == "img") {
          $("img").remove("#selected-card");
