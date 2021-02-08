@@ -87,7 +87,7 @@ hr {
     right:2px;
 }
 
-#caret{
+.caret{
     float: left;
     width: 30px;
     height: 30px;
