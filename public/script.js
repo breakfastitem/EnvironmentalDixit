@@ -29,7 +29,7 @@ const imagesHtml = [`<img src="https://drive.google.com/uc?export=view&id=1GqnHw
    , `<img src="https://i.ibb.co/vJYq4Tk/img-8.jpg" alt="img-8" border="0"/>`
    , `<img src="https://i.ibb.co/MVFP12S/img-9.jpg" alt="img-9" border="0"/>`];
 
-   const caretSources =["https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak","https://lh3.google.com/u/0/d/1FgEesVcge39EkFcdgQsDXQOIZ5HVbxdh"];
+const caretSources = ["https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak", "https://lh3.google.com/u/0/d/1FgEesVcge39EkFcdgQsDXQOIZ5HVbxdh"];
 
 let GameObject = {
    gameId: "",
@@ -63,8 +63,8 @@ let handNum;
 
 //For caret switch
 
-let isRules =true;
-let isScores=true;
+let isRules = true;
+let isScores = true;
 
 /**
 * Static Functions
@@ -72,7 +72,9 @@ let isScores=true;
 function displayImageInViewer(cardId) {
 
    $("#img-viewer").empty();
+   let button = $("<button id='exit-button'>EXIT</button>");
    let card = $(imagesHtml[cardId]);
+   $("#img-viewer").append(button);
    $("#img-viewer").append(card);
    $("#lightBox").show();
 
@@ -111,11 +113,18 @@ function displayCards() {
    for (let i = 0; i < GameObject.hand.length; i++) {
 
       let imgIdentifier = GameObject.hand[i];
+      let cardDiv =$("<div>");
+      cardDiv.attr("class", "hand-card-div");
+      cardDiv.attr("id",`card-${i}`);
+
       let card = $(imagesHtml[imgIdentifier]);
 
       card.attr("class", "player-card");
       card.attr("id", `img-${i}`);
-      hand.append(card);
+
+      cardDiv.append(card);
+
+      hand.append(cardDiv);
    }
 }
 
@@ -355,7 +364,10 @@ function displayVoteSelection(cardRoundIndex) {
 /**
  * Event Listeners
  */
-$("#exit-button").on("click", function (event) {
+
+//Clicks
+
+$("#lightBox").on("click", "#exit-button", function (event) {
    $("#lightBox").hide();
 });
 
@@ -679,32 +691,46 @@ $("#id-input").on("change", function (event) {
 });
 
 //Pertains to dropdown menu
-$(".caret").on("click",function(event){
- 
+$(".caret").on("click", function (event) {
+
    const varId = event.target.id.split("-")[0];
 
 
-   if(event.target.src==caretSources[0]){
-      $(`#${event.target.id}`).attr("src",caretSources[1]);
-   }else{
-      $(`#${event.target.id}`).attr("src",caretSources[0]);
+   if (event.target.src == caretSources[0]) {
+      $(`#${event.target.id}`).attr("src", caretSources[1]);
+   } else {
+      $(`#${event.target.id}`).attr("src", caretSources[0]);
    }
-   
-   if(varId=="rules"){
-      isRules=!isRules;
-   }else{
-      isScores=!isScores;
+
+   if (varId == "rules") {
+      isRules = !isRules;
+   } else {
+      isScores = !isScores;
    }
 
 
-   if((varId=="rules"&&isRules)||(varId=="scores"&&isScores)){ 
-         $(`#${varId}`).hide();
-   }else{
+   if ((varId == "rules" && isRules) || (varId == "scores" && isScores)) {
+      $(`#${varId}`).hide();
+   } else {
       $(`#${varId}`).show();
    }
-   
+
 });
 
+//Hovers
+
+$("#hand").on({
+   mouseenter: (event) => {
+
+      let img = $(`<img class='lightbox-button' id="lbutton-${event.target.id.split("-")[1]}" src='https://lh3.google.com/u/0/d/1PmWUnfvCGbDVvUHH2CCldLUBt1PDi4dv'></img>`);
+      $(`#${event.target.id}`).append(img);
+   },
+   mouseleave: (event) => {
+      // $(`#${event.target.id}`).empty();
+   }
+}, ".hand-card-div");
+
+//Pertains to overlay to allow for light box click
 
 
 /**
