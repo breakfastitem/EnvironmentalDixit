@@ -24,6 +24,7 @@ h1 {
 img {
     height: 200px;
     width:120px;
+    max-width: 100%;
 }
 
 hr {
@@ -33,14 +34,20 @@ hr {
 /*Class Stylings*/
 
 .hand-card-div {
-    margin-left: 20px;
-    float: left;
+    position: relative;
+}
+
+.lightbox-button {
+    position:absolute;
+    right: 15px;
+    bottom:0px;
+    border-radius: 5px;
+    height: 20px;
+    width: 20px;
 }
 
 .player-card {
-    padding-left: 10px;
-    padding-right: 0px;
-    width: 130px;
+    width: 120px;
     height: 200px;
 }
 

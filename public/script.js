@@ -113,9 +113,9 @@ function displayCards() {
    for (let i = 0; i < GameObject.hand.length; i++) {
 
       let imgIdentifier = GameObject.hand[i];
-      let cardDiv =$("<div>");
-      cardDiv.attr("class", "hand-card-div");
-      cardDiv.attr("id",`card-${i}`);
+      let cardDiv = $("<div>");
+      cardDiv.attr("class", "col-2 hand-card-div");
+      cardDiv.attr("id", `card-${i}`);
 
       let card = $(imagesHtml[imgIdentifier]);
 
@@ -656,8 +656,7 @@ $("#hand").on("click", (event) => {
 
    let type = targetID.split("-")[0];
    handNum = targetID.split("-")[1];
-   if (type == "img") {
-      cardIdentifier = GameObject.hand[handNum];
+   if (type == "lbutton") {
       displayImageInViewer(cardIdentifier);
    }
 
@@ -665,6 +664,7 @@ $("#hand").on("click", (event) => {
 
 
       if (type == "img") {
+         cardIdentifier = GameObject.hand[handNum];
          $("img").remove("#selected-card");
 
          let card = $(imagesHtml[cardIdentifier]);
@@ -722,13 +722,13 @@ $(".caret").on("click", function (event) {
 $("#hand").on({
    mouseenter: (event) => {
 
-      let img = $(`<img class='lightbox-button' id="lbutton-${event.target.id.split("-")[1]}" src='https://lh3.google.com/u/0/d/1PmWUnfvCGbDVvUHH2CCldLUBt1PDi4dv'></img>`);
-      $(`#${event.target.id}`).append(img);
-   },
-   mouseleave: (event) => {
-      // $(`#${event.target.id}`).empty();
+      let handIdentifier = event.target.id.split("-")[1];
+      $(`.lightbox-button`).remove();
+
+      let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='https://lh3.google.com/u/0/d/1PmWUnfvCGbDVvUHH2CCldLUBt1PDi4dv'></img>`);
+      $(`#card-${handIdentifier}`).append(img);
    }
-}, ".hand-card-div");
+}, ".player-card");
 
 //Pertains to overlay to allow for light box click
 
