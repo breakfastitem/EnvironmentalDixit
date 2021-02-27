@@ -657,7 +657,7 @@ $("#hand").on("click", (event) => {
    let type = targetID.split("-")[0];
    handNum = targetID.split("-")[1];
    if (type == "lbutton") {
-      displayImageInViewer(cardIdentifier);
+      displayImageInViewer(GameObject.hand[handNum]);
    }
 
    if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
@@ -736,5 +736,5 @@ $("#hand").on({
 /**
  * main
  */
-$("#lightBox").hide();
+// $("#lightBox").hide();
 $("#rules").hide();
