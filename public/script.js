@@ -31,6 +31,9 @@ const imagesHtml = [`<img src="https://drive.google.com/uc?export=view&id=1GqnHw
 
 const caretSources = ["https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak", "https://lh3.google.com/u/0/d/1FgEesVcge39EkFcdgQsDXQOIZ5HVbxdh"];
 
+const iconSources= ["https://lh3.google.com/u/0/d/1hAQpVbcLkhmx3uFND_amgVh3Yi6LjXAD", "https://lh3.google.com/u/0/d/1HCIIhnUCZjNjp6VLY3kVURHs9o6e9zfY","https://lh3.google.com/u/0/d/1RSPwuFo5Oy0Sv1eTo5yInfmmin2rp6o9"
+,"https://lh3.google.com/u/0/d/1MPgDdtMmtbJDeQAEES7_nmiEpIexWzE7","https://lh3.google.com/u/0/d/1tHcU7VpYFHDEZAIr0Lxj3qJ_Nak-QGSm","https://lh3.google.com/u/0/d/119N2ZxoBK9xImMltOdW4wICHdnLeoz-7"];
+
 let GameObject = {
    gameId: "",
    playerCount: "0",
@@ -72,7 +75,7 @@ let isScores = true;
 function displayImageInViewer(cardId) {
 
    $("#img-viewer").empty();
-   let button = $("<button id='exit-button'>EXIT</button>");
+   let button = $("<button id='exit-button'>X</button>");
    let card = $(imagesHtml[cardId]);
    $("#img-viewer").append(button);
    $("#img-viewer").append(card);
@@ -148,6 +151,9 @@ function initializeUpdateInterval() {
                case "join":
                   //Add Response data to game object
                   gameID = GameObject.gameID;
+                  localStorage.setItem("gameId", gameID);
+                  localStorage.setItem("index", playerIndex);
+                  localStorage.setItem("GameObject", GameObject);
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   break;
 
@@ -736,5 +742,13 @@ $("#hand").on({
 /**
  * main
  */
-// $("#lightBox").hide();
+$("#lightBox").hide();
 $("#rules").hide();
+
+// //If in active game reload game settings
+// gameID = localStorage.getItem("gameId");
+
+// if (gameID != null) {
+//    playerIndex = localStorage.getItem("index");
+//    GameObject = localStorage.getItem("GameObject");
+// }
