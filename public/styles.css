@@ -168,13 +168,9 @@ button:focus {
 }
 
 #title {
-    font-weight: 900;
-    text-shadow: 2px 2px #0f610f;
-}
-
-#title img {
-    height: 125px;
-    width: 250px;
+    margin-top:15px;
+    height: 112.5px;
+    width: 225px;
 }
 
 #scores p {
