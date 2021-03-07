@@ -90,6 +90,13 @@ button:focus {
     margin-left: 10px;
 }
 
+.error-message {
+    color:red;
+}
+
+.error-message hr {
+    border-color: red;
+}
 /*Specific ID stylings*/
 
 #board {
@@ -170,3 +177,7 @@ button:focus {
     width: 250px;
 }
 
+#scores p {
+    font-weight: 600;
+    font-size: larger;
+}

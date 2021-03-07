@@ -31,12 +31,12 @@ const imagesHtml = [`<img src="https://drive.google.com/uc?export=view&id=1GqnHw
 
 const caretSources = ["https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak", "https://lh3.google.com/u/0/d/1FgEesVcge39EkFcdgQsDXQOIZ5HVbxdh"];
 
-const iconSources= ["https://lh3.google.com/u/0/d/1hAQpVbcLkhmx3uFND_amgVh3Yi6LjXAD",
- "https://lh3.google.com/u/0/d/1HCIIhnUCZjNjp6VLY3kVURHs9o6e9zfY",
- "https://lh3.google.com/u/0/d/1RSPwuFo5Oy0Sv1eTo5yInfmmin2rp6o9",
- "https://lh3.google.com/u/0/d/1MPgDdtMmtbJDeQAEES7_nmiEpIexWzE7",
- "https://lh3.google.com/u/0/d/1tHcU7VpYFHDEZAIr0Lxj3qJ_Nak-QGSm",
- "https://lh3.google.com/u/0/d/119N2ZxoBK9xImMltOdW4wICHdnLeoz-7"];
+const iconSources = ["https://lh3.google.com/u/0/d/1hAQpVbcLkhmx3uFND_amgVh3Yi6LjXAD",
+   "https://lh3.google.com/u/0/d/1HCIIhnUCZjNjp6VLY3kVURHs9o6e9zfY",
+   "https://lh3.google.com/u/0/d/1RSPwuFo5Oy0Sv1eTo5yInfmmin2rp6o9",
+   "https://lh3.google.com/u/0/d/1MPgDdtMmtbJDeQAEES7_nmiEpIexWzE7",
+   "https://lh3.google.com/u/0/d/1tHcU7VpYFHDEZAIr0Lxj3qJ_Nak-QGSm",
+   "https://lh3.google.com/u/0/d/119N2ZxoBK9xImMltOdW4wICHdnLeoz-7"];
 
 let GameObject = {
    gameId: "",
@@ -379,6 +379,40 @@ function displayVoteSelection(cardRoundIndex) {
    }
 };
 
+function displayBoardError(errorMessage) {
+   const board = $("#board");
+
+   const messageDiv = $(`
+   
+   <div class="col-12 error-message">
+      <hr class="error-line">
+         <p> ${errorMessage} </p>
+      <hr class="error-line">
+   </div>
+  `);
+
+
+   board.append(messageDiv);
+
+   let timeout = setTimeout(() => {
+      board.children().last().remove();
+   }, 1500);
+
+}
+
+function playerNameValidations(playerName) {
+   if (playerName === "") {
+      displayBoardError("Player Name must have a value");
+      return false;
+   }
+
+   if (playerName.length > 10) {
+      displayBoardError("Player Name must have a less than 10 characters");
+      return false;
+   }
+
+   return true;
+}
 /**
  * Event Listeners
  */
@@ -398,55 +432,57 @@ $("#board").on("click", function (event) {
    switch (id) {
 
       case "join-button":
-         gameID = $("#id-input").val().toUpperCase();
+         gameID = $("#id-input").val().trim().toUpperCase();
          playerName = $("#name-input").val().trim();
-         console.log(gameID);
+
+
+         //Validation Checks
+         if (gameID === "") {
+            displayBoardError("Enter a gameID to Join Existing game");
+            return;
+         }
+
+         if (!playerNameValidations(playerName)) {
+            return;
+         }
+         //Update code display
+         $("#code").text(gameID);
 
          //Get game from game id
-
-         if (gameID != "" && playerName != "") {
-            //Update code display
-            $("#code").text(gameID);
-
+         $.ajax({
+            method: "put",
+            url: "/game/join",
+            data: { gameId: gameID, playerName: playerName }
+         }).then(function () {
             $.ajax({
-               method: "put",
-               url: "/game/join",
-               data: { gameId: gameID, playerName: playerName }
-            }).then(function () {
-               $.ajax({
-                  method: "get",
-                  url: `/game/pull/${gameID}/25`
+               method: "get",
+               url: `/game/pull/${gameID}/25`
 
-               }).then(function (response) {
-                  if (response) {
-                     updateGameObjectFromResponse(response);
+            }).then(function (response) {
+               if (response) {
+                  updateGameObjectFromResponse(response);
 
-                     playerIndex = GameObject.playerCount - 1;
+                  playerIndex = GameObject.playerCount - 1;
 
-                     updatePlayerScores(GameObject.playerCount, GameObject.players);
+                  updatePlayerScores(GameObject.playerCount, GameObject.players);
 
-                     initializeUpdateInterval();
+                  initializeUpdateInterval();
 
-                     displayJoinPhase(false);
-                  } else {
-                     console.log("Game Is Full!");
-                  }
-               });
-
-
+                  displayJoinPhase(false);
+               } else {
+                  console.log("Game Is Full!");
+               }
             });
-         } else {
-            console.log("ERROR No input");
-         }
+
+
+         });
          break;
 
       case "new-button":
 
          playerName = $("#name-input").val().trim();
 
-         if(playerName===""){
-            //TODO:: Add board message
-            console.log("Cannot have empty string.");
+         if (!playerNameValidations(playerName)) {
             return;
          }
 
