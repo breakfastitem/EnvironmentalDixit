@@ -29,6 +29,26 @@ hr {
     border-color: white;
 }
 
+button {
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: medium;
+}
+
+button:hover {
+    background-color: green;
+    color:white;
+    border-color: green;
+}
+
+button:active {
+    background-color: darkgreen;
+    color:white;
+}
+
+button:focus {
+    outline:none;
+}
 
 /*Class Stylings*/
 
