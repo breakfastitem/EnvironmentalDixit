@@ -555,6 +555,10 @@ $("#board").on("click", function (event) {
                initializeUpdateInterval();
             });
 
+         }).catch(err=>{
+            if(err.status===400){
+               displayBoardError("Must have a minimum of 3 players.");
+            }
          });
 
          break;

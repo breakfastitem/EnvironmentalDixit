@@ -72,15 +72,15 @@ app.get("/game/pull/:gameid/:playerIndex", (req, res) => {
 
     let tempArray = games.filter(game => game.gameID == gameId);
 
-    if(tempArray.length==0){
-        res.sendStatus(400,"Game"+gameId+" Not Found");
-    }else{
+    if (tempArray.length == 0) {
+        res.sendStatus(400, "Game" + gameId + " Not Found");
+    } else {
         let game = tempArray[0];
 
         let data = game.sendData(req.params.playerIndex);
-    
+
         res.send(data);
-    }   
+    }
 
 });
 
@@ -106,16 +106,17 @@ app.put("/game/:funct", (req, res) => {
     let funct = req.params.funct;
     let game = games.filter(tempGame => tempGame.gameID == req.body.gameId)[0];
 
-    if(game===undefined){
+    if (game === undefined) {
         res.sendStatus(404);
         return;
     }
 
+    let err = false;
 
     switch (funct) {
         case "start":
 
-            game.startGame("");
+            err = game.startGame("");
 
             break;
         case "clue":
@@ -137,12 +138,12 @@ app.put("/game/:funct", (req, res) => {
             break;
         case "join":
 
-            let err = game.addPlayer(req.body.playerName);
-            if(err){
-                res.sendStatus(err);
-                return;
-            }
+            err = game.addPlayer(req.body.playerName);
             break;
+    }
+    if (err) {
+        res.sendStatus(err);
+        return;
     }
     res.sendStatus(200);
 });

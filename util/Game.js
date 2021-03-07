@@ -72,30 +72,30 @@ class Game {
         this.settings = settings;
         this.deckID = settings.deckID;
 
-        if (this.playerCount >= 3) {
-
-            let cardOrder = [];
-
-            for (let i = 1; i <= this.playerCount; i++) {
-                this.turnOrder.push(i);
-            }
-            this.turnOrder = Utility.shuffle(this.turnOrder);
-
-
-
-            for (let i = 0; i < this.cardCount; i++) {
-                cardOrder.push(i);
-            }
-            cardOrder = Utility.shuffle(cardOrder);
-
-
-            this.cardOrder = cardOrder;
-            this.gameState = "mainCard";
-
-            this.dealCards();
-
-            return true;
+        if (this.playerCount < 3) {
+            //Not enough players
+            return 400;       
         }
+
+        let cardOrder = [];
+
+        for (let i = 1; i <= this.playerCount; i++) {
+            this.turnOrder.push(i);
+        }
+        this.turnOrder = Utility.shuffle(this.turnOrder);
+
+
+
+        for (let i = 0; i < this.cardCount; i++) {
+            cardOrder.push(i);
+        }
+        cardOrder = Utility.shuffle(cardOrder);
+
+
+        this.cardOrder = cardOrder;
+        this.gameState = "mainCard";
+
+        this.dealCards();
 
         return false;
 
