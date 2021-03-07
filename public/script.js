@@ -163,9 +163,9 @@ function initializeUpdateInterval() {
                case "join":
                   //Add Response data to game object
                   gameID = GameObject.gameID;
-                  localStorage.setItem("gameId", gameID);
-                  localStorage.setItem("index", playerIndex);
-                  localStorage.setItem("GameObject", GameObject);
+                  // localStorage.setItem("gameId", gameID);
+                  // localStorage.setItem("index", playerIndex);
+                  // localStorage.setItem("GameObject", GameObject);
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   break;
 
@@ -398,9 +398,9 @@ $("#board").on("click", function (event) {
    switch (id) {
 
       case "join-button":
-         gameID = $("#id-input").val();
+         gameID = $("#id-input").val().toUpperCase();
          playerName = $("#name-input").val().trim();
-         console.log(playerName);
+         console.log(gameID);
 
          //Get game from game id
 
