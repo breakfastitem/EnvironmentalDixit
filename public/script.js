@@ -31,8 +31,12 @@ const imagesHtml = [`<img src="https://drive.google.com/uc?export=view&id=1GqnHw
 
 const caretSources = ["https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak", "https://lh3.google.com/u/0/d/1FgEesVcge39EkFcdgQsDXQOIZ5HVbxdh"];
 
-const iconSources= ["https://lh3.google.com/u/0/d/1hAQpVbcLkhmx3uFND_amgVh3Yi6LjXAD", "https://lh3.google.com/u/0/d/1HCIIhnUCZjNjp6VLY3kVURHs9o6e9zfY","https://lh3.google.com/u/0/d/1RSPwuFo5Oy0Sv1eTo5yInfmmin2rp6o9"
-,"https://lh3.google.com/u/0/d/1MPgDdtMmtbJDeQAEES7_nmiEpIexWzE7","https://lh3.google.com/u/0/d/1tHcU7VpYFHDEZAIr0Lxj3qJ_Nak-QGSm","https://lh3.google.com/u/0/d/119N2ZxoBK9xImMltOdW4wICHdnLeoz-7"];
+const iconSources= ["https://lh3.google.com/u/0/d/1hAQpVbcLkhmx3uFND_amgVh3Yi6LjXAD",
+ "https://lh3.google.com/u/0/d/1HCIIhnUCZjNjp6VLY3kVURHs9o6e9zfY",
+ "https://lh3.google.com/u/0/d/1RSPwuFo5Oy0Sv1eTo5yInfmmin2rp6o9",
+ "https://lh3.google.com/u/0/d/1MPgDdtMmtbJDeQAEES7_nmiEpIexWzE7",
+ "https://lh3.google.com/u/0/d/1tHcU7VpYFHDEZAIr0Lxj3qJ_Nak-QGSm",
+ "https://lh3.google.com/u/0/d/119N2ZxoBK9xImMltOdW4wICHdnLeoz-7"];
 
 let GameObject = {
    gameId: "",
@@ -99,8 +103,16 @@ function updatePlayerScores(playerCount, playerObjects) {
    for (let i = 0; i < playerCount; i++) {
       let player = playerObjects[i];
 
-      let scoreInfo = $(`<p id="name-${i + 1}">${player.name}</p>
-      <p>Score: <span id="score-${i + 1}">${player.score}</span></p>
+      let scoreInfo = $(`
+      <div class="row">
+         <div class=col-5>
+            <img class="player-icon" src=${iconSources[i]}></img>
+         </div> 
+         <div class=col-7>
+            <p id="name-${i + 1}">${player.name} </p>
+            <p>Score: <span id="score-${i + 1}">${player.score}</span></p>
+         </div>
+      </div>
       <hr>`);
 
       scoreBar.append(scoreInfo);

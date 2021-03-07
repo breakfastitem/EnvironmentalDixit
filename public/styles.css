@@ -22,14 +22,15 @@ h1 {
 }
 
 img {
-    height: 200px;
-    width:120px;
+    /* height: 200px;
+    width:120px; */
     max-width: 100%;
 }
 
 hr {
     border-color: white;
 }
+
 
 /*Class Stylings*/
 
@@ -61,6 +62,14 @@ hr {
     height: 30px;
     margin-top: 5px;
     margin-right: 5px;
+}
+
+
+.player-icon{
+    height:45px;
+    width:45px;
+    left: 20px;
+    margin-left: 10px;
 }
 
 /*Specific ID stylings*/
@@ -137,3 +146,5 @@ hr {
     font-weight: 900;
     text-shadow: 2px 2px #0f610f;
 }
+
+
