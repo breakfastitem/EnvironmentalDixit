@@ -445,8 +445,7 @@ $("#board").on("click", function (event) {
          if (!playerNameValidations(playerName)) {
             return;
          }
-         //Update code display
-         $("#code").text(gameID);
+
 
          //Get game from game id
          $.ajax({
@@ -454,6 +453,10 @@ $("#board").on("click", function (event) {
             url: "/game/join",
             data: { gameId: gameID, playerName: playerName }
          }).then(function () {
+
+            //Update code display
+            $("#code").text(gameID);
+
             $.ajax({
                method: "get",
                url: `/game/pull/${gameID}/25`,
@@ -469,17 +472,21 @@ $("#board").on("click", function (event) {
                   initializeUpdateInterval();
 
                   displayJoinPhase(false);
-               } else {
-                  displayBoardError("Game Is Full!");
                }
             });
-               
+
          })
-         .catch(err => {
-            if(err.status===404){
-               displayBoardError("Game Not Found");
-            }
-         });
+            .catch(err => {
+               if (err.status === 404) {
+                  displayBoardError("Game Not Found");
+               }
+               if (err.status === 400) {
+                  displayBoardError("Too many players are already in game. Max is six.");
+               }
+               if (err.status === 399) {
+                  displayBoardError(`In lobby ${gameID} the name ${playerName} is taken.`);
+               }
+            });
          break;
 
       case "new-button":

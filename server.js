@@ -137,7 +137,11 @@ app.put("/game/:funct", (req, res) => {
             break;
         case "join":
 
-            game.addPlayer(req.body.playerName);
+            let err = game.addPlayer(req.body.playerName);
+            if(err){
+                res.sendStatus(err);
+                return;
+            }
             break;
     }
     res.sendStatus(200);
