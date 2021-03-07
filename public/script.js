@@ -456,7 +456,7 @@ $("#board").on("click", function (event) {
          }).then(function () {
             $.ajax({
                method: "get",
-               url: `/game/pull/${gameID}/25`
+               url: `/game/pull/${gameID}/25`,
 
             }).then(function (response) {
                if (response) {
@@ -470,11 +470,15 @@ $("#board").on("click", function (event) {
 
                   displayJoinPhase(false);
                } else {
-                  console.log("Game Is Full!");
+                  displayBoardError("Game Is Full!");
                }
             });
-
-
+               
+         })
+         .catch(err => {
+            if(err.status===404){
+               displayBoardError("Game Not Found");
+            }
          });
          break;
 

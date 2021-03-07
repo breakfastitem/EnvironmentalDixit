@@ -85,7 +85,6 @@ app.get("/game/pull/:gameid/:playerIndex", (req, res) => {
 });
 
 
-//TODO: Create checks to see if game exists already
 //POST Functions
 app.post("/game/new", (req, res) => {
 
@@ -106,6 +105,11 @@ app.post("/game/new", (req, res) => {
 app.put("/game/:funct", (req, res) => {
     let funct = req.params.funct;
     let game = games.filter(tempGame => tempGame.gameID == req.body.gameId)[0];
+
+    if(game===undefined){
+        res.sendStatus(404);
+        return;
+    }
 
 
     switch (funct) {
