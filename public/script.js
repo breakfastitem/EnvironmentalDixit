@@ -399,7 +399,8 @@ $("#board").on("click", function (event) {
 
       case "join-button":
          gameID = $("#id-input").val();
-         playerName = $("#name-input").val();
+         playerName = $("#name-input").val().trim();
+         console.log(playerName);
 
          //Get game from game id
 
@@ -441,7 +442,13 @@ $("#board").on("click", function (event) {
 
       case "new-button":
 
-         playerName = $("#name-input").val();
+         playerName = $("#name-input").val().trim();
+
+         if(playerName===""){
+            //TODO:: Add board message
+            console.log("Cannot have empty string.");
+            return;
+         }
 
 
          $.ajax({
