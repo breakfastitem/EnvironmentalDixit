@@ -32,11 +32,11 @@ const imagesHtml = [`<img src="https://drive.google.com/uc?export=view&id=1GqnHw
 const caretSources = ["https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak", "https://lh3.google.com/u/0/d/1FgEesVcge39EkFcdgQsDXQOIZ5HVbxdh"];
 
 const iconSources = ["https://lh3.google.com/u/0/d/1hAQpVbcLkhmx3uFND_amgVh3Yi6LjXAD",
-   "https://lh3.google.com/u/0/d/1HCIIhnUCZjNjp6VLY3kVURHs9o6e9zfY",
    "https://lh3.google.com/u/0/d/1RSPwuFo5Oy0Sv1eTo5yInfmmin2rp6o9",
-   "https://lh3.google.com/u/0/d/1MPgDdtMmtbJDeQAEES7_nmiEpIexWzE7",
+   "https://lh3.google.com/u/0/d/119N2ZxoBK9xImMltOdW4wICHdnLeoz-7",
+   "https://lh3.google.com/u/0/d/1HCIIhnUCZjNjp6VLY3kVURHs9o6e9zfY",
    "https://lh3.google.com/u/0/d/1tHcU7VpYFHDEZAIr0Lxj3qJ_Nak-QGSm",
-   "https://lh3.google.com/u/0/d/119N2ZxoBK9xImMltOdW4wICHdnLeoz-7"];
+   "https://lh3.google.com/u/0/d/1MPgDdtMmtbJDeQAEES7_nmiEpIexWzE7"];
 
 let GameObject = {
    gameId: "",
@@ -195,7 +195,7 @@ function initializeUpdateInterval() {
                      let board = $("#board");
                      board.empty();
 
-                     let display = $(`<p>Pick an image that matches the clue.</p>
+                     let display = $(`<p>Pick a card from your deck that best matches the clue.</p>
                     <h2>${GameObject.clue}</h2>
                     <button id="submit-fake">Submit</button>
                      `);
@@ -219,7 +219,7 @@ function initializeUpdateInterval() {
                      let board = $("#board");
                      board.empty();
 
-                     let display = $(`<p>Vote for the image you most think represents the clue.</p>
+                     let display = $(`<p>Vote for the card you believe to be the StoryTeller’s card.</p>
                     <h2>${GameObject.clue}</h2>
                     <button id="submit-vote">Submit</button>
                      `);
@@ -337,7 +337,7 @@ function startNewRound(dealerIndex) {
    cardIdentifier = GameObject.hand[0];
 
    if (dealerIndex - 1 == playerIndex) {
-      display = $(`<p>Choose an image, and write a clue related to said image.</p>
+      display = $(`<p>Choose a card from your deck and enter a clue that relates to it.</p>
       <form>
       <textarea id="clue-input" rows="4" cols="50"></textarea>
       <button id="submit-clue">submit</button>
@@ -354,7 +354,7 @@ function startNewRound(dealerIndex) {
       board.append(card);
 
    } else {
-      display = $(`<p> Player ${dealerIndex} The StoryTeller will submit a clue and image shortly...</p>`);
+      display = $(`<p> ${GameObject.players[dealerIndex-1].name} is the StoryTeller and will submit a clue shortly...</p>`);
       board.append(display);
    }
 
@@ -588,7 +588,7 @@ $("#board").on("click", function (event) {
 
                board.empty();
 
-               let display = $("<p>All other playings are selecting cards to match your clue...</p>");
+               let display = $("<p>The othe players are selecting cards to match your clue...</p>");
                board.append(display);
 
                //Start the update interval that was paused to deal cards
@@ -628,7 +628,7 @@ $("#board").on("click", function (event) {
 
                board.empty();
 
-               let display = $("<p>Other playings are still selecting card...</p>");
+               let display = $("<p>Other players are still selecting a card...</p>");
                board.append(display);
 
                //Start the update interval that was paused to deal cards
