@@ -131,10 +131,10 @@ function updatePlayerScores(playerCount, playerObjects) {
 
       let scoreInfo = $(`
       <div class="row">
-         <div class="col-lg-5 col-md-12">
+         <div class="col-lg-5 col-md-2">
             <img class="player-icon" src=${iconSources[i]}></img>
          </div> 
-         <div class="col-lg-7 col-md-12">
+         <div class="col-lg-7 col-md-10">
             <p id="name-${i + 1}">${player.name} </p>
             <p>Score: <span id="score-${i + 1}">${player.score}</span></p>
          </div>
