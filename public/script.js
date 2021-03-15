@@ -105,10 +105,10 @@ function updatePlayerScores(playerCount, playerObjects) {
 
       let scoreInfo = $(`
       <div class="row">
-         <div class=col-5>
+         <div class="col-lg-5 col-md-12">
             <img class="player-icon" src=${iconSources[i]}></img>
          </div> 
-         <div class=col-7>
+         <div class="col-lg-7 col-md-12">
             <p id="name-${i + 1}">${player.name} </p>
             <p>Score: <span id="score-${i + 1}">${player.score}</span></p>
          </div>
@@ -129,7 +129,7 @@ function displayCards() {
 
       let imgIdentifier = GameObject.hand[i];
       let cardDiv = $("<div>");
-      cardDiv.attr("class", "col-2 hand-card-div");
+      cardDiv.attr("class", "col-lg-2 col-md-4 col-sm-6 hand-card-div");
       cardDiv.attr("id", `card-${i}`);
 
       let card = $(imagesHtml[imgIdentifier]);
@@ -279,7 +279,7 @@ function initializeUpdateInterval() {
                   //Display cards with owner and votes
                   for (let i = 0; i < GameObject.playerCount; i++) {
                      let cardData = GameObject.roundData.cardArray[i];
-                     let display = $(`<div id="result"><p>${GameObject.players[cardData.playerIndex].name}</p> ${imagesHtml[cardData.cardIdentifier]}<p> ${cardData.votes}</p></div>`);
+                     let display = $(`<div id=".result"><p>${GameObject.players[cardData.playerIndex].name}</p> ${imagesHtml[cardData.cardIdentifier]}<p> ${cardData.votes}</p></div>`);
 
                      $("#board").append(display);
                   }
@@ -592,7 +592,7 @@ $("#board").on("click", function (event) {
 
                board.empty();
 
-               let display = $("<p>The othe players are selecting cards to match your clue...</p>");
+               let display = $("<p>The other players are selecting cards to match your clue...</p>");
                board.append(display);
 
                //Start the update interval that was paused to deal cards

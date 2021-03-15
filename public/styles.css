@@ -22,6 +22,8 @@ h1 {
 }
 
 img {
+    height: 166px;
+    width: 128px;
     max-width: 100%;
 }
 
@@ -58,16 +60,22 @@ button:focus {
 
 .lightbox-button {
     position:absolute;
-    right: 15px;
+    left: 15px;
     bottom:0px;
     border-radius: 5px;
     height: 20px;
     width: 20px;
+
+    z-index: 6;
+}
+
+
+.result p {
+    position: static;
 }
 
 .player-card {
-    height: 166px;
-    width: 100%;
+    margin-top: 10px;
 }
 
 .player-card:hover {
@@ -97,17 +105,20 @@ button:focus {
 .error-message hr {
     border-color: red;
 }
+
 /*Specific ID stylings*/
 
 #board {
     position: relative;
-    height: 600px;
+    /* height: 600px; */
     width: 100%;
     margin-bottom: 10px;
     padding: 10px;
     border-left-style: solid;
     border-left-color: white;
     border-left-width: 2px;
+
+    min-height: 400px;
 }
 
 #hand {
@@ -115,9 +126,7 @@ button:focus {
     padding-bottom: 10px;
 }
 
-#result {
-    float: left;
-}
+
 
 #code {
     position: absolute;
