@@ -220,8 +220,8 @@ function initializeUpdateInterval() {
                      board.empty();
 
                      let display = $(`<p>Vote for the card you believe to be the StoryTeller’s card.</p>
-                    <h2>${GameObject.clue}</h2>
-                    <button id="submit-vote">Submit</button>
+                    <h2>${GameObject.clue} <button id="submit-vote">Submit</button> </h2>
+                    
                      `);
                      board.append(display);
                      //TODO:: Make cards that are displayed random
@@ -258,7 +258,7 @@ function initializeUpdateInterval() {
                      //TODO:: Make cards that are displayed randomLY
                      for (let i = 0; i < GameObject.roundCards.length; i++) {
                         let card = $(imagesHtml[GameObject.roundCards[i]]);
-                        card.attr("class", "player-card");
+                        card.attr("class", "voteCard");
                         card.attr("id", `vote-${i}`);
 
                         board.append(card);
@@ -363,19 +363,24 @@ function startNewRound(dealerIndex) {
 function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
    if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+
+      $(`#vote-${voteCardIndex}`).attr("class","voteCard");
       //if random var will from different variable
       voteCardIndex = cardRoundIndex;
 
-      let voteCardIdentifier = GameObject.roundCards[cardRoundIndex];
+      
 
-      $("img").remove("#selected-card");
+      $(`#vote-${voteCardIndex}`).attr("class","voteCard vote-selected");
+      // let voteCardIdentifier = GameObject.roundCards[cardRoundIndex];
 
-      let card = $(imagesHtml[voteCardIdentifier]);
+      // $("img").remove("#selected-card");
 
-      card.attr("class", "player-card");
-      card.attr("id", `selected-card`);
+      // let card = $(imagesHtml[voteCardIdentifier]);
 
-      $("#board").append(card);
+      // card.attr("class", "player-card");
+      // card.attr("id", `selected-card`);
+
+      // $("#board").append(card);
    }
 };
 
