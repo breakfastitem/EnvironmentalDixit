@@ -1,40 +1,15 @@
 const { response } = require("express");
 const express = require("express");
 const Utility = require("./util/Utility");
-const mongoose = require('mongoose');
 
 const GameObject = require("./util/Game");
 
-mongoose.connect('mongodb+srv://ehrman:dixit@cluster0.jfqke.mongodb.net/GameData?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false });
-mongoose.set("returnOriginal", false);
 
 //for Heroku
 const PORT = process.env.PORT || 5000;
 
 let ids = [];
 let games = [];
-
-//Game Data schema
-const gameData = new mongoose.Schema({
-    gameID: String,
-    playerCount: Number,
-    cardCount: Number,
-    cardOrder: [Number],
-    gameState: String,
-    players: [{ name: String, score: Number, cards: [Number], handCount: Number, host: Boolean }],
-    roundCount: Number,
-    turnOrder: [Number],
-    roundData: { playersActed: Number, clue: String, cardArray: [{ playerIndex: Number, cardIdentifier: Number, votes: Number, voterIndexes: [Number] }] }
-});
-
-const Game = mongoose.model('Game', gameData);
-
-//Mongoose Connection
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-// db.once('open', function () {
-//     // we're connected!
-// });
 
 //use the application off of express.
 const app = express();
