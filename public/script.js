@@ -1,6 +1,29 @@
 /**
  * Static Vars
  */
+
+const imageSources = ["https://drive.google.com/uc?export=view&id=1GqnHwAS71JxIP3Unr67ZEw3v0l-6Gomk"
+   , "https://lh3.google.com/u/0/d/1yvvivcVUeb2Z9WAy-KghoFgbeoFg7y3P=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1nzKA04PAh_5KLFEBx2tK5JKlZ3_Abu8d=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1BLiU5GT4pNgOgYxUtXco8KTrJ1fpXWdP=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1m0SxXdHE4bq543JtLCpFbbgor07HsdiR=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1psc3KNn6o-haSnrc1yOCu0t4gnNT5bIu=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1dn1xRkYRb1wj8xhNSKFU03XzrdSKd7MN=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1F4gzNKZ822ZmiCH-JaBKRRp71WqD9tM8=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1nJDdawjrO8GLLpeFhkQZG6Hm3EmScjgA=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1AwBp9JVItAdVcoQqpb89TIgr-Us0lgdV=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/139y97JCRhO3spqqHVPlfXDT1zgNgaEKr=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1vMckOxLxuw64iqL6rlRrYlzKyZ4Kq7So=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1johQA0mfOvc_l4qi7G0M1pvn6AA37Ifz=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1F-Gypag7I1xfR6OTYSc31xnkf-GfpE-i=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1OGOgJim2o2zIrO3AKyyKg8i-I5xVfHhS=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1UUinmWZpnCaawiyENy2E5Shb9sSAMoN_=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1LsP5Y6ZjePioWpvbEuR-Bm-ymMde3S7O=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1KvI1xsNUTCG17EH_5cRmyJ5M8E95roaQ=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1f4bUcqaBEwcECyPa-Tx2-LLDkZoTjLzd=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1uBxLtkGGj-WK7r5FO8Y9fBglqYKG7lMr=w1920-h937-iv1"
+   , "https://lh3.google.com/u/0/d/1HKPFyGBeH8DbVg8a6PMb4d83ymXfgexR=w1920-h937-iv1"];
+
 const imagesHtml = [`<img src="https://drive.google.com/uc?export=view&id=1GqnHwAS71JxIP3Unr67ZEw3v0l-6Gomk" alt="Utility Scale Solar" border="0" />`
    , `<img src="https://lh3.google.com/u/0/d/1yvvivcVUeb2Z9WAy-KghoFgbeoFg7y3P=w1920-h937-iv1" alt="Wind Turbines Onshore" border="0"/>`
    , `<img src="https://lh3.google.com/u/0/d/1nzKA04PAh_5KLFEBx2tK5JKlZ3_Abu8d=w1920-h937-iv1" alt="img-3" border="0"/>`
@@ -67,6 +90,9 @@ let fakeCardSubmited = false;
 
 //for card removal
 let handNum;
+
+//For display purposes
+let dealerName;
 
 //For caret switch
 
@@ -196,9 +222,8 @@ function initializeUpdateInterval() {
                      board.empty();
 
                      let display = $(`<p>Pick a card from your deck that best matches the clue.</p>
-                    <h2>${GameObject.clue}</h2>
-                    <button id="submit-fake">Submit</button>
-                     `);
+                    <h2>${GameObject.clue}  <button id="submit-fake">Submit</button></h2>
+                    `);
 
                      cardIdentifier = GameObject.hand[0];
                      let card = $(imagesHtml[cardIdentifier]);
@@ -221,33 +246,34 @@ function initializeUpdateInterval() {
 
                      let display = $(`<p>Vote for the card you believe to be the StoryTeller’s card.</p>
                     <h2>${GameObject.clue} <button id="submit-vote">Submit</button> </h2>
-                    
-                     `);
+                    `);
+
                      board.append(display);
-                     //TODO:: Make cards that are displayed random
+
+                     let row = $("<div class='row'>");
+
                      for (let i = 0; i < GameObject.roundCards.length; i++) {
+
                         let card = $(imagesHtml[GameObject.roundCards[i]]);
                         card.attr("class", "voteCard");
                         card.attr("id", `vote-${i}`);
 
-                        board.append(card);
+                        if (i == 0) {
+                           card.attr("class", "voteCard vote-selected");
+                           voteCardIndex = 0;
+                        }
+
+                        let div = $(`<div class="voteDiv col-sm-12 col-md-4 col-lg-3" id=voteDiv-${i}></div>`);
+
+                        div.append(card);
+
+                        row.append(div);
 
                      }
-
-                     // board.append("<hr>");
-
-                     // let card = $(imagesHtml[GameObject.roundCards[0]]);
-
-                     // card.attr("class", "player-card");
-                     // card.attr("id", `selected-card`);
-
-                     // voteCardIndex = 0;
-
-                     // board.append(card);
-
-
+                     board.append(row);
 
                      boardInstantiated++;
+
                   } else if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
                      let board = $("#board");
                      board.empty();
@@ -255,15 +281,22 @@ function initializeUpdateInterval() {
                      let display = $(`<p> The other players are voting. </p>`);
                      board.append(display);
 
-                     //TODO:: Make cards that are displayed randomLY
+                     let row = $("<div class='row'>");
+
                      for (let i = 0; i < GameObject.roundCards.length; i++) {
+
                         let card = $(imagesHtml[GameObject.roundCards[i]]);
                         card.attr("class", "voteCard");
                         card.attr("id", `vote-${i}`);
 
-                        board.append(card);
+                        let div = $(`<div class="voteDiv col-sm-12 col-md-4 col-lg-3" id=voteDiv-${i}></div>`);
+
+                        div.append(card);
+
+                        row.append(div);
 
                      }
+                     board.append(row);
                      boardInstantiated++;
                   }
                   break;
@@ -273,16 +306,19 @@ function initializeUpdateInterval() {
 
                   board.empty();
 
-                  let header = $(`<h2>End Results</h2>`);
+                  let header = $(`<h2> Points This Round </h2>
+                  <p>${dealerName} was the story teller</p>`);
                   board.append(header);
+                  let row = $("<div class='row'></div>");
 
                   //Display cards with owner and votes
                   for (let i = 0; i < GameObject.playerCount; i++) {
                      let cardData = GameObject.roundData.cardArray[i];
-                     let display = $(`<div id=".result"><p>${GameObject.players[cardData.playerIndex].name}</p> ${imagesHtml[cardData.cardIdentifier]}<p> ${cardData.votes}</p></div>`);
+                     let display = $(`<div class="col-sm-12 col-md-4 col-lg-3" id=".result"><p>${GameObject.players[cardData.playerIndex].name}</p> ${imagesHtml[cardData.cardIdentifier]}<p>Votes: ${cardData.votes}</p></div>`);
 
-                     $("#board").append(display);
+                     row.append(display);
                   }
+                  $("#board").append(row);
 
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   //if host
@@ -290,7 +326,6 @@ function initializeUpdateInterval() {
                      let button = $(`<button id="new-Round">next round</button>`);
                      board.append(button);
                   }
-
                   break;
 
             }
@@ -336,6 +371,8 @@ function startNewRound(dealerIndex) {
    let display;
    cardIdentifier = GameObject.hand[0];
 
+   dealerName = GameObject.players[dealerIndex - 1].name;
+
    if (dealerIndex - 1 == playerIndex) {
       display = $(`<p>Choose a card from your deck and enter a clue that relates to it.</p>
       <form>
@@ -354,7 +391,7 @@ function startNewRound(dealerIndex) {
       board.append(card);
 
    } else {
-      display = $(`<p> ${GameObject.players[dealerIndex - 1].name} is the StoryTeller and will submit a clue shortly...</p>`);
+      display = $(`<p> ${dealerName} is the StoryTeller and will submit a clue shortly...</p>`);
       board.append(display);
    }
 
@@ -390,7 +427,7 @@ function displayBoardError(errorMessage) {
 
    let timeout = setTimeout(() => {
       board.children().last().remove();
-   }, 1500);
+   }, 2500);
 
 }
 
@@ -667,7 +704,7 @@ $("#board").on("click", function (event) {
 
                board.empty();
 
-               let display = $("<p>Other playings are still voting...</p>");
+               let display = $("<p>Other players are still voting...</p>");
                board.append(display);
 
                //Start the update interval that was paused to deal cards
@@ -705,23 +742,18 @@ $("#board").on("click", function (event) {
          });
          break;
 
-      case "vote-0":
-         displayVoteSelection(0);
-         break;
-      case "vote-1":
-         displayVoteSelection(1);
-         break;
-      case "vote-2":
-         displayVoteSelection(2);
-         break;
-      case "vote-3":
-         displayVoteSelection(3);
-         break;
-      case "vote-4":
-         displayVoteSelection(4);
-         break;
-      case "vote-5":
-         displayVoteSelection(5);
+      //light button handler
+      default:
+         if (id.split("-")[0] === "lbutton") {
+            let i = id.split("-")[1];
+            displayImageInViewer(GameObject.roundCards[i]);
+            break;
+         }
+         if (id.split("-")[0] === "vote") {
+            let i = id.split("-")[1];
+            displayVoteSelection(i);
+            break;
+         }
          break;
 
    }
@@ -753,7 +785,6 @@ $("#hand").on("click", (event) => {
       }
 
    }
-
 
 });
 
@@ -795,6 +826,16 @@ $(".caret").on("click", function (event) {
 });
 
 //Hovers
+$("#board").on({
+   mouseenter: (event) => {
+
+      let handIdentifier = event.target.id.split("-")[1];
+      $(`.lightbox-button`).remove();
+
+      let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='https://lh3.google.com/u/0/d/1PmWUnfvCGbDVvUHH2CCldLUBt1PDi4dv'></img>`);
+      $(`#voteDiv-${handIdentifier}`).append(img);
+   }
+}, ".voteCard");
 
 $("#hand").on({
    mouseenter: (event) => {
