@@ -40,6 +40,10 @@ class Game {
     //Adds player to players if there are less than six players
     addPlayer(name) {
 
+        if(this.gameState!="join"){
+            return 377;
+        }
+
         if (this.playerCount >= 6) {
             //Too many players.
             return 400;
@@ -102,12 +106,14 @@ class Game {
     }
 
     recieveClue(playerIndex, cardID, clue) {
+        if(clue==""){
+            return 400;
+        }
+
         if (this.gameState == "mainCard") {
             this.roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardID, votes: 0, voterIndexes: [] }] };
 
             this.gameState = "fakeCards";
-
-            return true;
         }
 
         return false;

@@ -96,7 +96,7 @@ app.put("/game/:funct", (req, res) => {
             break;
         case "clue":
 
-            game.recieveClue(req.body.playerIndex, req.body.roundData.cardArray[0].cardIdentifier, req.body.roundData.clue);
+            err = game.recieveClue(req.body.playerIndex, req.body.roundData.cardArray[0].cardIdentifier, req.body.roundData.clue);
 
             break;
         case "fake":

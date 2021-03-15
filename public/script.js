@@ -354,7 +354,7 @@ function startNewRound(dealerIndex) {
       board.append(card);
 
    } else {
-      display = $(`<p> ${GameObject.players[dealerIndex-1].name} is the StoryTeller and will submit a clue shortly...</p>`);
+      display = $(`<p> ${GameObject.players[dealerIndex - 1].name} is the StoryTeller and will submit a clue shortly...</p>`);
       board.append(display);
    }
 
@@ -364,23 +364,12 @@ function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
    if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
 
-      $(`#vote-${voteCardIndex}`).attr("class","voteCard");
+      $(`#vote-${voteCardIndex}`).attr("class", "voteCard");
       //if random var will from different variable
       voteCardIndex = cardRoundIndex;
 
-      
+      $(`#vote-${voteCardIndex}`).attr("class", "voteCard vote-selected");
 
-      $(`#vote-${voteCardIndex}`).attr("class","voteCard vote-selected");
-      // let voteCardIdentifier = GameObject.roundCards[cardRoundIndex];
-
-      // $("img").remove("#selected-card");
-
-      // let card = $(imagesHtml[voteCardIdentifier]);
-
-      // card.attr("class", "player-card");
-      // card.attr("id", `selected-card`);
-
-      // $("#board").append(card);
    }
 };
 
@@ -491,6 +480,9 @@ $("#board").on("click", function (event) {
                if (err.status === 399) {
                   displayBoardError(`In lobby ${gameID} the name ${playerName} is taken.`);
                }
+               if (err.status === 377) {
+                  displayBoardError(`Cannot join game that has already been started.`);
+               }
             });
          break;
 
@@ -560,8 +552,8 @@ $("#board").on("click", function (event) {
                initializeUpdateInterval();
             });
 
-         }).catch(err=>{
-            if(err.status===400){
+         }).catch(err => {
+            if (err.status === 400) {
                displayBoardError("Must have a minimum of 3 players.");
             }
          });
@@ -604,6 +596,10 @@ $("#board").on("click", function (event) {
                initializeUpdateInterval();
             });
 
+         }).catch((err) => {
+            if (err.status === 400) {
+               displayBoardError("Clue cannot be empty.");
+            }
          });
 
          break;
@@ -820,7 +816,7 @@ $("#hand").on({
 $("#lightBox").hide();
 $("#rules").hide();
 
-// //If in active game reload game settings
+//If in active game reload game settings
 // gameID = localStorage.getItem("gameId");
 
 // if (gameID != null) {
