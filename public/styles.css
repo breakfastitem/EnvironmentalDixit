@@ -3,7 +3,6 @@
 body {
     background-color: black;
     color: white;
-
     font-family: hobo-std, sans-serif;
     font-weight: 400;
     font-style: normal;
@@ -25,7 +24,7 @@ li {
 h1 {
     background-color: black;
     text-align: center;
-    color: green;
+    color: #d8945c;
     position: relative;
 }
 
@@ -42,31 +41,39 @@ hr {
 button {
     border-radius: 10px;
     font-weight: 500;
-    font-size: medium;
-
     background-color: white;
 }
 
 button:hover {
-    background-color: #24861d;
-    color:white;
-    border-color: #24861d;
+    background-color: #d8945c;
+    color: white;
+    border-color: #d8945c;
 }
 
 button:active {
-    background-color: #0e620b;
-    color:white;
+    background-color: #d76507;
+    color: white;
 }
 
 button:focus {
-    outline:none;
+    outline: none;
 }
 
 /*Class Stylings*/
 
+h2 {
+    color:#d8945c
+}
+
+.submit-fake-vote {
+    font-size: 30px;
+    display: block;
+}
+
 .voteCard {
     margin-left: 5px;
     margin-right: 5px;
+    margin-top: 10px;
 }
 
 .hand-card-div {
@@ -74,14 +81,13 @@ button:focus {
 }
 
 .lightbox-button {
-    position:absolute;
+    position: absolute;
     left: 15px;
-    bottom:0px;
+    bottom: 0px;
     border-radius: 5px;
     height: 20px;
     width: 20px;
 }
-
 
 .result p {
     position: static;
@@ -103,16 +109,15 @@ button:focus {
     margin-right: 5px;
 }
 
-
-.player-icon{
-    height:45px;
-    width:45px;
+.player-icon {
+    height: 45px;
+    width: 45px;
     left: 20px;
     margin-left: 10px;
 }
 
 .error-message {
-    color:red;
+    color: red;
 }
 
 .error-message hr {
@@ -136,7 +141,6 @@ button:focus {
     border-left-style: solid;
     border-left-color: white;
     border-left-width: 2px;
-
     min-height: 400px;
 }
 
@@ -144,8 +148,6 @@ button:focus {
     padding-top: 10px;
     padding-bottom: 10px;
 }
-
-
 
 #code {
     position: absolute;
@@ -162,13 +164,10 @@ button:focus {
 
 #lightBox {
     position: absolute;
-
     padding: 10px;
     top: 5px;
-
     height: 1430px;
     width: 100%;
-
     background-color: black;
 }
 
@@ -186,18 +185,16 @@ button:focus {
 #exit-button {
     position: absolute;
     left: 30px;
-
     font-weight: 900;
     color: red;
     text-shadow: 2px 2px #611b0f;
     font-size: 30px;
-
     border: 0px 0px 0px 0px;
     background-color: rgba(210, 105, 30, 0);
 }
 
 #title {
-    margin-top:15px;
+    margin-top: 15px;
     height: 112.5px;
     width: 225px;
 }

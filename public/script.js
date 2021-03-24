@@ -222,7 +222,8 @@ function initializeUpdateInterval() {
                      board.empty();
 
                      let display = $(`<p>Pick a card from your deck that best matches the clue.</p>
-                    <h2>${GameObject.clue}  <button id="submit-fake">Submit</button></h2>
+                      <h2 class="inline"> ${GameObject.clue} </h2> 
+                      <button class="submit-fake-vote" id="submit-fake">Submit</button>
                     `);
 
                      cardIdentifier = GameObject.hand[0];
@@ -245,7 +246,8 @@ function initializeUpdateInterval() {
                      board.empty();
 
                      let display = $(`<p>Vote for the card you believe to be the StoryTeller’s card.</p>
-                    <h2>${GameObject.clue} <button id="submit-vote">Submit</button> </h2>
+                    <h2 class="inline"> ${GameObject.clue} </h2> 
+                    <button class="submit-fake-vote" id="submit-vote">Submit</button>
                     `);
 
                      board.append(display);
@@ -441,7 +443,7 @@ function displayBoardError(errorMessage) {
 
 function playerNameValidations(playerName) {
    if (playerName === "") {
-      displayBoardError("Player Name must have a value");
+      displayBoardError("Please Enter a Player Name");
       return false;
    }
 
@@ -523,7 +525,7 @@ $("#board").on("click", function (event) {
                   displayBoardError("Too many players are already in game. Max is six.");
                }
                if (err.status === 399) {
-                  displayBoardError(`In lobby ${gameID} the name ${playerName} is taken.`);
+                  displayBoardError(`The name ${playerName} is taken, please choose another name.`);
                }
                if (err.status === 377) {
                   displayBoardError(`Cannot join game that has already been started.`);

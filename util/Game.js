@@ -40,7 +40,7 @@ class Game {
     //Adds player to players if there are less than six players
     addPlayer(name) {
 
-        if(this.gameState!="join"){
+        if (this.gameState != "join") {
             return 377;
         }
 
@@ -49,15 +49,15 @@ class Game {
             return 400;
         }
 
-        let found =false;
+        let found = false;
 
         this.players.forEach(player => {
-            if (player.name === name) {
-             found =true; 
+            if (player.name.toLowerCase() === name.toLowerCase()) {
+                found = true;
             }
         });
 
-        if(found){
+        if (found) {
             return 399;
         }
 
@@ -78,7 +78,7 @@ class Game {
 
         if (this.playerCount < 3) {
             //Not enough players
-            return 400;       
+            return 400;
         }
 
         let cardOrder = [];
@@ -106,7 +106,7 @@ class Game {
     }
 
     recieveClue(playerIndex, cardID, clue) {
-        if(clue==""){
+        if (clue == "") {
             return 400;
         }
 
