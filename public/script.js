@@ -263,7 +263,7 @@ function initializeUpdateInterval() {
                            voteCardIndex = 0;
                         }
 
-                        let div = $(`<div class="voteDiv col-sm-12 col-md-4 col-lg-3" id=voteDiv-${i}></div>`);
+                        let div = $(`<div class="voteDiv col-sm-12 col-md-4 col-lg-2" id=voteDiv-${i}></div>`);
 
                         div.append(card);
 
@@ -289,7 +289,7 @@ function initializeUpdateInterval() {
                         card.attr("class", "voteCard");
                         card.attr("id", `vote-${i}`);
 
-                        let div = $(`<div class="voteDiv col-sm-12 col-md-4 col-lg-3" id=voteDiv-${i}></div>`);
+                        let div = $(`<div class="voteDiv col-sm-12 col-md-4 col-lg-2" id=voteDiv-${i}></div>`);
 
                         div.append(card);
 
@@ -302,30 +302,38 @@ function initializeUpdateInterval() {
                   break;
 
                case "endDisplay":
-                  let board = $("#board");
+                  if (boardInstantiated < 4) {
+                     let board = $("#board");
 
-                  board.empty();
+                     board.empty();
 
-                  let header = $(`<h2> Points This Round </h2>
-                  <p>${dealerName} was the story teller</p>`);
-                  board.append(header);
-                  let row = $("<div class='row'></div>");
+                     let header = $(`<h2> Votes This Round </h2>
+                  <p>${dealerName} was the StoryTeller</p>`);
+                     board.append(header);
+                     let row = $("<div class='row'></div>");
 
-                  //Display cards with owner and votes
-                  for (let i = 0; i < GameObject.playerCount; i++) {
-                     let cardData = GameObject.roundData.cardArray[i];
-                     let display = $(`<div class="col-sm-12 col-md-4 col-lg-3" id=".result"><p>${GameObject.players[cardData.playerIndex].name}</p> ${imagesHtml[cardData.cardIdentifier]}<p>Votes: ${cardData.votes}</p></div>`);
+                     //Display cards with owner and votes
+                     for (let i = 0; i < GameObject.playerCount; i++) {
+                        let cardData = GameObject.roundData.cardArray[i];
+                        let display = $(`<div class="col-sm-12 col-md-4 col-lg-2"><p>${GameObject.players[cardData.playerIndex].name}</p> 
+                        <div class="voteCard" id="card-${i}">${imagesHtml[cardData.cardIdentifier]}</div>
+                        <p>Votes: ${cardData.votes}</p></div>`);
 
-                     row.append(display);
+                        GameObject.roundCards[i] = cardData.cardIdentifier;
+
+                        row.append(display);
+                     }
+                     $("#board").append(row);
+
+                     updatePlayerScores(GameObject.playerCount, GameObject.players);
+                     //if host
+                     if (playerIndex == 0) {
+                        let button = $(`<button id="new-Round">next round</button>`);
+                        board.append(button);
+                     }
+                     boardInstantiated++;
                   }
-                  $("#board").append(row);
 
-                  updatePlayerScores(GameObject.playerCount, GameObject.players);
-                  //if host
-                  if (playerIndex == 0) {
-                     let button = $(`<button id="new-Round">next round</button>`);
-                     board.append(button);
-                  }
                   break;
 
             }
@@ -399,7 +407,7 @@ function startNewRound(dealerIndex) {
 
 function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
-   if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+   if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState == "vote") {
 
       $(`#vote-${voteCardIndex}`).attr("class", "voteCard");
       //if random var will from different variable
@@ -427,7 +435,7 @@ function displayBoardError(errorMessage) {
 
    let timeout = setTimeout(() => {
       board.children().last().remove();
-   }, 2500);
+   }, 10000);
 
 }
 
