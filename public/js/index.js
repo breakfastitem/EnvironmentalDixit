@@ -24,33 +24,7 @@ const imageSources = ["https://drive.google.com/uc?export=view&id=1GqnHwAS71JxIP
    , "https://lh3.google.com/u/0/d/1uBxLtkGGj-WK7r5FO8Y9fBglqYKG7lMr=w1920-h937-iv1"
    , "https://lh3.google.com/u/0/d/1HKPFyGBeH8DbVg8a6PMb4d83ymXfgexR=w1920-h937-iv1"];
 
-const imagesHtml = [`<img src="https://drive.google.com/uc?export=view&id=1GqnHwAS71JxIP3Unr67ZEw3v0l-6Gomk" alt="Utility Scale Solar" border="0" />`
-   , `<img src="https://lh3.google.com/u/0/d/1yvvivcVUeb2Z9WAy-KghoFgbeoFg7y3P=w1920-h937-iv1" alt="Wind Turbines Onshore" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1nzKA04PAh_5KLFEBx2tK5JKlZ3_Abu8d=w1920-h937-iv1" alt="img-3" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1BLiU5GT4pNgOgYxUtXco8KTrJ1fpXWdP=w1920-h937-iv1" alt="img-4" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1m0SxXdHE4bq543JtLCpFbbgor07HsdiR=w1920-h937-iv1" alt="img-5" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1psc3KNn6o-haSnrc1yOCu0t4gnNT5bIu=w1920-h937-iv1" alt="img-6" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1dn1xRkYRb1wj8xhNSKFU03XzrdSKd7MN=w1920-h937-iv1" alt="img-7" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1F4gzNKZ822ZmiCH-JaBKRRp71WqD9tM8=w1920-h937-iv1" alt="img-8" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1nJDdawjrO8GLLpeFhkQZG6Hm3EmScjgA=w1920-h937-iv1" alt="img-9" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1AwBp9JVItAdVcoQqpb89TIgr-Us0lgdV=w1920-h937-iv1" alt="img-1" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/139y97JCRhO3spqqHVPlfXDT1zgNgaEKr=w1920-h937-iv1" alt="img-2" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1vMckOxLxuw64iqL6rlRrYlzKyZ4Kq7So=w1920-h937-iv1" alt="img-3" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1johQA0mfOvc_l4qi7G0M1pvn6AA37Ifz=w1920-h937-iv1" alt="img-4" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1F-Gypag7I1xfR6OTYSc31xnkf-GfpE-i=w1920-h937-iv1" alt="img-5" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1OGOgJim2o2zIrO3AKyyKg8i-I5xVfHhS=w1920-h937-iv1" alt="img-6" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1UUinmWZpnCaawiyENy2E5Shb9sSAMoN_=w1920-h937-iv1" alt="img-7" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1LsP5Y6ZjePioWpvbEuR-Bm-ymMde3S7O=w1920-h937-iv1" alt="img-8" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1KvI1xsNUTCG17EH_5cRmyJ5M8E95roaQ=w1920-h937-iv1" alt="img-9" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1f4bUcqaBEwcECyPa-Tx2-LLDkZoTjLzd=w1920-h937-iv1" alt="img-1" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1uBxLtkGGj-WK7r5FO8Y9fBglqYKG7lMr=w1920-h937-iv1" alt="img-2" border="0"/>`
-   , `<img src="https://lh3.google.com/u/0/d/1HKPFyGBeH8DbVg8a6PMb4d83ymXfgexR=w1920-h937-iv1" alt="img-3" border="0"/>`
-   , `<img src="https://i.ibb.co/QCcnSFL/img-4.jpg" alt="img-4" border="0"/>`
-   , `<img src="https://i.ibb.co/nMvYFgx/img-5.jpg" alt="img-5" border="0"/>`
-   , `<img src="https://i.ibb.co/HVdVwkp/img-6.jpg" alt="img-6" border="0"/>`
-   , `<img src="https://i.ibb.co/jLh6ns1/img-7.jpg" alt="img-7" border="0"/>`
-   , `<img src="https://i.ibb.co/vJYq4Tk/img-8.jpg" alt="img-8" border="0"/>`
-   , `<img src="https://i.ibb.co/MVFP12S/img-9.jpg" alt="img-9" border="0"/>`];
+const imagesHtml = imageSources.map(url => `<img src=${url} alt="Clue Card" border="0" />`);
 
 const caretSources = ["https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak", "https://lh3.google.com/u/0/d/1FgEesVcge39EkFcdgQsDXQOIZ5HVbxdh"];
 

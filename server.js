@@ -1,8 +1,17 @@
+require("dotenv").config();
 const { response } = require("express");
 const express = require("express");
 const Utility = require("./util/Utility");
+const mongoose = require("mongoose");
+const fetch = require("node-fetch");
 
+mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+    , { useNewUrlParser: true, useUnifiedTopology: true });
+
+
+//Models
 const GameObject = require("./util/Game");
+const Deck = mongoose.model('Deck', { cardUrls: [String], name: String });
 
 
 //for Heroku
@@ -26,6 +35,9 @@ app.use(express.static(__dirname + '/public'));
 app.get("/", (request, response) => {
     //show this file when the "/" is requested
     response.sendFile(__dirname + "/index.html");
+});
+app.get("/deck", (req, res) => {
+    res.sendFile(__dirname + "/public/html/upload.html");
 });
 
 //Get Functions
@@ -61,11 +73,39 @@ app.get("/game/pull/:gameid/:playerIndex", (req, res) => {
 
 
 //POST Functions
+app.post("/api/deck", (req, res) => {
+
+    if (req.body.passphrase == "thunderbird") {
+        fetch(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${req.body.set}&user_id=${req.body.user}&format=json&nojsoncallback=1`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                let tempArray = data.photoset.photo.map(photo => {
+                    return `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`;
+                });
+
+                const deck = new Deck({ name: req.body.name, cardUrls: tempArray });
+
+                deck.save()
+                    .catch(err => console.log(err))
+
+                res.send(tempArray);
+
+            })
+            .catch(err => {
+                res.sendStatus(err.code);
+            });
+    } else {
+        res.sendStatus(400);
+    }
+
+});
+
 app.post("/game/new", (req, res) => {
 
     _gameID = Utility.generateID(ids);
 
-    let game = new GameObject(_gameID, req.body.playerName, 27);
+    let game = new GameObject(_gameID, req.body.playerName, 20);
     games.push(game);
 
     console.log(_gameID);
