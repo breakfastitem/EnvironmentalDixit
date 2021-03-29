@@ -1,4 +1,4 @@
-const Game = require("../util/Game");
+const Game = require("../models/Game");
 
 describe("Game", () => {
     describe("Constructor", () => {

@@ -1,6 +1,6 @@
 
 const Player = require("./Player");
-const Utility = require("./Utility");
+const Utility = require("../util/Utility");
 /**
  *  const _game = new Game({ gameID: _gameID, playerCount: 1, cardCount: 45, cardOrder: [], gameState: "join", 
  * players:[], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
