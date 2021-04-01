@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 
 
 mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-    , { useNewUrlParser: true, useUnifiedTopology: true });
+    , { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
 //models
 const db = require("./models");

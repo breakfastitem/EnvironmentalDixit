@@ -1,22 +1,19 @@
-
 const Player = require("./Player");
 const Utility = require("../util/Utility");
-/**
- *  const _game = new Game({ gameID: _gameID, playerCount: 1, cardCount: 45, cardOrder: [], gameState: "join", 
- * players:[], roundCount: 0, turnOrder: [0], roundData: { playersActed: 0, clue: "", cardArray: [] } });
- */
-
-//Temp may not work on export
 
 
 class Game {
 
     //Creates the game as an object. This will match what the current schema calls are doing.
-    constructor(gameID, playerName, cardCount) {
+    constructor(gameID, playerName, deck) {
 
         //Initialize game
 
-        this.cardCount = cardCount;
+        this.cardCount = deck.cardUrls.length;
+
+        this.deckURLs = deck.cardUrls;
+
+        this.deckName = deck.name;
 
         this.gameID = gameID;
 
@@ -71,10 +68,8 @@ class Game {
         return false;
     }
 
-    startGame(settings) {
-        //TODO:: Flesh out  settings
-        this.settings = settings;
-        this.deckID = settings.deckID;
+    startGame() {
+
 
         if (this.playerCount < 3) {
             //Not enough players

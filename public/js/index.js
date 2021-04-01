@@ -467,28 +467,19 @@ $("#board").on("click", function (event) {
             method: "put",
             url: "/game/join",
             data: { gameId: gameID, playerName: playerName }
-         }).then(function () {
-
+         }).then((response) => {
             //Update code display
             $("#code").text(gameID);
 
-            $.ajax({
-               method: "get",
-               url: `/game/pull/${gameID}/25`,
+            updateGameObjectFromResponse(response);
 
-            }).then(function (response) {
-               if (response) {
-                  updateGameObjectFromResponse(response);
+            playerIndex = GameObject.playerCount - 1;
 
-                  playerIndex = GameObject.playerCount - 1;
+            updatePlayerScores(GameObject.playerCount, GameObject.players);
 
-                  updatePlayerScores(GameObject.playerCount, GameObject.players);
+            initializeUpdateInterval();
 
-                  initializeUpdateInterval();
-
-                  displayJoinPhase(false);
-               }
-            });
+            displayJoinPhase(false);
 
          })
             .catch(err => {
@@ -527,34 +518,30 @@ $("#board").on("click", function (event) {
             url: "/game/new",
             data: {
                playerName: playerName,
-               settings: { deckId: deckId }
+               id: deckId
             }
 
-         }).then(function () {
-            $.ajax({
-               method: "get",
-               url: `/game/pull/new/25`
+         }).then((response) => {
 
-            }).then(function (response) {
+            playerIndex = 0;
 
-               playerIndex = 0;
+            updateGameObjectFromResponse(response);
 
-               updateGameObjectFromResponse(response);
+            //Get gameId from server
+            gameID = GameObject.gameID;
 
-               //Get gameId from server
-               gameID = GameObject.gameID;
-
-               //Update code display
-               $("#code").text(gameID);
+            //Update code display
+            $("#code").text(gameID);
 
 
-               updatePlayerScores(GameObject.playerCount, GameObject.players);
-               initializeUpdateInterval();
+            updatePlayerScores(GameObject.playerCount, GameObject.players);
+            initializeUpdateInterval();
 
-               displayJoinPhase(true);
-            });
-
+            displayJoinPhase(true);
+         }).catch(err => {
+            console.log(err.status)
          });
+
 
          break;
 
@@ -566,7 +553,7 @@ $("#board").on("click", function (event) {
             method: "put",
             url: "/game/start",
             data: { gameId: gameID }
-         }).then(function () {
+         }).then(() => {
 
             $.ajax({
                method: "get",

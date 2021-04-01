@@ -8,20 +8,7 @@ module.exports = function (app, db) {
 
     //Get Functions
     app.get("/game/pull/:gameid/:playerIndex", (req, res) => {
-        let gameId;
-
-        switch (req.params.gameid) {
-            case "new":
-                gameId = ids[ids.length - 1];
-
-                break;
-
-            default:
-                gameId = req.params.gameid;
-
-                break;
-
-        }
+        let gameId = req.params.gameid;
 
         let tempArray = games.filter(game => game.gameID == gameId);
 
@@ -40,22 +27,31 @@ module.exports = function (app, db) {
 
     app.post("/game/new", (req, res) => {
 
-        _gameID = Utility.generateID(ids);
+        let _gameID = Utility.generateID(ids);
 
-        let game = new db.Game(_gameID, req.body.playerName, 20);
-        games.push(game);
+        db.Deck.findById(req.body.id)
+            .then(data => {
+                let game = new db.Game(_gameID, req.body.playerName, data);
+                games.push(game);
 
-        console.log(_gameID);
-        ids.push(_gameID);
+                console.log(_gameID);
+                ids.push(_gameID);
 
-        res.sendStatus(200);
+                let gameData = game.sendData(434);
 
+                res.send(gameData);
+            })
+            .catch(() => {
+                console.log(err);
+                res.sendStatus(500);
+            });
     });
 
     //PUT functions
     app.put("/game/:funct", (req, res) => {
         let funct = req.params.funct;
         let game = games.filter(tempGame => tempGame.gameID == req.body.gameId)[0];
+        let data;
 
         if (game === undefined) {
             res.sendStatus(404);
@@ -90,12 +86,18 @@ module.exports = function (app, db) {
             case "join":
 
                 err = game.addPlayer(req.body.playerName);
+                data = game.sendData(434);
                 break;
         }
         if (err) {
             res.sendStatus(err);
             return;
         }
-        res.sendStatus(200);
+        if (data != undefined) {
+            res.send(data);
+        } else {
+            res.sendStatus(200);
+        }
+
     });
 }
