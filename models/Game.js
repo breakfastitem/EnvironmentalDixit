@@ -11,7 +11,7 @@ class Game {
 
         this.cardCount = deck.cardUrls.length;
 
-        this.deckURLs = deck.cardUrls;
+        this.deckUrls = deck.cardUrls;
 
         this.deckName = deck.name;
 
@@ -186,7 +186,7 @@ class Game {
         let data;
         switch (this.gameState) {
             case "join":
-                data = { gameID: this.gameID, gameState: this.gameState, playerCount: this.playerCount, players: [] };
+                data = { cardUrls: this.deckUrls, gameID: this.gameID, gameState: this.gameState, playerCount: this.playerCount, players: [] };
 
                 for (let i = 0; i < this.playerCount; i++) {
                     data.players.push({ name: this.players[i].name, score: this.players[i].score });

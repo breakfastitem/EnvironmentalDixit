@@ -38,6 +38,7 @@ module.exports = function (app, db) {
                 ids.push(_gameID);
 
                 let gameData = game.sendData(434);
+                console.log(gameData);
 
                 res.send(gameData);
             })
@@ -87,6 +88,7 @@ module.exports = function (app, db) {
 
                 err = game.addPlayer(req.body.playerName);
                 data = game.sendData(434);
+
                 break;
         }
         if (err) {
