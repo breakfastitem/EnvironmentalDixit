@@ -1,4 +1,6 @@
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config();
+}
 const fetch = require("node-fetch");
 
 module.exports = function (app, db) {
@@ -30,6 +32,13 @@ module.exports = function (app, db) {
             res.sendStatus(400);
         }
 
+    });
+
+    app.get("/api/decks", (req, res) => {
+        db.Deck.find({})
+            .then(data => {
+                res.send(data);
+            });
     });
 
 }

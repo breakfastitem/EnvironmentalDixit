@@ -508,6 +508,12 @@ $("#board").on("click", function (event) {
          break;
 
       case "new-button":
+         let deckId = $("#deck-select").val();
+
+         if (deckId === "") {
+            displayBoardError("Please Select a Deck");
+            return;
+         }
 
          playerName = $("#name-input").val().trim();
 
@@ -519,7 +525,10 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "POST",
             url: "/game/new",
-            data: { playerName: playerName }
+            data: {
+               playerName: playerName,
+               settings: { deckId: deckId }
+            }
 
          }).then(function () {
             $.ajax({
@@ -840,6 +849,19 @@ $("#hand").on({
  */
 $("#lightBox").hide();
 $("#rules").hide();
+
+//get deck from database
+$.ajax({
+   method: "GET",
+   url: "/api/decks"
+}).then(data => {
+   let selector = $("#deck-select");
+   console.log(data);
+   data.forEach(deck => {
+      let option = $(`<option value=${deck._id}>${deck.name}</option>`);
+      selector.append(option);
+   });
+});
 
 //If in active game reload game settings
 // gameID = localStorage.getItem("gameId");
