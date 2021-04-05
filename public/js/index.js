@@ -165,7 +165,7 @@ function initializeUpdateInterval() {
                      boardInstantiated++;
                   }
 
-                  if (boardInstantiated == 3) {
+                  if (boardInstantiated == 4) {
                      boardInstantiated = 0;
                   }
 
