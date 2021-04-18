@@ -21,6 +21,10 @@ const PORT = process.env.PORT || 5001;
 //use the application off of express.
 const app = express();
 
+//Set up IO connection
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+
 //middleWare for post and pull
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -34,8 +38,17 @@ require("./routes/html-routes")(app);
 require("./routes/api-routes")(app, db);
 require("./routes/game-routes")(app, db);
 
+io.on('connection', socket => {
+    console.log("a User connected");
+
+    socket.on("new-message", (message) => {
+        console.log(message);
+        io.emit("message", message);
+    });
+});
+
 
 //start the server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`server at http://localhost:${PORT}  ...`);
 });

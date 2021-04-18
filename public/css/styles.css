@@ -20,6 +20,7 @@ li {
     list-style: none;
     position: absolute;
 }
+
 h1 {
     background-color: black;
     text-align: center;
@@ -61,7 +62,7 @@ button:focus {
 /*Class Stylings*/
 
 h2 {
-    color:#d8945c
+    color: #d8945c
 }
 
 .submit-fake-vote {
@@ -129,7 +130,17 @@ h2 {
     border-color: green;
 }
 
+.message:nth-child(2n+0) {
+    background-color: lightgray;
+    color: black;
+}
+
 /*Specific ID stylings*/
+
+#chat-messages {
+    height: 400px;
+    overflow-y: auto;
+}
 
 #board {
     position: relative;
@@ -143,7 +154,7 @@ h2 {
     min-height: 400px;
 }
 
-#board  button {
+#board button {
     margin-top: 10px;
 }
 

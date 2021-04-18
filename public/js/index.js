@@ -1,6 +1,7 @@
 /**
  * Static Vars
  */
+const socket = io({});
 
 //filled after join and deck information is given
 let imageSources;
@@ -789,7 +790,20 @@ $("#hand").on({
    }
 }, ".player-card");
 
-//Pertains to overlay to allow for light box click
+//Chat event listeners
+
+$("#chat-form").on("submit", (event) => {
+   event.preventDefault();
+   let input = $("#chat-input");
+   socket.emit("new-message", input.val());
+   input.val("");
+});
+
+
+socket.on("message", (message) => {
+   let messageHTML = $(`<p class="message">${message}</p>`);
+   $("#chat-messages").append(messageHTML);
+});
 
 
 /**

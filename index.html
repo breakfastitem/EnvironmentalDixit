@@ -92,6 +92,19 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-12">
+                <h1>Chat</h1>
+                <div id="chat-messages">
+
+                </div>
+                <form id="chat-form">
+                    <input id="chat-input" type="text"></input>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
         <div id="lightBox">
 
             <div id="img-viewer">
@@ -111,8 +124,11 @@
     <!-- jQuery and moment.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 
+    <script src="/socket.io/socket.io.js"></script>
+
     <!--Local-->
     <script src="./js/index.js"></script>
+
 
 </body>
 
