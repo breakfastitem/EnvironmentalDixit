@@ -275,7 +275,7 @@ function initializeUpdateInterval() {
                      for (let i = 0; i < GameObject.playerCount; i++) {
                         let cardData = GameObject.roundData.cardArray[i];
                         let display = $(`<div class="col-sm-12 col-md-4 col-lg-2"><p>${GameObject.players[cardData.playerIndex].name}</p> 
-                        <div class="voteCard" id="card-${i}">${imagesHtml[cardData.cardIdentifier]}</div>
+                        <div class="voteCard" id="vote-${i}">${imagesHtml[cardData.cardIdentifier]}</div>
                         <p>Votes: ${cardData.votes}</p></div>`);
 
                         GameObject.roundCards[i] = cardData.cardIdentifier;
@@ -540,26 +540,19 @@ $("#board").on("click", function (event) {
       case "start-button":
 
          updatePlayerScores(GameObject.playerCount, GameObject.players);
-
+         console.log(playerIndex);
          $.ajax({
             method: "put",
             url: "/game/start",
-            data: { gameId: gameID }
-         }).then(() => {
+            data: { gameId: gameID, playerIndex: playerIndex }
+         }).then((response) => {
 
-            $.ajax({
-               method: "get",
-               url: `/game/pull/${gameID}/${playerIndex}`
+            updateGameObjectFromResponse(response);
 
-            }).then(function (response) {
+            startNewRound(GameObject.turnOrder[GameObject.roundCount]);
 
-               updateGameObjectFromResponse(response);
-
-               startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-
-               //Start the update interval that was paused to deal cards
-               initializeUpdateInterval();
-            });
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
 
          }).catch(err => {
             if (err.status === 400) {
@@ -582,28 +575,23 @@ $("#board").on("click", function (event) {
             method: "put",
             url: "/game/clue",
             data: { gameId: gameID, roundData: roundData, playerIndex: playerIndex }
-         }).then(function () {
-            $.ajax({
-               method: "get",
-               url: `/game/pull/${gameID}/${playerIndex}`
+         }).then(function (response) {
 
-            }).then(function (response) {
-               updateGameObjectFromResponse(response);
+            updateGameObjectFromResponse(response);
 
-               //update hand with removed card
-               $("img").remove(`#img-${handNum}`);
+            //update hand with removed card
+            $("img").remove(`#img-${handNum}`);
 
-               //Update story teller display
-               let board = $("#board");
+            //Update story teller display
+            let board = $("#board");
 
-               board.empty();
+            board.empty();
 
-               let display = $("<p>The other players are selecting cards to match your clue...</p>");
-               board.append(display);
+            let display = $("<p>The other players are selecting cards to match your clue...</p>");
+            board.append(display);
 
-               //Start the update interval that was paused to deal cards
-               initializeUpdateInterval();
-            });
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
 
          }).catch((err) => {
             if (err.status === 400) {
@@ -620,35 +608,28 @@ $("#board").on("click", function (event) {
             method: "put",
             url: "/game/fake",
             data: { gameId: gameID, cardIdentifier: cardIdentifier, playerIndex: playerIndex }
-         }).then(function () {
-
-            $.ajax({
-               method: "get",
-               url: `/game/pull/${gameID}/${playerIndex}`
-
-            }).then(function (response) {
-
-               //To prevent selected cards appending
-               fakeCardSubmited = true;
-
-               updateGameObjectFromResponse(response);
+         }).then(function (response) {
 
 
-               //update hand with removed card
-               $("img").remove(`#img-${handNum}`);
+            //To prevent selected cards appending
+            fakeCardSubmited = true;
 
-               //Update story teller display
-               let board = $("#board");
+            updateGameObjectFromResponse(response);
 
-               board.empty();
 
-               let display = $("<p>Other players are still selecting a card...</p>");
-               board.append(display);
+            //update hand with removed card
+            $("img").remove(`#img-${handNum}`);
 
-               //Start the update interval that was paused to deal cards
-               initializeUpdateInterval();
-            });
+            //Update story teller display
+            let board = $("#board");
 
+            board.empty();
+
+            let display = $("<p>Other players are still selecting a card...</p>");
+            board.append(display);
+
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
          });
          break;
 
@@ -658,31 +639,24 @@ $("#board").on("click", function (event) {
             method: "put",
             url: "/game/vote",
             data: { gameId: gameID, cardIndex: voteCardIndex, playerIndex: playerIndex }
-         }).then(function () {
+         }).then(function (response) {
 
-            $.ajax({
-               method: "get",
-               url: `/game/pull/${gameID}/${playerIndex}`
+            //To prevent selected cards appending
+            fakeCardSubmited = true;
 
-            }).then(function (response) {
-               //To prevent selected cards appending
-               fakeCardSubmited = true;
-
-               updateGameObjectFromResponse(response);
+            updateGameObjectFromResponse(response);
 
 
-               //Update story teller display
-               let board = $("#board");
+            //Update story teller display
+            let board = $("#board");
 
-               board.empty();
+            board.empty();
 
-               let display = $("<p>Other players are still voting...</p>");
-               board.append(display);
+            let display = $("<p>Other players are still voting...</p>");
+            board.append(display);
 
-               //Start the update interval that was paused to deal cards
-               initializeUpdateInterval();
-            });
-
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
          });
 
          break;
@@ -695,23 +669,18 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/next",
-            data: { gameId: gameID, players: GameObject.players, cardOrder: GameObject.cardOrder }
-         }).then(function () {
-            $.ajax({
-               method: "get",
-               url: `/game/pull/${gameID}/${playerIndex}`
+            data: { gameId: gameID, players: GameObject.players, cardOrder: GameObject.cardOrder, playerIndex: playerIndex }
+         }).then(function (response) {
 
-            }).then(function (response) {
+            updateGameObjectFromResponse(response);
 
-               updateGameObjectFromResponse(response);
+            displayCards();
 
-               displayCards();
-
-               //Start the update interval that was paused to deal cards
-               initializeUpdateInterval();
-            });
+            //Start the update interval that was paused to deal cards
+            initializeUpdateInterval();
 
          });
+
          break;
 
       //light button handler

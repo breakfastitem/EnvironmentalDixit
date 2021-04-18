@@ -12,7 +12,6 @@ module.exports = function (app, db) {
             fetch(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${req.body.set}&user_id=${req.body.user}&format=json&nojsoncallback=1`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
                     let tempArray = data.photoset.photo.map(photo => {
                         return `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`;
                     });

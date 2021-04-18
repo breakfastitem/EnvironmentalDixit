@@ -38,7 +38,6 @@ module.exports = function (app, db) {
                 ids.push(_gameID);
 
                 let gameData = game.sendData(434);
-                console.log(gameData);
 
                 res.send(gameData);
             })
@@ -64,7 +63,7 @@ module.exports = function (app, db) {
         switch (funct) {
             case "start":
 
-                err = game.startGame("");
+                err = game.startGame();
 
                 break;
             case "clue":
@@ -75,19 +74,21 @@ module.exports = function (app, db) {
             case "fake":
 
                 game.recieveFake(req.body.playerIndex, req.body.cardIdentifier);
+
                 break;
             case "vote":
 
                 game.recieveVote(req.body.playerIndex, req.body.cardIndex);
+
                 break;
             case "next":
 
                 game.newRound();
+
                 break;
             case "join":
 
                 err = game.addPlayer(req.body.playerName);
-                data = game.sendData(434);
 
                 break;
         }
@@ -95,11 +96,14 @@ module.exports = function (app, db) {
             res.sendStatus(err);
             return;
         }
-        if (data != undefined) {
-            res.send(data);
+
+        if (req.body != undefined && req.body.playerIndex != undefined) {
+            data = game.sendData(req.body.playerIndex);
         } else {
-            res.sendStatus(200);
+            data = game.sendData(434);
         }
+
+        res.send(data);
 
     });
 }
