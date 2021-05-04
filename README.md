@@ -22,6 +22,7 @@ setup .env file
 NAME=[deck admin username]
 
 PASSWORD=[Password]
+
 API_KEY=[flickr api key]
 
 https://www.flickr.com/services/api/
