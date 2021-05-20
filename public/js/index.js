@@ -91,7 +91,7 @@ function updatePlayerScores(playerCount, playerObjects) {
       <div class="row">
          <div class="col-lg-5 col-md-2">
             <img class="player-icon" src=${iconSources[i]}></img>
-         </div> 
+         </div>
          <div class="col-lg-7 col-md-10">
             <p id="name-${i + 1}">${player.name} </p>
             <p>Score: <span id="score-${i + 1}">${player.score}</span></p>
@@ -180,7 +180,7 @@ function initializeUpdateInterval() {
                      board.empty();
 
                      let display = $(`<p>Pick a card from your deck that best matches the clue.</p>
-                      <h2 class="inline"> ${GameObject.clue} </h2> 
+                      <h2 class="inline"> ${GameObject.clue} </h2>
                       <button class="submit-fake-vote" id="submit-fake">Submit</button>
                     `);
 
@@ -204,7 +204,7 @@ function initializeUpdateInterval() {
                      board.empty();
 
                      let display = $(`<p>Vote for the card you believe to be the StoryTeller’s card.</p>
-                    <h2 class="inline"> ${GameObject.clue} </h2> 
+                    <h2 class="inline"> ${GameObject.clue} </h2>
                     <button class="submit-fake-vote" id="submit-vote">Submit</button>
                     `);
 
@@ -275,7 +275,7 @@ function initializeUpdateInterval() {
                      //Display cards with owner and votes
                      for (let i = 0; i < GameObject.playerCount; i++) {
                         let cardData = GameObject.roundData.cardArray[i];
-                        let display = $(`<div class="col-sm-12 col-md-4 col-lg-2"><p>${GameObject.players[cardData.playerIndex].name}</p> 
+                        let display = $(`<div class="col-sm-12 col-md-4 col-lg-2"><p>${GameObject.players[cardData.playerIndex].name}</p>
                         <div class="voteCard" id="vote-${i}">${imagesHtml[cardData.cardIdentifier]}</div>
                         <p>Votes: ${cardData.votes}</p></div>`);
 
@@ -353,7 +353,7 @@ function startNewRound(dealerIndex) {
 
       card.attr("class", "voteCard");
       card.attr("id", `selected-card`);
-      // img-${GameObject.players[playerIndex].cards[0]} 
+      // img-${GameObject.players[playerIndex].cards[0]}
       //Appends information to board
       board.append(display);
       board.append(card);
@@ -382,7 +382,7 @@ function displayBoardError(errorMessage) {
    const board = $("#board");
 
    const messageDiv = $(`
-   
+
    <div class="col-12 error-message">
       <hr class="error-line">
          <p> ${errorMessage} </p>
@@ -794,15 +794,22 @@ $("#hand").on({
 
 $("#chat-form").on("submit", (event) => {
    event.preventDefault();
+   let currentRoom = gameID || "global-waiting-room-id";
    let input = $("#chat-input");
-   socket.emit("new-message", input.val());
+   socket.emit("new-message", {
+      roomId: currentRoom,
+      message: input.val()
+   });
    input.val("");
 });
 
 
-socket.on("message", (message) => {
-   let messageHTML = $(`<p class="message">${message}</p>`);
+socket.on("message", (messageObject) => {
+   let currentRoom = gameID || "global-waiting-room-id";
+   if (messageObject.roomId === currentRoom) {
+      let messageHTML = $(`<p class="message">${messageObject.message}</p>`);
    $("#chat-messages").append(messageHTML);
+   }
 });
 
 

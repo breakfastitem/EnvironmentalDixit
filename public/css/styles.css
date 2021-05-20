@@ -169,6 +169,15 @@ h2 {
     font-weight: 600;
 }
 
+#learn-link {
+    position: absolute;
+    right: 1%;
+    font-weight: 600;
+    top: 3rem;
+    font-size: 17px;
+    color: #d8945c;
+}
+
 #selected-card {
     height: 400px;
     width: 300px;
