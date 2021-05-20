@@ -6,9 +6,13 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const mongoose = require("mongoose");
 
-
+// For running in production:
 mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
     , { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+
+// For local testing, run the comands: mkdir data; mkdir data/db; mongod --noauth --dbpath ./data/db
+// mongoose.connect('mongodb://localhost/test?retryWrites=true&w=majority'
+//     , { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
 //models
 const db = require("./models");
