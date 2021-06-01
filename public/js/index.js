@@ -392,7 +392,7 @@ function displayBoardError(errorMessage) {
    board.append(messageDiv);
 
    let timeout = setTimeout(() => {
-      board.children().last().remove();
+      board.children().last().remove(".error-message");
    }, 10000);
 
 }
