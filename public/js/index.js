@@ -8,16 +8,14 @@ let imageSources;
 
 let imagesHtml;
 
-// imageSources.map(url => `<img src=${url} alt="Clue Card" border="0" />`);
+const caretSources = ["./images/misc/up-caret-symbol.png", "./images/misc/down-caret-symbol.png"];
 
-const caretSources = ["https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak", "https://lh3.google.com/u/0/d/1FgEesVcge39EkFcdgQsDXQOIZ5HVbxdh"];
-
-const iconSources = ["https://lh3.google.com/u/0/d/1hAQpVbcLkhmx3uFND_amgVh3Yi6LjXAD",
-   "https://lh3.google.com/u/0/d/1RSPwuFo5Oy0Sv1eTo5yInfmmin2rp6o9",
-   "https://lh3.google.com/u/0/d/119N2ZxoBK9xImMltOdW4wICHdnLeoz-7",
-   "https://lh3.google.com/u/0/d/1HCIIhnUCZjNjp6VLY3kVURHs9o6e9zfY",
-   "https://lh3.google.com/u/0/d/1tHcU7VpYFHDEZAIr0Lxj3qJ_Nak-QGSm",
-   "https://lh3.google.com/u/0/d/1MPgDdtMmtbJDeQAEES7_nmiEpIexWzE7"];
+const iconSources = ["./images/playerIcons/Car.png",
+   "./images/playerIcons/House.png",
+   "./images/playerIcons/Power-plant.png",
+   "./images/playerIcons/Cow.png",
+   "./images/playerIcons/Tree.png",
+   "./images/playerIcons/Refrigerator.png"];
 
 let GameObject = {
    gameId: "",
@@ -394,7 +392,7 @@ function displayBoardError(errorMessage) {
    board.append(messageDiv);
 
    let timeout = setTimeout(() => {
-      board.children().last().remove();
+      board.children().last().remove(".error-message");
    }, 10000);
 
 }
@@ -774,7 +772,7 @@ $("#board").on({
       let handIdentifier = event.target.id.split("-")[1];
       $(`.lightbox-button`).remove();
 
-      let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='https://lh3.google.com/u/0/d/1PmWUnfvCGbDVvUHH2CCldLUBt1PDi4dv'></img>`);
+      let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='./images/misc/up-caret-symbol.png'></img>`);
       $(`#voteDiv-${handIdentifier}`).append(img);
    }
 }, ".voteCard");
@@ -785,7 +783,7 @@ $("#hand").on({
       let handIdentifier = event.target.id.split("-")[1];
       $(`.lightbox-button`).remove();
 
-      let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='https://lh3.google.com/u/0/d/1PmWUnfvCGbDVvUHH2CCldLUBt1PDi4dv'></img>`);
+      let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='./images/misc/zoom.JPG'></img>`);
       $(`#card-${handIdentifier}`).append(img);
    }
 }, ".player-card");
