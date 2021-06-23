@@ -351,7 +351,6 @@ function startNewRound(dealerIndex) {
 
       card.attr("class", "voteCard");
       card.attr("id", `selected-card`);
-      // img-${GameObject.players[playerIndex].cards[0]}
       //Appends information to board
       board.append(display);
       board.append(card);
