@@ -7,8 +7,20 @@ const express = require("express");
 const mongoose = require("mongoose");
 
 
-mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+if (process.env.NODE_ENV === "production") {
+
+    // ---- For running in production: -----
+    mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
     , { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+
+} else if (process.env.NODE_ENV === 'development') {
+
+    /* ---- For local testing: ----- */
+    mongoose.connect('mongodb://localhost/test?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+
+} else if (process.env.NODE_ENV === undefined) {
+    console.log("Uh oh! The NODE_ENV environment variable isn't set. Please set it to 'development' for testing or 'production' for the main server. (see the \"For local testing\" comment in server.js for details)")
+}
 
 //models
 const db = require("./models");
