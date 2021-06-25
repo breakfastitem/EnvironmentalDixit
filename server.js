@@ -15,18 +15,7 @@ if (process.env.NODE_ENV === "production") {
 
 } else if (process.env.NODE_ENV === 'development') {
 
-    /* ---- For local testing: -----
-    1. run the comands:
-       mkdir data
-       mkdir data/db
-       mongod --noauth --dbpath ./data/db
-    /  (note: on windows I think you use reverse slashes for the ./data/db path)
-    2. create a text file in the same folder as server.js and call it ".env" (with the . at the front and no file extension).
-        In that file add theses lines (to set the environment variables):
-           NODE_ENV=development
-           API_KEY=replace_this_with_our_flicker_api_key
-    3. then run this script with node in a new terminal/prompt (ie run: "node server.js")
-    */
+    /* ---- For local testing: ----- */
     mongoose.connect('mongodb://localhost/test?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
 } else if (process.env.NODE_ENV === undefined) {
