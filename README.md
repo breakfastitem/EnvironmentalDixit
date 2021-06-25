@@ -15,7 +15,11 @@
 This repository contains the code for a server implementation of the online game dixit. The game is for 3-6 players. Players can add their own decks from Flickr alblums.
 
 ## Installation
-Download or clone the respository. In respository directory run `npm install`.
+Download or clone the respository.
+
+### _Install Node.js_
+1. Get NodeJS from: https://nodejs.org/en/download
+2. In respository directory run `npm install`
 
 ### _setup .env file:_
 1. Create a text file in the same folder as `server.js` and call it ".env" (with the . at the front and no file extension).
