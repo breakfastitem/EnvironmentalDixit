@@ -38,13 +38,10 @@ _Note: Name & Password aren't needed for development while runing with a local M
 ```
  mkdir data
  mkdir data/db
- mongod --noauth --dbpath ./data/db/
 ```
 
-
-
 ## Usage
-After installation, run `node server.js` or `npm run start` in a new terminal/cmd prompt. Then open your browser to the address the server gives you in the terminal (something like http://localhost:5001). The first player that connects creates the lobby, which generates a roomcode. All subsequent players connect to the room code.
+After installation, run `npm run dev` in a new terminal/cmd prompt. Then open your browser to the address the server gives you in the terminal (something like http://localhost:5001). The first player that connects creates the lobby, which generates a roomcode. All subsequent players connect to the room code.
 
 Deployed to https://peaceful-dusk-06372.herokuapp.com/ for test usage.
 
@@ -56,13 +53,19 @@ run the test script in the json package. `npm run test`.
 This tests specifically the Game.js object and how it handles game calls.
 
 ## Credits
-Code By Andrew Ehrman.
+
+### Contributors
+- [Andrew Ehrman](https://github.com/breakfastitem)
+- [Kyle](https://github.com/KW-M)
 
 ### Components Used
-- Node
-- npm packages:
-  - jest
-  - nodemon
-  - inquirer
-  - mongoose
-  - express
+- npm production packages:
+  - [node-fetch](https://www.npmjs.com/package/node-fetch)
+  - socket.io
+  - [mongoose](https://www.npmjs.com/package/mongoose)
+  - [express](https://www.npmjs.com/package/express)
+- npm development packages:
+  - [jest](https://www.npmjs.com/package/jest)
+  - [nodemon](https://www.npmjs.com/package/nodemon)
+  - [dotenv](https://www.npmjs.com/package/dotenv)
+  - [concurrently](https://www.npmjs.com/package/concurrently)
