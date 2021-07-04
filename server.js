@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === "production") {
 
     // ---- For running in production: -----
     mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-    , { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+        , { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
 
 } else if (process.env.NODE_ENV === 'development') {
 
@@ -53,9 +53,9 @@ require("./routes/game-routes")(app, db);
 io.on('connection', socket => {
     console.log("a User connected");
 
-    socket.on("new-message", (message) => {
-        console.log(message);
-        io.emit("message", message);
+    socket.on("new-message", (messageObject) => {
+        console.log(messageObject);
+        io.emit("message", messageObject);
     });
 });
 

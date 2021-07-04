@@ -795,7 +795,7 @@ $("#chat-form").on("submit", (event) => {
    let input = $("#chat-input");
    socket.emit("new-message", {
       roomId: currentRoom,
-      message: input.val()
+      message: (gameID !== undefined ? GameObject.players[playerIndex].name + ": " : "") + input.val()
    });
    input.val("");
 });
@@ -805,7 +805,7 @@ socket.on("message", (messageObject) => {
    let currentRoom = gameID || "global-waiting-room-id";
    if (messageObject.roomId === currentRoom) {
       let messageHTML = $(`<p class="message">${messageObject.message}</p>`);
-   $("#chat-messages").append(messageHTML);
+      $("#chat-messages").append(messageHTML);
    }
 });
 
