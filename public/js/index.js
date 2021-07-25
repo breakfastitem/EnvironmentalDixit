@@ -69,6 +69,22 @@ function displayImageInViewer(cardId) {
 
 }
 
+function reconnectMenu() {
+   $("#board").empty();
+   $("#board").append(`<p>Reconnect to game ${gameID} </p>
+    <button id="reconnect-yes">Yes</button>
+    <button id="reconnect-no">No</button>`);
+}
+
+function handleReconnect(isRejoining) {
+   if (!isRejoining) {
+      localStorage.setItem("gameID", "");
+      this.location.reload();
+   } else {
+      //:TODO call reconnect
+   }
+}
+
 function updateGameObjectFromResponse(serverResponse) {
    let keys = Object.keys(serverResponse);
 
@@ -145,9 +161,7 @@ function initializeUpdateInterval() {
                case "join":
                   //Add Response data to game object
                   gameID = GameObject.gameID;
-                  // localStorage.setItem("gameId", gameID);
-                  // localStorage.setItem("index", playerIndex);
-                  // localStorage.setItem("GameObject", GameObject);
+                  localStorage.setItem("gameID", gameID);
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   break;
 
@@ -435,6 +449,7 @@ $("#board").on("click", function (event) {
 
       case "join-button":
          gameID = $("#id-input").val().trim().toUpperCase();
+         localStorage.setItem("gameID", gameID);
          playerName = $("#name-input").val().trim();
 
 
@@ -510,19 +525,18 @@ $("#board").on("click", function (event) {
             }
 
          }).then((response) => {
-            console.log(response);
             playerIndex = 0;
 
             updateGameObjectFromResponse(response);
 
             setDeckUrls(response.cardUrls);
 
-            //Get gameId from server
+            //Get gameId from server         
             gameID = GameObject.gameID;
+            localStorage.setItem("gameID", gameID);
 
             //Update code display
             $("#code").text(gameID);
-
 
             updatePlayerScores(GameObject.playerCount, GameObject.players);
             initializeUpdateInterval();
@@ -538,7 +552,6 @@ $("#board").on("click", function (event) {
       case "start-button":
 
          updatePlayerScores(GameObject.playerCount, GameObject.players);
-         console.log(playerIndex);
          $.ajax({
             method: "put",
             url: "/game/start",
@@ -693,6 +706,13 @@ $("#board").on("click", function (event) {
             displayVoteSelection(i);
             break;
          }
+         if (id.split("-")[0] === "reconnect") {
+            if (id.split("-")[1] === "yes") {
+               handleReconnect(true);
+            } else {
+               handleReconnect(false);
+            }
+         }
          break;
 
    }
@@ -795,7 +815,7 @@ $("#chat-form").on("submit", (event) => {
    let input = $("#chat-input");
    socket.emit("new-message", {
       roomId: currentRoom,
-      message: (gameID !== undefined ? GameObject.players[playerIndex].name + ": " : "") + input.val()
+      message: (GameObject?.players !== undefined ? GameObject.players[playerIndex].name + ": " : "") + input.val()
    });
    input.val("");
 });
@@ -808,6 +828,26 @@ socket.on("message", (messageObject) => {
       $("#chat-messages").append(messageHTML);
    }
 });
+
+socket.on("disconnect", (disconnectObject) => {
+   if (disconnectObject.roomId === gameID) {
+      let messageHTML = $(`<p class="message">${GameObject.players[disconnectObject.playerIndex].name} has disconnected</p>`);
+      $("#chat-messages").append(messageHTML);
+   }
+});
+
+//On leave emit disconnect
+window.beforeunload = () => {
+   console.log("HEY");
+   if (![undefined, null, ""].includes(gameID)) {
+      socket.emit('new-disconnect', {
+         roomId: gameID,
+         playerIndex: playerIndex
+      });
+      console.log(847);
+   }
+
+};
 
 
 /**
@@ -822,7 +862,6 @@ $.ajax({
    url: "/api/decks"
 }).then(data => {
    let selector = $("#deck-select");
-   console.log(data);
    data.forEach(deck => {
       let option = $(`<option value=${deck._id}>${deck.name}</option>`);
       selector.append(option);
@@ -830,9 +869,8 @@ $.ajax({
 });
 
 //If in active game reload game settings
-// gameID = localStorage.getItem("gameId");
+gameID = localStorage.getItem("gameID");
 
-// if (gameID != null) {
-//    playerIndex = localStorage.getItem("index");
-//    GameObject = localStorage.getItem("GameObject");
-// }
+if (![null, undefined, ""].includes(gameID)) {
+   reconnectMenu();
+}

@@ -57,8 +57,12 @@ io.on('connection', socket => {
         console.log(messageObject);
         io.emit("message", messageObject);
     });
-});
 
+    socket.on("new-disconnect", (discObject) => {
+        console.log(`player ${discObject.playerIndex} left the game ${discObject.roomId}}`);
+        io.emit("disconnect", discObject);
+    });
+});
 
 //start the server
 server.listen(PORT, () => {
