@@ -107,6 +107,7 @@ function displayCards() {
    const hand = $("#hand");
    hand.empty();
 
+   let lastCardImgElement = null;
    for (let i = 0; i < GameObject.hand.length; i++) {
 
       let imgIdentifier = GameObject.hand[i];
@@ -115,8 +116,10 @@ function displayCards() {
       cardDiv.attr("id", `card-${i}`);
 
       let card = $(imagesHtml[imgIdentifier]);
+      console.log(card)
 
       card.attr("class", "player-card");
+      card.attr("style", "margin-left: calc(-99px - 100% / 6 + 120px);")
       card.attr("id", `img-${i}`);
 
       cardDiv.append(card);
