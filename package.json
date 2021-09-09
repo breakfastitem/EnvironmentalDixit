@@ -2,7 +2,7 @@
   "name": "awcproject",
   "version": "1.0.0",
   "description": "",
-  "main": "script.js",
+  "main": "server.js",
   "scripts": {
     "test": "jest --verbose",
     "start": "node ./server.js",

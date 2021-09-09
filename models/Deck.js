@@ -1,4 +1,4 @@
-const mongoose= require("mongoose");
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const deckSchema = new Schema({
@@ -16,4 +16,4 @@ const deckSchema = new Schema({
 
 const deckModel = mongoose.model("Deck", deckSchema)
 
-module.exports= deckModel;
+module.exports = deckModel;
