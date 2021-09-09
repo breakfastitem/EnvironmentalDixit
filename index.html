@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!-- Make chat name colored and remove playerIcons
+
+add maginfiing glass to vote screen
+and fix width voteCard
+
+voteDiv has caret instead of maginfiing
+hide hand when voting and use hand - splay look in vote screen
+
+center picked card in board
+
+zoom lightbox for different screen sizes
+
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,36 +35,98 @@
 </head>
 
 <body>
-    <h1>
+    <header>
         <img id="title" src="./images/misc/logo.png" />
-        <span id="code">----</span>
-        <a href="http://artworksforchange.org" target="_blank" id="learn-link">Learn More</a>
-    </h1>
+        <h1 id="code-label" style="display: none;">
+            Join Code:<br>
+            <span id="code">----</span>
+        </h1>
+        <!--
 
+         -->
 
-    <div class="container">
+    </header>
+    
+    <section id="game-start-form" class="row">
+        <div class="mini-form">
+            <h2>Start a New Game:</h2>
+            <input id="newgame-name-input" placeholder="Your Name"></input>
+            <br>
+            <select name="decks" id="deck-select">
+                <option value="">Choose A Deck</option>
+            </select>
+            <br>
+            <button id="new-game-button">Start Game</button>
+        </div>
+        <div class="mini-form">
+            <h2>Join an Existing Game:</h2>
+            <input id="name-input" placeholder="Your Name"></input>
+            <br>
+            <input id="id-input" placeholder="Game Id"></input>
+            <br>
+            <button id="join-button">Join Game</button>
+        </div>
+    
+    </section>
+    
+    
+    <div id="start-about-links" class="about-links">
+        <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">Learn More</a></h2>
+        <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">How To Play</a></h2>
+    </div>
+    
+    <div id="error-bar">
+    
+    </div>
+    
+    <div id="board-container" style="display: none;">
+
         <div class="row">
             <!-- score aside-->
             <div class="col-sm-12 col-lg-2">
-                <span><img class="caret" id="rules-caret"
-                        src="https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak">
-                    <h2>Rules</h2>
+                <span class="caret-header">
+                    <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">How To Play</a></h2>
                 </span>
-                <aside id="rules">
+<!-- <aside id="rules" style="display: none;">
                     <p>This is where the rules would be displayed or mabye in a lightBox</p>
-                </aside>
+                </aside> -->
+                
+                <span class="caret-header">
+                    <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">Learn More</a></h2>
+                </span>
+                
+                <hr>
 
-                <span><img class="caret" id="scores-caret"
-                        src="https://lh3.google.com/u/0/d/1p5Zn4m5KkNrvh-aFeq1LtH5_MlpyW0Ak"></img>
+                <span class="caret-header" id="scores-caret"><img class="caret" src="./images/misc/down-caret-symbol.png"></img>
                     <h2>Scores</h2>
                 </span>
 
-                <hr>
+
 
                 <aside id="scores">
 
                 </aside>
 
+                <hr>
+                
+                <span class="caret-header" id="chat-caret"><img class="caret" src="./images/misc/up-caret-symbol.png"></img>
+                    <h2>Chat</h2>
+                </span>
+                
+                <aside id="chat" style="display: none;">
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="chat-messages">
+                
+                            </div>
+                            <form id="chat-form">
+                                <input id="chat-input" type="text"></input>
+                                <button type="submit">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </aside>
+                <hr>
             </div>
 
             <div class="col-sm-12 col-lg-10">
@@ -59,17 +134,7 @@
                 <div class="row">
                     <div class="col-12">
                         <section id="board">
-                            <form>
-                                <input id="name-input" placeholder="Player Name"></input>
-                                <br>
-                                <button id="join-button">Join Game</button>
-                                <input id="id-input" placeholder="Game Id (Join Only)"></input>
-                                <br>
-                                <button id="new-button">New Game</button>
-                                <select name="decks" id="deck-select">
-                                    <option value="">Choose A Deck (New Only)</option>
-                                </select>
-                            </form>
+
 
                         </section>
                     </div>
@@ -90,19 +155,6 @@
 
                 </div>
 
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12">
-                <h1>Chat</h1>
-                <div id="chat-messages">
-
-                </div>
-                <form id="chat-form">
-                    <input id="chat-input" type="text"></input>
-                    <button type="submit">Submit</button>
-                </form>
             </div>
         </div>
 

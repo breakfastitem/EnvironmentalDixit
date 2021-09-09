@@ -8,10 +8,12 @@ const mongoose = require("mongoose");
 
 
 if (process.env.NODE_ENV === "production") {
-
-    // ---- For running in production: -----
-    mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
-        , { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+    if (process.env.MONGO_DB_URL) { // use the MONGO_DB_URL environemnt variable if available:
+        mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@${process.env.MONGO_DB_URL}`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+    } else {
+        // otherwise use the original production heroku server:
+        mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+    }
 
 } else if (process.env.NODE_ENV === 'development') {
 

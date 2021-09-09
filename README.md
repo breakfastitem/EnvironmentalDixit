@@ -29,6 +29,7 @@ NODE_ENV=[development or production]
 API_KEY=[our flicker api key]
 NAME=[deck admin username (IE: the MongoDB Server Username)]
 PASSWORD=[MongoDB Server Password]
+
 ```
 _Note: Name & Password aren't needed for development while runing with a local Mongo DB on your machine_
 
