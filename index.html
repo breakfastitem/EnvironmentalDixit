@@ -1,18 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- Make chat name colored and remove playerIcons
-
-add maginfiing glass to vote screen
-and fix width voteCard
-
-voteDiv has caret instead of maginfiing
-hide hand when voting and use hand - splay look in vote screen
-
-center picked card in board
-
-zoom lightbox for different screen sizes
-
+<!--  TODO: fix new round and add maginfiing glass to vote screen
+voteDiv perviously had caret instead of maginfiing glass ?
 -->
 <head>
     <meta charset="UTF-8">
@@ -46,7 +36,7 @@ zoom lightbox for different screen sizes
          -->
 
     </header>
-    
+
     <section id="game-start-form" class="row">
         <div class="mini-form">
             <h2>Start a New Game:</h2>
@@ -66,19 +56,19 @@ zoom lightbox for different screen sizes
             <br>
             <button id="join-button">Join Game</button>
         </div>
-    
+
     </section>
-    
-    
+
+
     <div id="start-about-links" class="about-links">
         <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">Learn More</a></h2>
         <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">How To Play</a></h2>
     </div>
-    
+
     <div id="error-bar">
-    
+
     </div>
-    
+
     <div id="board-container" style="display: none;">
 
         <div class="row">
@@ -90,11 +80,11 @@ zoom lightbox for different screen sizes
 <!-- <aside id="rules" style="display: none;">
                     <p>This is where the rules would be displayed or mabye in a lightBox</p>
                 </aside> -->
-                
+
                 <span class="caret-header">
                     <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">Learn More</a></h2>
                 </span>
-                
+
                 <hr>
 
                 <span class="caret-header" id="scores-caret"><img class="caret" src="./images/misc/down-caret-symbol.png"></img>
@@ -108,16 +98,16 @@ zoom lightbox for different screen sizes
                 </aside>
 
                 <hr>
-                
+
                 <span class="caret-header" id="chat-caret"><img class="caret" src="./images/misc/up-caret-symbol.png"></img>
                     <h2>Chat</h2>
                 </span>
-                
+
                 <aside id="chat" style="display: none;">
                     <div class="row">
                         <div class="col-12">
                             <div id="chat-messages">
-                
+
                             </div>
                             <form id="chat-form">
                                 <input id="chat-input" type="text"></input>
@@ -145,7 +135,7 @@ zoom lightbox for different screen sizes
                     <div class="col-12">
                         <hr>
 
-                        <div class="row" id="hand">
+                        <div class="row splay-deck" id="hand">
 
 
                         </div>

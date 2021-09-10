@@ -110,8 +110,8 @@ function updatePlayerScores(playerCount, playerObjects) {
             <img class="player-icon" src=${iconSources[i]}></img>
          </div>
          <div class="col-lg-7 col-md-10">
-            <p id="name-${i + 1}">${player.name} </p>
-            <p>Score: <span id="score-${i + 1}">${player.score}</span></p>
+            <p id="name-${i + 1}" style="color:${iconColors[i]}; margin-bottom:0">${player.name} </p>
+            <p><span id="score-${i + 1}" style="margin-top:3px">${player.score}</span></p>
          </div>
       </div>`);
 
@@ -148,12 +148,18 @@ function displayCards() {
          console.log(this)
          console.log(this.width)
          cardDiv.on("mouseenter", () => {
+            cardDiv.addClass("hand-card-active");
             cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
          });
          cardDiv.on("mouseleave", () => {
-            console.log("mouseexit")
+            if (i == selectedHandCardIndex) return;
+            cardDiv.removeClass("hand-card-active");
             cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
          });
+      }
+      if (i == 0) {
+         cardDiv.addClass("vote-selected");
+         cardDiv.addClass("hand-card-active");
       }
 
       card.attr("class", "player-card");
@@ -165,6 +171,7 @@ function displayCards() {
    }
 }
 
+let lastGameState = null;
 function initializeUpdateInterval() {
    interval = setInterval(() => {
 
@@ -179,6 +186,7 @@ function initializeUpdateInterval() {
          console.log(response, GameObject)
          //TODO:: Varable indicating change
          if (GameObject != response) {
+            if (response.gameState != GameObject.gameState) lastGameState = GameObject.gameState
             updateGameObjectFromResponse(response);
 
             switch (GameObject.gameState) {
@@ -195,10 +203,10 @@ function initializeUpdateInterval() {
                   break;
 
                case "mainCard":
-                  hideJoinPhase();
-                  //TODO :: If it is players turn to pick offer them a choice
-                  if (boardInstantiated < 1) {
 
+                  //TODO :: If it is players turn to pick offer them a choice
+                  if (boardInstantiated < 1 || lastGameState == "endDisplay") {
+                     hideJoinPhase();
                      fakeCardSubmited = false;
 
                      displayCards();
@@ -206,6 +214,8 @@ function initializeUpdateInterval() {
                      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
                      boardInstantiated++;
                   }
+
+
 
                   if (boardInstantiated == 4) {
                      boardInstantiated = 0;
@@ -229,7 +239,7 @@ function initializeUpdateInterval() {
                      cardIdentifier = GameObject.hand[0];
                      let card = $(imagesHtml[cardIdentifier]);
 
-                     card.attr("class", "player-card");
+                     card.attr("class", "player-card hand-card-active");
                      card.attr("id", `selected-card`);
 
                      board.append(display);
@@ -246,6 +256,10 @@ function initializeUpdateInterval() {
                      let board = $("#board");
                      board.empty();
 
+                     // clear hand so as not to confuse people between voting cards and hand cards
+                     const hand = $("#hand");
+                     hand.empty();
+
                      let display = $(`<p>Vote for the card you believe to be the StoryTeller’s card.</p>
                     <h2 class="inline"> ${GameObject.clue} </h2>
                     <button class="submit-fake-vote" id="submit-vote">Submit</button>
@@ -253,24 +267,37 @@ function initializeUpdateInterval() {
 
                      board.append(display);
 
-                     let row = $("<div class='row'>");
+                     let row = $("<div class='row splay-deck'>");
 
                      for (let i = 0; i < GameObject.roundCards.length; i++) {
 
+                        let cardDiv = $(`<div class="hand-card-div voteDiv col-sm-12 col-md-4 col-lg-2" id=voteDiv-${i}></div>`);
+                        cardDiv.css({ "z-index": (10 - i).toString() });
+
                         let card = $(imagesHtml[GameObject.roundCards[i]]);
-                        card.attr("class", "voteCard");
+                        card[0].onload = function () {
+                           cardDiv.on("mouseenter", () => {
+                              cardDiv.addClass("hand-card-active");
+                              cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                           });
+                           cardDiv.on("mouseleave", () => {
+                              if (i == voteCardIndex) return;
+                              cardDiv.removeClass("hand-card-active");
+                              cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                           });
+                        }
+                        card.attr("class", "voteCard ");
                         card.attr("id", `vote-${i}`);
 
                         if (i == 0) {
-                           card.attr("class", "voteCard vote-selected");
+                           cardDiv.addClass("vote-selected");
+                           cardDiv.addClass("hand-card-active")
                            voteCardIndex = 0;
                         }
 
-                        let div = $(`<div class="voteDiv col-sm-12 col-md-4 col-lg-2" id=voteDiv-${i}></div>`);
+                        cardDiv.append(card);
 
-                        div.append(card);
-
-                        row.append(div);
+                        row.append(cardDiv);
 
                      }
                      board.append(row);
@@ -281,22 +308,38 @@ function initializeUpdateInterval() {
                      let board = $("#board");
                      board.empty();
 
+                     // clear hand so as not to confuse people between voting cards and hand cards
+                     const hand = $("#hand");
+                     hand.empty();
+
                      let display = $(`<p> The other players are voting. </p>`);
                      board.append(display);
 
-                     let row = $("<div class='row'>");
+                     let row = $("<div class='row splay-deck'>");
 
                      for (let i = 0; i < GameObject.roundCards.length; i++) {
 
+                        let cardDiv = $(`<div class="hand-card-div voteDiv col-sm-12 col-md-4 col-lg-2" id=voteDiv-${i}></div>`);
+                        cardDiv.css({ "z-index": (10 - i).toString() });
+
                         let card = $(imagesHtml[GameObject.roundCards[i]]);
-                        card.attr("class", "voteCard");
+                        card[0].onload = function () {
+                           cardDiv.on("mouseenter", () => {
+                              cardDiv.addClass("hand-card-active");
+                              cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                           });
+                           cardDiv.on("mouseleave", () => {
+                              if (i == voteCardIndex) return;
+                              cardDiv.removeClass("hand-card-active");
+                              cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                           });
+                        }
+                        card.attr("class", "voteCard ");
                         card.attr("id", `vote-${i}`);
 
-                        let div = $(`<div class="voteDiv col-sm-12 col-md-4 col-lg-2" id=voteDiv-${i}></div>`);
+                        cardDiv.append(card);
 
-                        div.append(card);
-
-                        row.append(div);
+                        row.append(cardDiv);
 
                      }
                      board.append(row);
@@ -313,12 +356,12 @@ function initializeUpdateInterval() {
                      let header = $(`<h2> Votes This Round </h2>
                   <p>${dealerName} was the StoryTeller</p>`);
                      board.append(header);
-                     let row = $("<div class='row'></div>");
+                     let row = $("<div class='row' style='justify-content: center;'></div>");
 
                      //Display cards with owner and votes
                      for (let i = 0; i < GameObject.playerCount; i++) {
                         let cardData = GameObject.roundData.cardArray[i];
-                        let display = $(`<div class="col-sm-12 col-md-4 col-lg-2"><p>${GameObject.players[cardData.playerIndex].name}</p>
+                        let display = $(`<div class="votesDisplayCard"><p>${GameObject.players[cardData.playerIndex].name}</p>
                         <div class="voteCard" id="vote-${i}">${imagesHtml[cardData.cardIdentifier]}</div>
                         <p>Votes: ${cardData.votes}</p></div>`);
 
@@ -442,13 +485,20 @@ function startNewRound(dealerIndex) {
 function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
    if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState == "vote") {
+      if (voteCardIndex != cardRoundIndex) {
+         var card = $(`#vote-${voteCardIndex}`)
+         card.parent().removeClass("vote-selected");
+         card.parent().removeClass("hand-card-active");
+         card.parent().css({ "max-width": '' });
 
-      $(`#vote-${voteCardIndex}`).attr("class", "voteCard");
-      //if random var will from different variable
-      voteCardIndex = cardRoundIndex;
+         //if random var will from different variable
+         voteCardIndex = cardRoundIndex;
 
-      $(`#vote-${voteCardIndex}`).attr("class", "voteCard vote-selected");
-
+         card = $(`#vote-${voteCardIndex}`)
+         card.parent().addClass("vote-selected");
+         card.parent().addClass("hand-card-active");
+         card.parent().css({ "max-width": `${card.width}px` });
+      }
    }
 };
 
@@ -754,21 +804,38 @@ $("#board").on("click", function (event) {
 
 });
 
+let selectedHandCardIndex = 0
 $("#hand").on("click", (event) => {
    const targetID = event.target.id;
-
+   console.log(targetID)
    let type = targetID.split("-")[0];
    handNum = targetID.split("-")[1];
+   console.log(type, handNum)
    if (type == "lbutton") {
       displayImageInViewer(GameObject.hand[handNum]);
    }
 
+
    if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
 
-
+      console.log("dddd")
       if (type == "img") {
          cardIdentifier = GameObject.hand[handNum];
          $("#selected-card").remove();
+
+         if (selectedHandCardIndex != handNum) {
+            var handCard = $(`#card-${selectedHandCardIndex}`)
+            handCard.removeClass("vote-selected");
+            handCard.removeClass("hand-card-active");
+            handCard.css({ "max-width": '' });
+
+            var handCard = $(`#card-${handNum}`)
+            handCard.addClass("vote-selected");
+            handCard.addClass("hand-card-active");
+            handCard.css({ "max-width": `${handCard.children().first().width}px` });
+
+            selectedHandCardIndex = handNum
+         }
 
          let card = $(imagesHtml[cardIdentifier]);
 
@@ -801,35 +868,44 @@ $(".caret-header").on("click", function (event) {
 
    if (varId == "rules") {
       isRules = !isRules;
+      isChat = false;
+      isScores = false;
    } else if (varId == "scores") {
       isScores = !isScores;
+      isChat = false;
+      isRules = false
    } else if (varId == "chat") {
-      isChat = !isChat
+      isChat = !isChat;
+      isScores = false;
+      isRules = false
    }
 
-   if ((varId == "rules" && isRules) || (varId == "scores" && isScores) || (varId == "chat" && isChat)) {
-      $(event.currentTarget).children(".caret").attr("src", caretSources[1])
-      $(`#${varId}`).show();
+   if (isRules) {
+      $("#rules-caret").children(".caret").attr("src", caretSources[1])
+      $(`#rules`).show();
    } else {
-      $(event.currentTarget).children(".caret").attr("src", caretSources[0])
-      $(`#${varId}`).hide();
+      $("#rules-caret").children(".caret").attr("src", caretSources[0])
+      $(`#rules`).hide();
+   }
+   if (isChat) {
+      $("#chat-caret").children(".caret").attr("src", caretSources[1])
+      $(`#chat`).show();
+   } else {
+      $("#chat-caret").children(".caret").attr("src", caretSources[0])
+      $(`#chat`).hide();
+   }
+   if (isScores) {
+      $("#scores-caret").children(".caret").attr("src", caretSources[1])
+      $(`#scores`).show();
+   } else {
+      $("#scores-caret").children(".caret").attr("src", caretSources[0])
+      $(`#scores`).hide();
    }
 
 });
 
 //Hovers
-$("#board").on({
-   mouseenter: (event) => {
-
-      let handIdentifier = event.target.id.split("-")[1];
-      $(`.lightbox-button`).remove();
-
-      let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='./images/misc/zoom.jpg'></img>`);
-      $(`#voteDiv-${handIdentifier}`).append(img);
-   }
-}, ".voteCard");
-
-$("#hand").on({
+let showCardZoomIconOnHoverJqueryEventConfig = {
    mouseenter: (event) => {
 
       let handIdentifier = event.target.id.split("-")[1];
@@ -838,10 +914,13 @@ $("#hand").on({
       let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='./images/misc/zoom.jpg'></img>`);
       $(`#card-${handIdentifier}`).append(img);
    }
-}, ".player-card");
+}
+// $("#board").on(showCardZoomIconOnHoverJqueryEventConfig, ".player-card");
+$("#board").on(showCardZoomIconOnHoverJqueryEventConfig, ".hand-card-div");
+$("#hand").on(showCardZoomIconOnHoverJqueryEventConfig, ".player-card");
+
 
 //Chat event listeners
-
 $("#chat-form").on("submit", (event) => {
    event.preventDefault();
    let currentRoom = gameID || "global-waiting-room-id";
