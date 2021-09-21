@@ -9,10 +9,26 @@ module.exports = function (app, db) {
     app.post("/api/deck", (req, res) => {
 
         if (req.body.passphrase == "thunderbird") {
-            // https://www.webfx.com/tools/idgettr/
-            console.log(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${req.body.set}&user_id=${req.body.user}&format=json&nojsoncallback=1`)
-            fetch(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=72157622222940086&user_id=36875125@N03&format=json&nojsoncallback=1`)
+            var url = req.body.alblumUrl
+            //
+            console.log(`https://www.flickr.com/services/rest/?method=flickr.urls.lookupUser&api_key=${process.env.API_KEY}&url=${encodeURIComponent(url)}&format=json&nojsoncallback=1`)
+            fetch(`https://www.flickr.com/services/rest/?method=flickr.urls.lookupUser&api_key=${process.env.API_KEY}&url=${encodeURIComponent(url)}&format=json&nojsoncallback=1`)
                 .then(response => response.json())
+                .then(data => {
+                    var userId, setName;
+                    // try {
+                    userId = data.user.id
+                    setName = url.split("/")[6];
+                    // } catch (err) {
+                    //     throw (err);
+                    // }
+
+                    // https://www.webfx.com/tools/idgettr/
+                    // https://www.flickr.com/photos/riceimages/albums/72157624738589194
+
+                    console.log(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${setName}&user_id=${userId}&format=json&nojsoncallback=1`)
+                    return fetch(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${setName}&user_id=${userId}&format=json&nojsoncallback=1`)
+                }).then(response => response.json())
                 .then(data => {
                     let tempArray = data.photoset.photo.map(photo => {
                         return `https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`;
@@ -29,6 +45,7 @@ module.exports = function (app, db) {
 
                 })
                 .catch(err => {
+                    console.log("Deck api or Flicker api error:", err);
                     res.sendStatus(err.code);
                 });
         } else {
