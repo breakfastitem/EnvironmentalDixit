@@ -50,14 +50,34 @@ app.use(express.static(__dirname + '/public'));
 //routes
 require("./routes/html-routes")(app);
 require("./routes/api-routes")(app, db);
-require("./routes/game-routes")(app, db);
+const gameRoutes = require("./routes/game-routes")(app, db);
 
 io.on('connection', socket => {
     console.log("a User connected");
 
-    socket.on("new-message", (messageObject) => {
-        console.log(messageObject);
-        io.emit("message", messageObject);
+    socket.on("start-new-game", () => {
+        gameRoutes.startNewGame(socket.id);
+    })
+
+    socket.on("update-game-state", (data) => {
+        if (!data.playerSocketId) {
+            console.log("using server socket id for player because playerSocketId was not in update game state data object:", socket.id, playerSocketId)
+            data.playerSocketId = socket.id;
+        }
+        for (const socket of sockets) {
+            gameRoutes.applyGameStateChange(data)
+        })
+
+    socket.on("new-chat-message", (messageObject) => {
+        console.log("chat message:", messageObject);
+        io.emit("broadcast-message", messageObject);
+    });
+
+
+
+    socket.on("game-update", (messageObject) => {
+        console.log("game state update: ", messageObject);
+        io.emit("broadcast-game-update", messageObject);
     });
 });
 

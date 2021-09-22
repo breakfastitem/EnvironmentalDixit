@@ -80,7 +80,7 @@ describe("Game", () => {
             });
         });
 
-        describe("recieveClue(playerIndex,cardID,clue)", () => {
+        describe("recieveClue(playerSocketId,cardID,clue)", () => {
 
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
@@ -111,7 +111,7 @@ describe("Game", () => {
 
         });
 
-        describe("recieveFake(playerIndex,cardID)", () => {
+        describe("recieveFake(playerSocketId,cardID)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             game.addPlayer("Johnny");
@@ -162,7 +162,7 @@ describe("Game", () => {
 
         });
 
-        describe("recieveVote(playerIndex,cardIndex)", () => {
+        describe("recieveVote(playerSocketId,cardIndex)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             game.addPlayer("Johnny");
@@ -194,7 +194,7 @@ describe("Game", () => {
             });
             it("properly calculates the score", () => {
                 game.recieveVote(game.turnOrder[2]-1, 1);
-                let tempArray = game.roundData.cardArray.filter(card => card.playerIndex == game.turnOrder[0]-1);
+                let tempArray = game.roundData.cardArray.filter(card => card.playerSocketId == game.turnOrder[0] - 1);
                 let hostVotes = tempArray[0].votes;
 
 
@@ -272,7 +272,7 @@ describe("Game", () => {
     });
     describe("Get Functions", () => {
 
-        describe("Send Data (playerIndex)", () => {
+        describe("Send Data (playerSocketId)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             let data;
@@ -332,7 +332,7 @@ describe("Game", () => {
                 let actual = data.roundCards;
                 let testArray = game.roundData.cardArray;
 
-                let filtered = testArray.filter(card => card.playerIndex != game.turnOrder[0]-1);
+                let filtered = testArray.filter(card => card.playerSocketId != game.turnOrder[0] - 1);
 
 
                 let expected = [filtered[0].cardIdentifier, filtered[1].cardIdentifier];
@@ -347,7 +347,7 @@ describe("Game", () => {
                 let actual = data.roundCards;
                 let testArray = game.roundData.cardArray;
 
-                let filtered = testArray.filter(card => card.playerIndex != game.turnOrder[1]-1);
+                let filtered = testArray.filter(card => card.playerSocketId != game.turnOrder[1] - 1);
 
 
                 let expected = [filtered[0].cardIdentifier, filtered[1].cardIdentifier];
@@ -358,13 +358,13 @@ describe("Game", () => {
             it("In endDisplay If both players vote for teller or against tellerthe score is resolved", () => {
                 let expected;
 
-                if (game.roundData.cardArray[0].playerIndex == game.turnOrder[0]-1) {
+                if (game.roundData.cardArray[0].playerSocketId == game.turnOrder[0] - 1) {
                     expected = [2, 2, 2];
                     expected[game.turnOrder[0]-1]=0;
                 } else{
                     expected=[2,2,2];
                     expected[game.turnOrder[0]-1]=0;
-                    expected[game.roundData.cardArray[0].playerIndex]=4;
+                    expected[game.roundData.cardArray[0].playerSocketId] = 4;
                 }
 
                 game.recieveVote(game.turnOrder[1]-1, 0);

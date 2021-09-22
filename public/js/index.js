@@ -43,7 +43,7 @@ let cardOrder = [];
 
 let gameID;
 //PLayer index in players on gameobject
-let playerIndex;
+let playerSocketId;
 
 let gameManager;
 //precents gameobject from being updated if not needed
@@ -173,16 +173,7 @@ function displayCards() {
 
 let lastGameState = null;
 function initializeUpdateInterval() {
-   interval = setInterval(() => {
-
-      $.ajax({
-         method: "get",
-         url: `/game/pull/${gameID}/${playerIndex}`,
-         error: () => {
-            location.reload();
-         }
-
-      }).then(function (response) {
+   socket.on("game-update", (response) => {
          console.log(response, GameObject)
          //TODO:: Varable indicating change
          if (GameObject != response) {
@@ -194,7 +185,7 @@ function initializeUpdateInterval() {
                   //Add Response data to game object
                   gameID = GameObject.gameID;
                   // localStorage.setItem("gameId", gameID);
-                  // localStorage.setItem("index", playerIndex);
+                  // localStorage.setItem("index", playerSocketId);
                   // localStorage.setItem("GameObject", GameObject);
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
 
@@ -226,7 +217,7 @@ function initializeUpdateInterval() {
 
                   //Everyone but dealer has this display
 
-                  if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+                  if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerSocketId) {
                      //Display board info
                      let board = $("#board");
                      board.empty();
@@ -251,7 +242,7 @@ function initializeUpdateInterval() {
 
                   break;
                case "vote":
-                  if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+                  if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerSocketId) {
                      //Display board info
                      let board = $("#board");
                      board.empty();
@@ -304,7 +295,7 @@ function initializeUpdateInterval() {
 
                      boardInstantiated++;
 
-                  } else if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+                  } else if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 == playerSocketId) {
                      let board = $("#board");
                      board.empty();
 
@@ -361,7 +352,7 @@ function initializeUpdateInterval() {
                      //Display cards with owner and votes
                      for (let i = 0; i < GameObject.playerCount; i++) {
                         let cardData = GameObject.roundData.cardArray[i];
-                        let display = $(`<div class="votesDisplayCard"><p>${GameObject.players[cardData.playerIndex].name}</p>
+                        let display = $(`<div class="votesDisplayCard"><p>${GameObject.players[cardData.playerSocketId].name}</p>
                         <div class="voteCard" id="vote-${i}">${imagesHtml[cardData.cardIdentifier]}</div>
                         <p>Votes: ${cardData.votes}</p></div>`);
 
@@ -373,7 +364,7 @@ function initializeUpdateInterval() {
 
                      updatePlayerScores(GameObject.playerCount, GameObject.players);
                      //if host
-                     if (playerIndex == 0) {
+                     if (playerSocketId == 0) {
                         let button = $(`<button id="new-Round">next round</button>`);
                         board.append(button);
                      }
@@ -386,20 +377,17 @@ function initializeUpdateInterval() {
 
          }
 
-      });
-
-   }, 2000);
-
+   });
 }
 
 function startNewGame() {
    // start a new game:
    updatePlayerScores(GameObject.playerCount, GameObject.players);
-   console.log(playerIndex);
+   console.log(playerSocketId);
    $.ajax({
       method: "put",
       url: "/game/start",
-      data: { gameId: gameID, playerIndex: playerIndex }
+      data: { gameId: gameID, playerSocketId: playerSocketId }
    }).then((response) => {
 
       updateGameObjectFromResponse(response);
@@ -459,7 +447,7 @@ function startNewRound(dealerIndex) {
 
    dealerName = GameObject.players[dealerIndex - 1].name;
 
-   if (dealerIndex - 1 == playerIndex) {
+   if (dealerIndex - 1 == playerSocketId) {
       display = $(`<p>Choose a card from your deck and enter a clue that relates to it.</p>
       <form>
       <textarea id="clue-input" rows="4" cols="50"></textarea>
@@ -484,7 +472,7 @@ function startNewRound(dealerIndex) {
 
 function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
-   if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState == "vote") {
+   if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerSocketId && GameObject.gameState == "vote") {
       if (voteCardIndex != cardRoundIndex) {
          var card = $(`#vote-${voteCardIndex}`)
          card.parent().removeClass("vote-selected");
@@ -501,6 +489,8 @@ function displayVoteSelection(cardRoundIndex) {
       }
    }
 };
+
+
 
 function displayBoardError(errorMessage) {
    const board = $("#error-bar");
@@ -581,7 +571,7 @@ $("#join-button").on("click", function () {
       updateGameObjectFromResponse(response);
       setDeckUrls(response.cardUrls);
 
-      playerIndex = GameObject.playerCount - 1;
+      playerSocketId = GameObject.playerCount - 1;
 
       updatePlayerScores(GameObject.playerCount, GameObject.players);
 
@@ -632,7 +622,7 @@ $("#new-game-button").on("click", function () {
 
    }).then((response) => {
       console.log(response);
-      playerIndex = 0;
+      playerSocketId = 0;
 
       updateGameObjectFromResponse(response);
 
@@ -670,14 +660,14 @@ $("#board").on("click", function (event) {
          clearInterval(interval);
          const clue = $("#clue-input").val().trim();
 
-         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardIdentifier, votes: 0, voterIndexes: [] }] };
+         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerSocketId: playerSocketId, cardIdentifier: cardIdentifier, votes: 0, voterIndexes: [] }] };
 
 
 
          $.ajax({
             method: "put",
             url: "/game/clue",
-            data: { gameId: gameID, roundData: roundData, playerIndex: playerIndex }
+            data: { func: "clue", gameId: gameID, roundData: roundData, playerSocketId: playerSocketId }
          }).then(function (response) {
 
             updateGameObjectFromResponse(response);
@@ -710,7 +700,7 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/fake",
-            data: { gameId: gameID, cardIdentifier: cardIdentifier, playerIndex: playerIndex }
+            data: { gameId: gameID, cardIdentifier: cardIdentifier, playerSocketId: playerSocketId }
          }).then(function (response) {
 
 
@@ -741,7 +731,7 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/vote",
-            data: { gameId: gameID, cardIndex: voteCardIndex, playerIndex: playerIndex }
+            data: { gameId: gameID, cardIndex: voteCardIndex, playerSocketId: playerSocketId }
          }).then(function (response) {
 
             //To prevent selected cards appending
@@ -772,7 +762,7 @@ $("#board").on("click", function (event) {
          $.ajax({
             method: "put",
             url: "/game/next",
-            data: { gameId: gameID, players: GameObject.players, cardOrder: GameObject.cardOrder, playerIndex: playerIndex }
+            data: { gameId: gameID, players: GameObject.players, cardOrder: GameObject.cardOrder, playerSocketId: playerSocketId }
          }).then(function (response) {
 
             updateGameObjectFromResponse(response);
@@ -816,7 +806,7 @@ $("#hand").on("click", (event) => {
    }
 
 
-   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
+   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerSocketId && GameObject.gameState === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerSocketId && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
 
       console.log("dddd")
       if (type == "img") {
@@ -925,20 +915,20 @@ $("#chat-form").on("submit", (event) => {
    event.preventDefault();
    let currentRoom = gameID || "global-waiting-room-id";
    let input = $("#chat-input");
-   socket.emit("new-message", {
+   socket.emit("new-chat-message", {
       roomId: currentRoom,
-      playerIndex: (gameID !== "global-waiting-room-id" ? playerIndex : -1),
+      playerSocketId: (gameID !== "global-waiting-room-id" ? playerSocketId : -1),
       message: input.val()
    });
    input.val("");
 });
 
 
-socket.on("message", (messageObject) => {
+socket.on("broadcast-message", (messageObject) => {
    let currentRoom = gameID || "global-waiting-room-id";
    if (messageObject.roomId === currentRoom) {
       let messageHTML = $(`
-            <p class="message"><em style="color:${messageObject.playerIndex >= 0 ? iconColors[messageObject.playerIndex] : "#fff"}">${(messageObject.playerIndex >= 0 ? GameObject.players[messageObject.playerIndex].name + ": " : "")}</em>${messageObject.message}</p>
+            <p class="broadcast-message"><em style="color:${messageObject.playerSocketId >= 0 ? iconColors[messageObject.playerSocketId] : "#fff"}">${(messageObject.playerSocketId >= 0 ? GameObject.players[messageObject.playerSocketId].name + ": " : "")}</em>${messageObject.message}</p>
       </div>`);
       $("#chat-messages").append(messageHTML);
    }
@@ -968,6 +958,6 @@ $.ajax({
 // gameID = localStorage.getItem("gameId");
 
 // if (gameID != null) {
-//    playerIndex = localStorage.getItem("index");
+//    playerSocketId = localStorage.getItem("index");
 //    GameObject = localStorage.getItem("GameObject");
 // }
