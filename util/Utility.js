@@ -30,7 +30,7 @@ function determineScores(players, roundData, tellerIndex) {
             }
         }
     } else {
-       
+
         players[tellerIndex].score += 3;
         let voterIndexes = tellerCard.voterIndexes;
         //Everyone who voted for correct card also gets points

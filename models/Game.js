@@ -5,7 +5,7 @@ const Utility = require("../util/Utility");
 class Game {
 
     //Creates the game as an object. This will match what the current schema calls are doing.
-    constructor(gameID, playerName, deck) {
+    constructor(gameID, playerName, playerSocketID, deck) {
 
         //Initialize game
 
@@ -23,7 +23,7 @@ class Game {
 
         this.playerCount = 1;
 
-        this.gameState = "join";
+        this.gameStage = "join";
 
         this.roundData = {};
 
@@ -31,19 +31,26 @@ class Game {
 
         this.turnOrder = [];
 
+        this.playerIndexToSocketIdMap = {};
+        this.playerIndexToSocketIdMap[playerSocketID] = 0;
+
+    }
+
+    getPlayerIndexFromSocketId(socketId) {
+        return this.playerIndexToSocketIdMap[socketId]
     }
 
     //Assumes name has been validated Error checks here are referenced to gamestate and other players.
     //Adds player to players if there are less than six players
-    addPlayer(name) {
+    addPlayer(name, playerSocketID) {
 
-        if (this.gameState != "join") {
-            return 377;
+        if (this.gameStage != "join") {
+            return { err: "addPlayer called when gameStage was not 'join', was " + this.gameStage };
         }
 
         if (this.playerCount >= 6) {
             //Too many players.
-            return 400;
+            return { err: "Too many players (max 6)" };
         }
 
         let found = false;
@@ -55,12 +62,14 @@ class Game {
         });
 
         if (found) {
-            return 399;
+            return { err: "A player with that name already joined." };
         }
 
         let player = new Player(name, false);
 
         this.players.push(player);
+        var playerIndex = this.players.length - 1
+        this.playerIndexToSocketIdMap[playerSocketID] = playerIndex // store the player index in the map
 
         this.playerCount++;
 
@@ -69,7 +78,6 @@ class Game {
     }
 
     startGame() {
-
 
         if (this.playerCount < 3) {
             //Not enough players
@@ -92,7 +100,7 @@ class Game {
 
 
         this.cardOrder = cardOrder;
-        this.gameState = "mainCard";
+        this.gameStage = "mainCard";
 
         this.dealCards();
 
@@ -102,13 +110,13 @@ class Game {
 
     recieveClue(playerIndex, cardID, clue) {
         if (clue == "") {
-            return 400;
+            return { err: "No clue provided" };
         }
 
-        if (this.gameState == "mainCard") {
+        if (this.gameStage == "mainCard") {
             this.roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardID, votes: 0, voterIndexes: [] }] };
 
-            this.gameState = "fakeCards";
+            this.gameStage = "fakeCards";
         }
 
         return false;
@@ -116,17 +124,17 @@ class Game {
     }
 
     recieveFake(playerIndex, cardID) {
-        if (this.gameState == "fakeCards") {
+        if (this.gameStage == "fakeCards") {
             this.roundData.playersActed = this.roundData.playersActed + 1;
             let card = { playerIndex: playerIndex, cardIdentifier: cardID, votes: 0, voterIndexes: [] }
             this.roundData.cardArray.push(card);
 
             if (this.roundData.playersActed == this.playerCount) {
 
-                //Randomizes so host card isnt displayed first 
+                //Randomizes so host card isnt displayed first
 
                 this.roundData.playersActed = 1;
-                this.gameState = "vote";
+                this.gameStage = "vote";
 
                 this.roundData.cardArray = Utility.shuffle(this.roundData.cardArray);
 
@@ -140,7 +148,7 @@ class Game {
     }
 
     recieveVote(playerIndex, cardIndex) {
-        if (this.gameState == "vote") {
+        if (this.gameStage == "vote") {
             let tempArray = this.roundData.cardArray;
 
             //Parses index response to account for the user submiting the missing card
@@ -160,7 +168,7 @@ class Game {
                 this.players = Utility.determineScores(this.players, this.roundData, this.turnOrder[this.roundCount] - 1);
 
 
-                this.gameState = "endDisplay";
+                this.gameStage = "endDisplay";
             }
 
             return true;
@@ -171,46 +179,40 @@ class Game {
     }
 
     newRound() {
-        if (this.gameState == "endDisplay") {
+        if (this.gameStage == "endDisplay") {
             this.removeUsedCardsFromHand();
             this.roundCount = this.roundCount + 1;
             this.dealCards();
-            this.gameState = "mainCard";
+            this.gameStage = "mainCard";
 
             return true;
         }
 
         return false;
     }
+
     sendData(playerIndex) {
         let data;
-        switch (this.gameState) {
+        switch (this.gameStage) {
             case "join":
-                data = { cardUrls: this.deckUrls, gameID: this.gameID, gameState: this.gameState, playerCount: this.playerCount, players: [] };
-
-                for (let i = 0; i < this.playerCount; i++) {
-                    data.players.push({ name: this.players[i].name, score: this.players[i].score });
-                }
+                data = { cardUrls: this.deckUrls, gameID: this.gameID, gameStage: this.gameStage, playerCount: this.playerCount, players: this.players, turnOrder: this.turnOrder, roundCount: this.roundCount };
 
                 break;
             case "mainCard":
-                data = { gameState: this.gameState, playerCount: this.playerCount, players: [], roundCount: this.roundCount };
-                for (let i = 0; i < this.playerCount; i++) {
-                    data.players.push({ name: this.players[i].name, score: this.players[i].score });
-                }
+                data = { gameStage: this.gameStage, playerCount: this.playerCount, players: this.players, roundCount: this.roundCount };
 
                 data.hand = this.players[playerIndex].cards;
                 data.turnOrder = this.turnOrder;
                 break;
             case "fakeCards":
-                data = { gameState: this.gameState, clue: this.roundData.clue };
+                data = { gameStage: this.gameStage, clue: this.roundData.clue };
 
                 data.hand = this.players[playerIndex].cards;
                 data.turnOrder = this.turnOrder;
 
                 break;
             case "vote":
-                data = { gameState: this.gameState, turnOrder: this.turnOrder, roundCount: this.roundCount };
+                data = { gameStage: this.gameStage, turnOrder: this.turnOrder, roundCount: this.roundCount };
 
                 let tempArray = this.roundData.cardArray;
 
@@ -225,12 +227,8 @@ class Game {
                 break;
 
             case "endDisplay":
-                data = { gameState: this.gameState, players: [], roundData: this.roundData, roundCount: this.roundCount };
-                for (let i = 0; i < this.playerCount; i++) {
-                    data.players.push({ name: this.players[i].name, score: this.players[i].score });
-                }
+                data = { gameStage: this.gameStage, players: this.players, roundData: this.roundData, roundCount: this.roundCount };
                 break;
-
         }
 
         return data;

@@ -20,7 +20,7 @@ describe("Game", () => {
         it("Initial game state should be join", () => {
             let game = new Game("AAAA", "jimmy", 45);
 
-            expect(game.gameState).toBe("join");
+            expect(game.gameStage).toBe("join");
         });
     });
 
@@ -49,7 +49,7 @@ describe("Game", () => {
 
         describe("Start Game (settings)", () => {
 
-            it("Function startGame() changes gamestate to main card", () => {
+            it("Function startGame() changes gamestage to main card", () => {
                 let game = new Game("AAAA", "jimmy", 45);
                 game.addPlayer("Billy");
                 game.addPlayer("Johnny");
@@ -57,7 +57,7 @@ describe("Game", () => {
                 let settings = "settings";
                 game.startGame(settings);
 
-                expect(game.gameState).toBe("mainCard");
+                expect(game.gameStage).toBe("mainCard");
             });
             it("Excepts settings parameters including deck information", () => {
                 let game = new Game("AAAA", "jimmy", 45);
@@ -97,12 +97,12 @@ describe("Game", () => {
                 let expected = "clue";
                 expect(actual).toBe(expected);
             });
-            it("Must change gamestate to fakecards", () => {
+            it("Must change gamestage to fakecards", () => {
 
                 let expected = "fakeCards";
-                expect(game.gameState).toBe(expected);
+                expect(game.gameStage).toBe(expected);
             });
-            it("Must fail if gamestate is not main card", () => {
+            it("Must fail if gamestage is not main card", () => {
                 let actual = game.recieveClue(0, 2, "clue");
                 let expected = false;
 
@@ -142,7 +142,7 @@ describe("Game", () => {
             it("if all players acted change game state", () => {
                 game.recieveFake(1, 4);
 
-                let actual = game.gameState;
+                let actual = game.gameStage;
                 let expected = "vote";
 
                 expect(actual).toBe(expected);
@@ -184,9 +184,9 @@ describe("Game", () => {
                 expect(actual).toBe(expected);
 
             });
-            it("when all votes are tallied update gameState to end display", () => {
+            it("when all votes are tallied update gameStage to end display", () => {
                 game.recieveVote(game.turnOrder[2]-1, 0);
-                let actual = game.gameState;
+                let actual = game.gameStage;
                 let expected = "endDisplay";
 
                 expect(actual).toBe(expected);
@@ -194,7 +194,7 @@ describe("Game", () => {
             });
             it("properly calculates the score", () => {
                 game.recieveVote(game.turnOrder[2]-1, 1);
-                let tempArray = game.roundData.cardArray.filter(card => card.playerIndex == game.turnOrder[0]-1);
+                let tempArray = game.roundData.cardArray.filter(card => card.playerIndex == game.turnOrder[0] - 1);
                 let hostVotes = tempArray[0].votes;
 
 
@@ -213,7 +213,7 @@ describe("Game", () => {
 
             });
 
-            it("Only tallie when gamestate is vote", () => {
+            it("Only tallie when gamestage is vote", () => {
                 let actual = game.recieveVote(1, 0);
 
                 let expected = false;
@@ -244,7 +244,7 @@ describe("Game", () => {
 
             it("Changes game state to clue phase, if valid", () => {
                 game.newRound();
-                let actual = game.gameState;
+                let actual = game.gameStage;
                 let expected = "mainCard";
 
                 expect(actual).toBe(expected);
@@ -283,7 +283,7 @@ describe("Game", () => {
 
                 console.log(data);
 
-                expect(data).toStrictEqual({gameID:"AAAA", gameState: "join", playerCount: 2, players: [{ name: "jimmy", score: 0 }, { name: "Billy", score: 0 }] });
+                expect(data).toStrictEqual({ gameID: "AAAA", gameStage: "join", playerCount: 2, players: [{ name: "jimmy", score: 0 }, { name: "Billy", score: 0 }] });
             });
 
 
@@ -332,7 +332,7 @@ describe("Game", () => {
                 let actual = data.roundCards;
                 let testArray = game.roundData.cardArray;
 
-                let filtered = testArray.filter(card => card.playerIndex != game.turnOrder[0]-1);
+                let filtered = testArray.filter(card => card.playerIndex != game.turnOrder[0] - 1);
 
 
                 let expected = [filtered[0].cardIdentifier, filtered[1].cardIdentifier];
@@ -347,7 +347,7 @@ describe("Game", () => {
                 let actual = data.roundCards;
                 let testArray = game.roundData.cardArray;
 
-                let filtered = testArray.filter(card => card.playerIndex != game.turnOrder[1]-1);
+                let filtered = testArray.filter(card => card.playerIndex != game.turnOrder[1] - 1);
 
 
                 let expected = [filtered[0].cardIdentifier, filtered[1].cardIdentifier];
@@ -358,13 +358,13 @@ describe("Game", () => {
             it("In endDisplay If both players vote for teller or against tellerthe score is resolved", () => {
                 let expected;
 
-                if (game.roundData.cardArray[0].playerIndex == game.turnOrder[0]-1) {
+                if (game.roundData.cardArray[0].playerIndex == game.turnOrder[0] - 1) {
                     expected = [2, 2, 2];
                     expected[game.turnOrder[0]-1]=0;
                 } else{
                     expected=[2,2,2];
                     expected[game.turnOrder[0]-1]=0;
-                    expected[game.roundData.cardArray[0].playerIndex]=4;
+                    expected[game.roundData.cardArray[0].playerIndex] = 4;
                 }
 
                 game.recieveVote(game.turnOrder[1]-1, 0);

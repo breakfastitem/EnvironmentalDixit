@@ -50,15 +50,65 @@ app.use(express.static(__dirname + '/public'));
 //routes
 require("./routes/html-routes")(app);
 require("./routes/api-routes")(app, db);
-require("./routes/game-routes")(app, db);
+const gameRoutes = require("./routes/game-routes")(app, db);
 
 io.on('connection', socket => {
     console.log("a User connected");
 
-    socket.on("new-message", (messageObject) => {
-        console.log(messageObject);
-        io.emit("message", messageObject);
+
+    async function broadcastGameUpdate(data) {
+        console.log("broadcasting game update: ", data)
+        // return all Socket instances
+        const sockets = await io.fetchSockets();
+        for (const othersocket of sockets) {
+            // skip the player socket connection that sent the update (since we already replied to them in a callback):
+            if (socket.id != othersocket.id) {
+                data.playerSocketId = othersocket.id
+
+                let theGameState = gameRoutes.getUpdatedGameState(data.gameId, othersocket.id)
+                console.log("sending update to socket " + othersocket.id + ": ", theGameState)
+                if (theGameState && !theGameState.err) othersocket.send("game-update", theGameState)
+            }
+        }
+
+    }
+
+    socket.on("create-new-game", (data, callback) => {
+        data.playerSocketId = socket.id
+        gameRoutes.createNewGame(data).then((gameState) => {
+            console.log(data, "new game state", gameState);
+            callback(gameState);
+        })
     });
+
+    socket.on("join-game", (data, callback) => {
+        data.playerSocketId = socket.id
+        gameRoutes.applyGameStateChange("join", data).then((gameState) => {
+            console.log(data, "new game state:", gameState);
+            callback(gameState);
+            broadcastGameUpdate(data);
+        })
+    });
+
+
+    socket.on("update-game-state", (data, callback) => {
+        data.playerSocketId = socket.id;
+
+        // reply directly to the socket connection that sent the update using the socket.io callback
+        callBackData = gameRoutes.applyGameStateChange(data)
+        console.log("sendingCallback:", callBackData)
+        callback(callBackData);
+
+
+        broadCast().then() // "then" only so the async function gets called and we can use await keyword
+
+    })
+
+    socket.on("new-chat-message", (messageObject) => {
+        console.log("chat message:", messageObject);
+        io.emit("broadcast-message", messageObject);
+    });
+
 });
 
 
