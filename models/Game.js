@@ -36,8 +36,8 @@ class Game {
 
     }
 
-    getPlayerIndexFromSocketId(socketId) {
-        return this.playerIndexToSocketIdMap[socketId]
+    getPlayerIndexFromSocketId(playerSocketID) {
+        return this.playerIndexToSocketIdMap[playerSocketID]
     }
 
     //Assumes name has been validated Error checks here are referenced to gamestate and other players.

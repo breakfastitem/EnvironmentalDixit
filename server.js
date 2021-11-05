@@ -1,12 +1,11 @@
-
+const express = require("express");
+const mongoose = require("mongoose");
 if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
 
-const express = require("express");
-const mongoose = require("mongoose");
 
-
+// setup database connection based on current NODE_ENV variable
 if (process.env.NODE_ENV === "production") {
     if (process.env.MONGO_DB_URL) { // use the MONGO_DB_URL environemnt variable if available:
         mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@${process.env.MONGO_DB_URL}`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
@@ -55,7 +54,8 @@ const gameRoutes = require("./routes/game-routes")(app, db);
 io.on('connection', socket => {
     console.log("a User connected");
 
-
+    // sends all connected players of the current game the updated game state representation specific to that player
+    // TODO: !!!! Make sure only players of the CURRENT/SAME game get sent updates (probably already happens because  getPlayerIndexFromSocketId in getUpdatedGameState will give an error)
     async function broadcastGameUpdate(data) {
         console.log("broadcasting game update: ", data)
         // return all Socket instances
@@ -70,14 +70,13 @@ io.on('connection', socket => {
                 if (theGameState && !theGameState.err) othersocket.send("game-update", theGameState)
             }
         }
-
     }
 
     socket.on("create-new-game", (data, callback) => {
         data.playerSocketId = socket.id
         gameRoutes.createNewGame(data).then((gameState) => {
-            console.log(data, "new game state", gameState);
-            callback(gameState);
+            console.log(data, "new game state:", gameState);
+            callback(gameState); // Since no other players exist, no need for broadCast
         })
     });
 
@@ -90,23 +89,18 @@ io.on('connection', socket => {
         })
     });
 
-
-    socket.on("update-game-state", (data, callback) => {
-        data.playerSocketId = socket.id;
-
-        // reply directly to the socket connection that sent the update using the socket.io callback
-        callBackData = gameRoutes.applyGameStateChange(data)
-        console.log("sendingCallback:", callBackData)
-        callback(callBackData);
-
-
-        broadCast().then() // "then" only so the async function gets called and we can use await keyword
-
-    })
+    socket.on("start-game", (data, callback) => {
+        data.playerSocketId = socket.id
+        gameRoutes.applyGameStateChange("start", data).then((gameState) => {
+            console.log(data, "new game state:", gameState);
+            callback(gameState);
+            broadcastGameUpdate(data).then() // "then" only so the async function gets called and we can use await keyword;
+        })
+    });
 
     socket.on("new-chat-message", (messageObject) => {
         console.log("chat message:", messageObject);
-        io.emit("broadcast-message", messageObject);
+        io.emit("broadcast-chat-message", messageObject);
     });
 
 });

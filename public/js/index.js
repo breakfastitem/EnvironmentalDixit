@@ -1,12 +1,8 @@
 /**
- * Static Vars
+ * Static Variables
  */
+
 const socket = io({});
-
-//filled after join and deck information is given
-let imageSources;
-
-let imagesHtml;
 
 const caretSources = ["./images/misc/up-caret-symbol.png", "./images/misc/down-caret-symbol.png"];
 
@@ -24,27 +20,27 @@ const iconColors = ["#e33533",
    "#22861c",
    "#d8945b"];
 
+/**
+ * Variables that change over gameplay
+ */
 
-// for debug / copying the join code
-// const copyToClipboard = (str) => {
-//    const el = document.createElement('textarea');
-//    el.value = str;
-//    document.body.appendChild(el);
-//    el.select();
-//    document.execCommand('copy');
-//    document.body.removeChild(el);
-// };
-
+let gameID;
 let GameObject = {
    gameId: "",
    playerCount: "0",
    gameStage: "none",
    players: []
 }
+
+// filled after join and deck information is given
+let imageSources;
+let imagesHtml;
+
 //Holds shuffled card values
 let cardOrder = [];
 
-let gameID;
+
+
 //PLayer key in players on gameobject
 let playerIndex;
 
@@ -139,18 +135,17 @@ $("#create-game-button").on("click", function () {
       //Get gameId from server
       gameID = GameObject.gameID;
 
-      //Update code display
+      //Update join code display
       $("#code").text(gameID);
       $("#code-label").show();
 
       // Select the game id on screen
-      console.log("Copy")
+      // (for debug / copying the join code)
       const selection = window.getSelection();
       const range = document.createRange();
       range.selectNodeContents(document.getElementById("code"));
       selection.removeAllRanges();
       selection.addRange(range);
-
 
       updatePlayerScores(GameObject.playerCount, GameObject.players);
       initializeGameUpdateListenerSocket();
@@ -226,7 +221,7 @@ function displayWaitingRoomPhase(isHost) {
    let display;
 
    if (isHost) {
-      display = $(`<div><p>Click start when all players have joined.<br/><button id="start-button">Start Game</button></p><div id="joined-player-list"></div></div>`);
+      display = $(`<div><p>Click start when all players have joined.<br/><button id="start-full-game-button">Start Game</button></p><div id="joined-player-list"></div></div>`);
    } else {
       display = $(`<div><p>Waiting For the Host...</p><div id="joined-player-list"></div></div>`);
    }
@@ -234,14 +229,15 @@ function displayWaitingRoomPhase(isHost) {
    startingForm.append(display);
 
 
-   $("#start-button").on("click", startGame)
+   $("#start-full-game-button").on("click", startFullGame)
 }
 
-socket.on("broadcast-message", (messageObject) => {
+
+socket.on("broadcast-chat-message", (messageObject) => {
    let currentRoom = gameID || "global-waiting-room-id";
    if (messageObject.roomId === currentRoom) {
       let messageHTML = $(`
-            <p class="broadcast-message"><em style="color:${messageObject.playerIndex >= 0 ? iconColors[messageObject.playerIndex] : "#fff"}">${(messageObject.playerIndex >= 0 ? GameObject.players[messageObject.playerIndex].name + ": " : "")}</em>${messageObject.message}</p>
+            <p class="broadcast-chat-message"><em style="color:${messageObject.playerIndex >= 0 ? iconColors[messageObject.playerIndex] : "#fff"}">${(messageObject.playerIndex >= 0 ? GameObject.players[messageObject.playerIndex].name + ": " : "")}</em>${messageObject.message}</p>
       </div>`);
       $("#chat-messages").append(messageHTML);
    }
@@ -260,14 +256,14 @@ function hideWaitingRoomPhase() {
    $("#board-container").show();
 }
 
-function startGame() {
+function startFullGame() {
    // start a new game:
    updatePlayerScores(GameObject.playerCount, GameObject.players);
-   console.log(playerIndex);
-   socket.emit("update-game-state", { func: "start", gameId: gameID, playerIndex: playerIndex }, (response) => {
-      console.log("response from starting the game:", response, GameObject)
+   console.log("Starting Game: PlayerIndex=", playerIndex);
+   socket.emit("start-game", { gameId: gameID, playerIndex: playerIndex }, (response) => {
+      console.log("server response from starting the game:", response, GameObject)
       if (response.err) {
-         displayBoardError(response.err + "(Must have a minimum of 3 players.)")
+         displayBoardError(response.err + "(Games must have 3 - 6 players.)")
          return
       }
 

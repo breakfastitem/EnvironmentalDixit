@@ -19,6 +19,7 @@ module.exports = function (app, db) {
                 return ({ "err": "Game" + gameId + " Not Found" });
             } else {
                 let playerIndex = game.getPlayerIndexFromSocketId(playerSocketId);
+                if (!playerIndex) return ({ "err": "playerSocketId is not a member of this game" })
                 let data = game.sendData(playerIndex);
                 return data;
             }
@@ -41,7 +42,6 @@ module.exports = function (app, db) {
                 return ({ "err": err });
             })
         },
-
 
         applyGameStateChange: (action, stateUpdate) => {
             return new Promise((resolve, reject) => {
