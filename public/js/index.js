@@ -532,7 +532,7 @@ function startNewRound(dealerIndex) {
 
    dealerName = GameObject.players[dealerIndex - 1].name;
 
-   if (dealerIndex - 1 == playerIndex) {
+   if (dealerIndex - 1 == playerSocketId) {
       display = $(`<p>Choose a card from your deck and enter a clue that relates to it.</p>
       <form>
       <textarea id="clue-input" rows="4" cols="50"></textarea>
@@ -659,6 +659,8 @@ function displayCards() {
    }
 }
 
+
+
 function displayBoardError(errorMessage) {
    const board = $("#error-bar");
 
@@ -722,7 +724,7 @@ $("#board").on("click", function (event) {
          clearInterval(interval);
          const clue = $("#clue-input").val().trim();
 
-         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardIdentifier, votes: 0, voterIndexes: [] }] };
+         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerSocketId: playerSocketId, cardIdentifier: cardIdentifier, votes: 0, voterIndexes: [] }] };
 
 
 
@@ -971,7 +973,7 @@ $("#chat-form").on("submit", (event) => {
    let input = $("#chat-input");
    socket.emit("new-chat-message", {
       roomId: currentRoom,
-      playerIndex: (gameID !== "global-waiting-room-id" ? playerIndex : -1),
+      playerSocketId: (gameID !== "global-waiting-room-id" ? playerSocketId : -1),
       message: input.val()
    });
    input.val("");

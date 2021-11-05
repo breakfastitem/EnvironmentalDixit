@@ -80,7 +80,7 @@ describe("Game", () => {
             });
         });
 
-        describe("recieveClue(playerIndex,cardID,clue)", () => {
+        describe("recieveClue(playerSocketId,cardID,clue)", () => {
 
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
@@ -111,7 +111,7 @@ describe("Game", () => {
 
         });
 
-        describe("recieveFake(playerIndex,cardID)", () => {
+        describe("recieveFake(playerSocketId,cardID)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             game.addPlayer("Johnny");
@@ -162,7 +162,7 @@ describe("Game", () => {
 
         });
 
-        describe("recieveVote(playerIndex,cardIndex)", () => {
+        describe("recieveVote(playerSocketId,cardIndex)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             game.addPlayer("Johnny");
@@ -272,7 +272,7 @@ describe("Game", () => {
     });
     describe("Get Functions", () => {
 
-        describe("Send Data (playerIndex)", () => {
+        describe("Send Data (playerSocketId)", () => {
             let game = new Game("AAAA", "jimmy", 45);
             game.addPlayer("Billy");
             let data;
