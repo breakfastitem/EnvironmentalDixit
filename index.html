@@ -5,6 +5,7 @@
 voteDiv perviously had caret instead of maginfiing glass ?
 Fix Deck addition url parsing of named flicker users.
 -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,7 +79,7 @@ Fix Deck addition url parsing of named flicker users.
                 <span class="caret-header">
                     <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">How To Play</a></h2>
                 </span>
-<!-- <aside id="rules" style="display: none;">
+                <!-- <aside id="rules" style="display: none;">
                     <p>This is where the rules would be displayed or mabye in a lightBox</p>
                 </aside> -->
 
@@ -88,7 +89,8 @@ Fix Deck addition url parsing of named flicker users.
 
                 <hr>
 
-                <span class="caret-header" id="scores-caret"><img class="caret" src="./images/misc/down-caret-symbol.png"></img>
+                <span class="caret-header" id="scores-caret"><img class="caret"
+                        src="./images/misc/down-caret-symbol.png"></img>
                     <h2>Scores</h2>
                 </span>
 
@@ -100,7 +102,8 @@ Fix Deck addition url parsing of named flicker users.
 
                 <hr>
 
-                <span class="caret-header" id="chat-caret"><img class="caret" src="./images/misc/up-caret-symbol.png"></img>
+                <span class="caret-header" id="chat-caret"><img class="caret"
+                        src="./images/misc/up-caret-symbol.png"></img>
                     <h2>Chat</h2>
                 </span>
 
@@ -110,7 +113,7 @@ Fix Deck addition url parsing of named flicker users.
                             <div id="chat-messages">
 
                             </div>
-                            <form id="chat-form">
+                            <form id="chat-form" autocomplete="off">
                                 <input id="chat-input" type="text"></input>
                                 <button type="submit">Submit</button>
                             </form>
