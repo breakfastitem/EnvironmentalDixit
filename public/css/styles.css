@@ -1,12 +1,30 @@
-/*General Stylings*/
+:root {
+  --main-bg-color: #303030;
+  --boundry-line-color: #808080;
+  --header-color: #c67d2f;
+  --subheader-color: #c79b6d ;
+  --accent-color: #2f8cc6;
+  --large-body-text-color: #e4e4e4;
+  --detail-text-color: white;
+  --button-text-color: black;
+  --button-bg-color: white;
+  --button-hover-bg-color: #d8945c;
+  --button-click-bg-color: #d76507;
+}
 
-body {
+/*General Stylings*/
+html,body {
   overflow-x: hidden;
 
-  color: white;
-  background-color: black;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 
-  font-family: hobo-std, sans-serif;
+  color: white;
+  background-color: VAR(--main-bg-color);
+
+  font-family: 'Montserrat','Open Sans',sans-serif;
+  font-size: 16px;
   font-weight: 400;
   font-style: normal;
 }
@@ -30,8 +48,14 @@ h1 {
 
   text-align: center;
 
-  color: #d8945c;
+  color: VAR(--header-color);
   background-color: black;
+}
+
+h2 {
+  color: VAR(--header-color);
+
+  font-family: hobo-std, sans-serif;
 }
 
 img {
@@ -42,29 +66,39 @@ img {
 hr {
   width: 100%;
 
-  border-color: white;
+  border-color: VAR(--boundry-line-color);
 }
 
 button {
-  border-radius: 10px;
-  background-color: white;
+margin: 10px;
+padding: 5px 10px;
 
+  color: VAR(--button-text-color);
+  border-radius: 15px;
+  background-color: VAR(--button-bg-color);
+
+  font-family: hobo-std, sans-serif;
+  font-size: 1.5em;
   font-weight: 500;
 }
 
 button:hover {
   color: white;
-  border-color: #d8945c;
-  background-color: #d8945c;
+  border-color:  VAR(--accent-color);
+  background-color: VAR(--button-hover-bg-color);
 }
 
 button:active {
   color: white;
-  background-color: #d76507;
+  background-color: VAR(--button-click-bg-color);
 }
 
 button:focus {
   outline: none;
+}
+
+.sidebar {
+  padding: 20px;
 }
 
 /*Class Stylings*/
@@ -95,6 +129,8 @@ button:focus {
 
   text-align: center;
 
+  color: VAR(--header-color);
+
 }
 
 header {
@@ -103,14 +139,12 @@ header {
   flex-direction: row;
   justify-content: space-around;
 
-  margin-top: 15px;
+  padding-top: 15px;
 
   text-align: center;
 }
 
-h2 {
-  color: #d8945c;
-}
+
 
 .submit-fake-vote {
   display: block;
@@ -149,7 +183,7 @@ height: 160px;
   cursor: pointer;
   transition: max-width 500ms ease, margin 500ms ease;
 
-    border: 1px solid white;
+    border: 1px solid VAR(--boundry-line-color);
   border-radius: 4px;
   box-shadow: 6px 2px 9px 4px #000000;
 }
@@ -210,12 +244,7 @@ height: 160px;
 .vote-selected {
   border-width: 5px;
   border-style: solid;
-  border-color: green;
-}
-
-.message:nth-child(2n + 0) {
-  color: black;
-  background-color: lightgray;
+  border-color: VAR(--accent-color);
 }
 
 /*Specific ID stylings*/
@@ -238,7 +267,7 @@ height: 160px;
 
   border-left-width: 2px;
   border-left-style: solid;
-  border-left-color: white;
+  border-left-color: VAR(--boundry-line-color);
 }
 
 #board button {
@@ -257,16 +286,14 @@ height: 160px;
   font-weight: 600;
 }
 
-/* #learn-link {
-  position: absolute;
-  top: 3rem;
-  right: 1%;
+.learn-link {
+  position: relative;
 
   color: #d8945c;
 
   font-size: 17px;
   font-weight: 600;
-} */
+}
 
 #selected-card {
     position: relative;

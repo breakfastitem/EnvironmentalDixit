@@ -201,13 +201,13 @@ class Game {
             case "mainCard":
                 data = { gameStage: this.gameStage, playerCount: this.playerCount, players: this.players, roundCount: this.roundCount };
 
-                data.hand = this.players[playerSocketId].cards;
+                data.hand = this.players[playerIndex].cards;
                 data.turnOrder = this.turnOrder;
                 break;
             case "fakeCards":
                 data = { gameStage: this.gameStage, clue: this.roundData.clue };
 
-                data.hand = this.players[playerSocketId].cards;
+                data.hand = this.players[playerIndex].cards;
                 data.turnOrder = this.turnOrder;
 
                 break;

@@ -12,6 +12,7 @@ https://www.artworksforchange.org/artist-galleries-ftb-part-ii/
 https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/51081140358/
 
 -->
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,12 +28,33 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
 
     <!--Font-->
     <link rel="stylesheet" href="https://use.typekit.net/rrw6rho.css" />
+    <link rel="stylesheet" href="./css/fonts.css" />
 
     <!--Icon Image-->
     <link rel="icon" href="./images/playerIcons/Tree.png">
 </head>
 
 <body>
+    <!-- <div class="container-fluid d-flex align-items-stretch h-100 p-0">
+        <div class="col-2" style="background-color: aqua; ">
+            sidebar
+        </div>
+        <div class="col-10 d-flex justify-content-spacearound align-items-stretch"
+            style="background-color: rebeccapurple;">
+            <div class="row h-20 d-flex flex-grow-1 flex-fill justify-content-center align-items-center"
+                style="background-color: rgb(110, 99, 183);">
+                header
+            </div>
+            <div class="row h-60 flex-fill justify-content-center align-items-center"
+                style="background-color: rgb(123, 144, 206);">
+                GameBoard
+            </div>
+            <div class="row h-20 flex-fill justify-content-center align-items-center"
+                style="background-color: rgba(177, 227, 197, 0.619);">
+                Hand
+            </div>
+        </div>
+    </div> -->
     <header>
         <img id="title" src="./images/misc/logo.png" />
         <h1 id="code-label" style="display: none;">
@@ -81,36 +103,22 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
 
         <div class="row">
             <!-- score aside-->
-            <div class="col-sm-12 col-lg-2">
-                <span class="caret-header">
-                    <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">How To Play</a></h2>
-                </span>
-<!-- <aside id="rules" style="display: none;">
-                    <p>This is where the rules would be displayed or mabye in a lightBox</p>
-                </aside> -->
-
-                <span class="caret-header">
-                    <h2><a href="http://artworksforchange.org" target="_blank" id="learn-link">Learn More</a></h2>
-                </span>
+            <div class="col-sm-12 col-lg-2" id="sidebar">
 
                 <hr>
-
-                <span class="caret-header" id="scores-caret"><img class="caret" src="./images/misc/down-caret-symbol.png"></img>
+                <span class="caret-header" id="scores-caret"><img class="caret"
+                        src="./images/misc/down-caret-symbol.png"></img>
                     <h2>Scores</h2>
                 </span>
-
-
-
                 <aside id="scores">
 
                 </aside>
 
                 <hr>
-
-                <span class="caret-header" id="chat-caret"><img class="caret" src="./images/misc/up-caret-symbol.png"></img>
+                <span class="caret-header" id="chat-caret"><img class="caret"
+                        src="./images/misc/up-caret-symbol.png"></img>
                     <h2>Chat</h2>
                 </span>
-
                 <aside id="chat" style="display: none;">
                     <div class="row">
                         <div class="col-12">
@@ -125,6 +133,16 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
                     </div>
                 </aside>
                 <hr>
+                <span class="caret-header">
+                    <h2><a href="http://artworksforchange.org" target="_blank" class="learn-link">How To Play</a></h2>
+                </span>
+                <!-- <aside id="rules" style="display: none;">
+                    <p>This is where the rules would be displayed or mabye in a lightBox</p>
+                </aside> -->
+
+                <span class="caret-header">
+                    <h2><a href="http://artworksforchange.org" target="_blank" class="learn-link">Learn More</a></h2>
+                </span>
             </div>
 
             <div class="col-sm-12 col-lg-10">
@@ -177,7 +195,6 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
 
     <!--Local-->
     <script src="./js/index.js"></script>
-
 
 </body>
 

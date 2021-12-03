@@ -13,12 +13,12 @@ const iconSources = ["./images/playerIcons/Car.png",
    "./images/playerIcons/Tree.png",
    "./images/playerIcons/Refrigerator.png"];
 
-const iconColors = ["#e33533",
-   "#a09030",
-   "#2080db",
-   "#a24526",
-   "#22861c",
-   "#d8945b"];
+const iconColors = ["#cb393d",
+   "#bbc2ad",
+   "#ffeb5d",
+   "#942804",
+   "#84c36e",
+   "#ffaf46"];
 
 /**
  * Variables that change over gameplay
@@ -177,7 +177,7 @@ $("#join-existing-game-button").on("click", function () {
       gameId: gameID, playerName: playerName
    }, (response) => {
 
-      print("join-game Response:", response);
+      console.log("join-game Response:", response);
 
       if (response.err) {
          displayBoardError(response.err);
