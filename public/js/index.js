@@ -34,23 +34,20 @@ let GameObject = {
 
 // filled after join and deck information is given
 let imageSources;
-let imagesHtml;
 
 //Holds shuffled card values
 let cardOrder = [];
 
-
-
-//PLayer key in players on gameobject
+// the curen't players index in the players array on gameobject
 let playerIndex;
 
 let gameManager;
-//precents gameobject from being updated if not needed
+// prevents gameobject from being updated if not needed
 let boardInstantiated = 0;
-//Interval to be cleared and initialized
+// Interval to be cleared and initialized
 let interval;
 
-//whichever card thats selected in round window is here, Identifies this cards position in imageshtml array
+//whichever card thats selected in round window is here, Identifies this cards position in imagesources array
 let cardIdentifier;
 //same as cardidentifier excpet for the vote, the index is the index in round data card array
 let voteCardIndex;
@@ -72,7 +69,7 @@ let isChat = false;
 
 /*
 -------------------------------------------------------------------------------------------------------
------ Phase 1 - Creating or joining a game form visible -----------------------------------------------
+----- Phase 1 - Create or join a game form visible -----------------------------------------------
 -------------------------------------------------------------------------------------------------------
 */
 
@@ -80,7 +77,6 @@ let isChat = false;
  * main
  */
 $("#lightBox").hide();
-// $("#rules").hide();
 
 //get deck from database
 $.ajax({
@@ -95,13 +91,13 @@ $.ajax({
    });
 });
 
- //If in active game reload game settings
- // gameID = localStorage.getItem("gameId");
+// If in active game reload game settings
+// gameID = localStorage.getItem("gameId");
 
- // if (gameID != null) {
- //    playerIndex = localStorage.getItem("index");
- //    GameObject = localStorage.getItem("GameObject");
- // }
+// if (gameID != null) {
+//    playerIndex = localStorage.getItem("index");
+//    GameObject = localStorage.getItem("GameObject");
+// }
 
 // Handle Player Clicking the Create Game Button and create a new game room.
 $("#create-game-button").on("click", function () {
@@ -147,7 +143,7 @@ $("#create-game-button").on("click", function () {
       selection.removeAllRanges();
       selection.addRange(range);
 
-      updatePlayerScores(GameObject.playerCount, GameObject.players);
+      // updatePlayerScores(GameObject.playerCount, GameObject.players);
       initializeGameUpdateListenerSocket();
 
       displayWaitingRoomPhase(true);
@@ -198,14 +194,11 @@ $("#join-existing-game-button").on("click", function () {
 
       playerIndex = GameObject.playerCount - 1;
 
-      updatePlayerScores(GameObject.playerCount, GameObject.players);
-
       initializeGameUpdateListenerSocket();
 
       displayWaitingRoomPhase(false);
    })
 })
-
 
 /*
 -------------------------------------------------------------------------------------------------------
@@ -214,7 +207,6 @@ $("#join-existing-game-button").on("click", function () {
 */
 
 function displayWaitingRoomPhase(isHost) {
-
    const startingForm = $("#game-start-form");
    startingForm.empty()
 
@@ -227,34 +219,21 @@ function displayWaitingRoomPhase(isHost) {
    }
 
    startingForm.append(display);
-
-
    $("#start-full-game-button").on("click", startFullGame)
 }
-
-
-socket.on("broadcast-chat-message", (messageObject) => {
-   let currentRoom = gameID || "global-waiting-room-id";
-   if (messageObject.roomId === currentRoom) {
-      let messageHTML = $(`
-            <p class="broadcast-chat-message"><em style="color:${messageObject.playerIndex >= 0 ? iconColors[messageObject.playerIndex] : "#fff"}">${(messageObject.playerIndex >= 0 ? GameObject.players[messageObject.playerIndex].name + ": " : "")}</em>${messageObject.message}</p>
-      </div>`);
-      $("#chat-messages").append(messageHTML);
-   }
-});
-
-/*
-----------------------------------------------------------------------------------------------------
------ Phase 3 - Game Started -----------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------
-*/
 
 function hideWaitingRoomPhase() {
    $("header").hide()
    $("#game-start-form").hide()
    $("#start-about-links").hide()
-   $("#board-container").show();
+   $("#game-layout-container").show();
 }
+
+/*
+-----------------------------------------------------------------------------------------------------
+----- Phase 3 - Start game (also Round over -> new Round) ---------------------------------------------
+-----------------------------------------------------------------------------------------------------
+*/
 
 function startFullGame() {
    // start a new game:
@@ -269,227 +248,272 @@ function startFullGame() {
 
       updateGameObjectFromResponse(response);
 
-      startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+      // startNewRound(GameObject.turnOrder[GameObject.roundCount]);
 
       // hide the ui resposible for creating / joining games
-      hideWaitingRoomPhase()
+      hideWaitingRoomPhase();
+      updatePlayerScores(GameObject.playerCount, GameObject.players);
 
-      //Start the update interval that was paused to deal cards
+      // Start listening for updates from the server
       initializeGameUpdateListenerSocket();
+      handleGameUpdate(response);
    })
 }
 
+function startNewRound(dealerIndex) {
+
+   clearBoard();
+   const board = $("#board");
+
+   let display;
+   cardIdentifier = GameObject.hand[0];
+
+   dealerName = GameObject.players[dealerIndex - 1].name;
+
+   if (dealerIndex - 1 == playerIndex) {
+      display = $(`<p>Choose a card from your deck and enter a clue that relates to it.</p>
+      <form class="d-flex flex-row align-items-center">
+      <textarea id="clue-input" rows="4" cols="50"></textarea>
+      <button id="submit-clue">submit</button>
+      </form>`);
+
+      //Auto Displays first card in selcted area.
+      let card = $(getImageHtml(cardIdentifier));
+
+      card.attr("class", "voteCard");
+      card.attr("id", `selected-card`);
+      //Appends information to board
+      board.append(display);
+      board.append(card);
+
+   } else {
+      display = $(`<p> ${dealerName} is the StoryTeller and will submit a clue shortly...</p>`);
+      board.append(display);
+   }
+
+}
 
 let lastGameStage = null;
-function initializeGameUpdateListenerSocket() {
-   socket.on("game-update", (response) => {
-      console.log(response, GameObject)
-      //TODO:: Varable indicating change
-      if (GameObject != response) {
-         if (response.gameStage != GameObject.gameStage) lastGameStage = GameObject.gameStage
-         updateGameObjectFromResponse(response);
+function handleGameUpdate(serverResponse) {
+   console.log("existing game object:", GameObject, "server response:", serverResponse);
+   //TODO:: Varable indicating change
+   if (GameObject != serverResponse) {
+      if (serverResponse.gameStage != GameObject.gameStage) lastGameStage = GameObject.gameStage
 
-         switch (GameObject.gameStage) {
-            case "join":
-               //Add Response data to game object
-               gameID = GameObject.gameID;
+      updateGameObjectFromResponse(serverResponse);
 
-               // localStorage.setItem("gameId", gameID);
-               // localStorage.setItem("index", playerIndex);
-               // localStorage.setItem("GameObject", GameObject);
-               updatePlayerScores(GameObject.playerCount, GameObject.players);
+      switch (GameObject.gameStage) {
+         case "join":
+            //Add Response data to game object
+            gameID = GameObject.gameID;
 
-               console.log("join event")
-               // hideJoinPhase();
-               break;
+            // localStorage.setItem("gameId", gameID);
+            // localStorage.setItem("index", playerIndex);
+            // localStorage.setItem("GameObject", GameObject);
+            updatePlayerScores(GameObject.playerCount, GameObject.players);
 
-            case "mainCard":
+            console.log("join event")
+            // hideJoinPhase();
+            break;
 
-               //TODO :: If it is players turn to pick offer them a choice
-               if (boardInstantiated < 1 || lastGameStage == "endDisplay") {
-                  hideWaitingRoomPhase();
-                  fakeCardSubmited = false;
+         case "mainCard":
 
-                  displayCards();
+            //TODO :: If it is players turn to pick offer them a choice
+            if (boardInstantiated < 1 || lastGameStage == "endDisplay") {
+               hideWaitingRoomPhase();
+               fakeCardSubmited = false;
 
-                  startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-                  boardInstantiated++;
-               }
+               displayCards();
+
+               startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+               boardInstantiated++;
+            }
 
 
 
-               if (boardInstantiated == 4) {
-                  boardInstantiated = 0;
-               }
+            if (boardInstantiated == 4) {
+               boardInstantiated = 0;
+            }
 
-               break;
-            case "fakeCards":
+            break;
+         case "fakeCards":
 
-               //Everyone but dealer has this display
+            //Everyone but dealer has this display
 
-               if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
-                  //Display board info
-                  let board = $("#board");
-                  board.empty();
+            if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+               //Display board info
+               let board = $("#board");
+               board.empty();
 
-                  let display = $(`<p>Pick a card from your deck that best matches the clue.</p>
+               let display = $(`<p>Pick a card from your deck that best matches the clue.</p>
                       <h2 class="inline"> ${GameObject.clue} </h2>
                       <button class="submit-fake-vote" id="submit-fake">Submit</button>
                     `);
 
-                  cardIdentifier = GameObject.hand[0];
-                  let card = $(imagesHtml[cardIdentifier]);
+               cardIdentifier = GameObject.hand[0];
+               let card = $(getImageHtml(cardIdentifier));
 
-                  card.attr("class", "player-card hand-card-active");
-                  card.attr("id", `selected-card`);
+               card.attr("class", "player-card hand-card-active");
+               card.attr("id", `selected-card`);
 
-                  board.append(display);
-                  board.append(card);
+               board.append(display);
+               board.append(card);
 
-                  boardInstantiated++;
-                  hideWaitingRoomPhase();
-               }
+               boardInstantiated++;
+               hideWaitingRoomPhase();
+            }
 
-               break;
-            case "vote":
-               if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
-                  //Display board info
-                  let board = $("#board");
-                  board.empty();
+            break;
+         case "vote":
+            if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+               //Display board info
+               let board = $("#board");
+               board.empty();
 
-                  // clear hand so as not to confuse people between voting cards and hand cards
-                  const hand = $("#hand");
-                  hand.empty();
+               // clear hand so as not to confuse people between voting cards and hand cards
+               const hand = $("#hand");
+               hand.empty();
 
-                  let display = $(`<p>Vote for the card you believe to be the StoryTeller’s card.</p>
+               let display = $(`<p>Vote for the card you believe to be the StoryTeller’s card.</p>
                     <h2 class="inline"> ${GameObject.clue} </h2>
                     <button class="submit-fake-vote" id="submit-vote">Submit</button>
                     `);
 
-                  board.append(display);
+               board.append(display);
 
-                  let row = $("<div class='row splay-deck'>");
+               let row = $("<div class='row splay-deck'>");
 
-                  for (let i = 0; i < GameObject.roundCards.length; i++) {
+               for (let i = 0; i < GameObject.roundCards.length; i++) {
 
-                     let cardDiv = $(`<div class="hand-card-div voteDiv col-sm-12 col-md-4 col-lg-2" id=voteDiv-${i}></div>`);
-                     cardDiv.css({ "z-index": (10 - i).toString() });
+                  let cardDiv = $(`<div class="hand-card-div voteDiv" id=voteDiv-${i}></div>`);
+                  cardDiv.css({ "z-index": (10 - i).toString() });
 
-                     let card = $(imagesHtml[GameObject.roundCards[i]]);
-                     card[0].onload = function () {
-                        cardDiv.on("mouseenter", () => {
-                           cardDiv.addClass("hand-card-active");
-                           cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-                        });
-                        cardDiv.on("mouseleave", () => {
-                           if (i == voteCardIndex) return;
-                           cardDiv.removeClass("hand-card-active");
-                           cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-                        });
-                     }
-                     card.attr("class", "voteCard ");
-                     card.attr("id", `vote-${i}`);
-
-                     if (i == 0) {
-                        cardDiv.addClass("vote-selected");
-                        cardDiv.addClass("hand-card-active")
-                        voteCardIndex = 0;
-                     }
-
-                     cardDiv.append(card);
-
-                     row.append(cardDiv);
-
+                  let card = $(getImageHtml(GameObject.roundCards[i]));
+                  card[0].onload = function () {
+                     cardDiv.on("mouseenter", () => {
+                        cardDiv.addClass("hand-card-active");
+                        cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                     });
+                     cardDiv.on("mouseleave", () => {
+                        if (i == voteCardIndex) return;
+                        cardDiv.removeClass("hand-card-active");
+                        cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                     });
                   }
-                  board.append(row);
+                  card.attr("class", "voteCard ");
+                  card.attr("id", `vote-${i}`);
 
-                  boardInstantiated++;
-
-               } else if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
-                  let board = $("#board");
-                  board.empty();
-
-                  // clear hand so as not to confuse people between voting cards and hand cards
-                  const hand = $("#hand");
-                  hand.empty();
-
-                  let display = $(`<p> The other players are voting. </p>`);
-                  board.append(display);
-
-                  let row = $("<div class='row splay-deck'>");
-
-                  for (let i = 0; i < GameObject.roundCards.length; i++) {
-
-                     let cardDiv = $(`<div class="hand-card-div voteDiv col-sm-12 col-md-4 col-lg-2" id=voteDiv-${i}></div>`);
-                     cardDiv.css({ "z-index": (10 - i).toString() });
-
-                     let card = $(imagesHtml[GameObject.roundCards[i]]);
-                     card[0].onload = function () {
-                        cardDiv.on("mouseenter", () => {
-                           cardDiv.addClass("hand-card-active");
-                           cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-                        });
-                        cardDiv.on("mouseleave", () => {
-                           if (i == voteCardIndex) return;
-                           cardDiv.removeClass("hand-card-active");
-                           cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-                        });
-                     }
-                     card.attr("class", "voteCard ");
-                     card.attr("id", `vote-${i}`);
-
-                     cardDiv.append(card);
-
-                     row.append(cardDiv);
-
+                  if (i == 0) {
+                     cardDiv.addClass("vote-selected");
+                     cardDiv.addClass("hand-card-active")
+                     voteCardIndex = 0;
                   }
-                  board.append(row);
-                  boardInstantiated++;
+
+                  cardDiv.append(card);
+
+                  row.append(cardDiv);
+
                }
-               break;
+               board.append(row);
 
-            case "endDisplay":
-               if (boardInstantiated < 4) {
-                  let board = $("#board");
+               boardInstantiated++;
 
-                  board.empty();
+            } else if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+               let board = $("#board");
+               board.empty();
 
-                  let header = $(`<h2> Votes This Round </h2>
+               // clear hand so as not to confuse people between voting cards and hand cards
+               const hand = $("#hand");
+               hand.empty();
+
+               let display = $(`<p> The other players are voting. </p>`);
+               board.append(display);
+
+               let row = $("<div class='row splay-deck'>");
+
+               for (let i = 0; i < GameObject.roundCards.length; i++) {
+
+                  let cardDiv = $(`<div class="hand-card-div voteDiv" id=voteDiv-${i}></div>`);
+                  cardDiv.css({ "z-index": (10 - i).toString() });
+
+                  let card = $(getImageHtml(GameObject.roundCards[i]));
+                  card[0].onload = function () {
+                     cardDiv.on("mouseenter", () => {
+                        cardDiv.addClass("hand-card-active");
+                        cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                     });
+                     cardDiv.on("mouseleave", () => {
+                        if (i == voteCardIndex) return;
+                        cardDiv.removeClass("hand-card-active");
+                        cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                     });
+                  }
+                  card.attr("class", "voteCard ");
+                  card.attr("id", `vote-${i}`);
+
+                  cardDiv.append(card);
+
+                  row.append(cardDiv);
+
+               }
+               board.append(row);
+               boardInstantiated++;
+            }
+            break;
+
+         case "endDisplay":
+            if (boardInstantiated < 4) {
+               let board = $("#board");
+
+               board.empty();
+
+               let header = $(`<h2> Votes This Round </h2>
                   <p>${dealerName} was the StoryTeller</p>`);
-                  board.append(header);
-                  let row = $("<div class='row' style='justify-content: center;'></div>");
+               board.append(header);
+               let row = $("<div class='row' style='justify-content: center;'></div>");
 
-                  //Display cards with owner and votes
-                  for (let i = 0; i < GameObject.playerCount; i++) {
-                     let cardData = GameObject.roundData.cardArray[i];
-                     let display = $(`<div class="votesDisplayCard"><p>${GameObject.players[cardData.playerIndex].name}</p>
-                        <div class="voteCard" id="vote-${i}">${imagesHtml[cardData.cardIdentifier]}</div>
+               //Display cards with owner and votes
+               for (let i = 0; i < GameObject.playerCount; i++) {
+                  let cardData = GameObject.roundData.cardArray[i];
+                  let display = $(`<div class="votesDisplayCard"><p>${GameObject.players[cardData.playerIndex].name}</p>
+                        <div class="voteCard" id="vote-${i}">${getImageHtml(cardData.cardIdentifier)}</div>
                         <p>Votes: ${cardData.votes}</p></div>`);
 
-                     GameObject.roundCards[i] = cardData.cardIdentifier;
+                  GameObject.roundCards[i] = cardData.cardIdentifier;
 
-                     row.append(display);
-                  }
-                  $("#board").append(row);
-
-                  updatePlayerScores(GameObject.playerCount, GameObject.players);
-                  //if host
-                  if (playerIndex == 0) {
-                     let button = $(`<button id="new-Round">next round</button>`);
-                     board.append(button);
-                  }
-                  boardInstantiated++;
+                  row.append(display);
                }
+               $("#board").append(row);
 
-               break;
+               updatePlayerScores(GameObject.playerCount, GameObject.players);
+               //if host
+               if (playerIndex == 0) {
+                  let button = $(`<button id="new-Round">next round</button>`);
+                  board.append(button);
+               }
+               boardInstantiated++;
+            }
 
-         }
+            break;
 
       }
 
+   }
+}
+
+function initializeGameUpdateListenerSocket() {
+   console.log("Listening For Game Updates...");
+   socket.on("game-update", (response) => {
+      console.log("Recived game-update broadcast.")
+      handleGameUpdate(response)
    });
 }
 
+/*
+----------------------------------------------------------------------------------------------------
+----- Phase 5 - Voting -----------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+*/
 
 function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
@@ -511,71 +535,76 @@ function displayVoteSelection(cardRoundIndex) {
    }
 };
 
-
 /*
------------------------------------------------------------------------------------------------------
------ Phase 4 - Round over --------------------------------------------------------------------------
------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----- Chat Functions ---------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
 */
 
-function startNewRound(dealerIndex) {
-
-   clearBoard();
-   const board = $("#board");
-
-   let display;
-   cardIdentifier = GameObject.hand[0];
-
-   dealerName = GameObject.players[dealerIndex - 1].name;
-
-   if (dealerIndex - 1 == playerSocketId) {
-      display = $(`<p>Choose a card from your deck and enter a clue that relates to it.</p>
-      <form>
-      <textarea id="clue-input" rows="4" cols="50"></textarea>
-      <button id="submit-clue">submit</button>
-      </form>`);
-
-      //Auto Displays first card in selcted area.
-      let card = $(imagesHtml[cardIdentifier]);
-
-      card.attr("class", "voteCard");
-      card.attr("id", `selected-card`);
-      //Appends information to board
-      board.append(display);
-      board.append(card);
-
-   } else {
-      display = $(`<p> ${dealerName} is the StoryTeller and will submit a clue shortly...</p>`);
-      board.append(display);
+socket.on("broadcast-chat-message", (messageObject) => {
+   let currentRoom = gameID || "global-waiting-room-id";
+   if (messageObject.roomId === currentRoom) {
+      let messageHTML = $(`
+            <p class="broadcast-chat-message"><em style="color:${messageObject.playerIndex >= 0 ? iconColors[messageObject.playerIndex] : "#fff"}">${(messageObject.playerIndex >= 0 ? GameObject.players[messageObject.playerIndex].name + ": " : "")}</em>${messageObject.message}</p>
+      </div>`);
+      $("#chat-messages").append(messageHTML);
    }
+});
 
-}
+// Chat event listeners
+$("#chat-form").on("submit", (event) => {
+   event.preventDefault();
+   let currentRoom = gameID || "global-waiting-room-id";
+   let input = $("#chat-input");
+   socket.emit("new-chat-message", {
+      roomId: currentRoom,
+      playerIndex: (gameID !== "global-waiting-room-id" ? playerIndex : -1),
+      message: input.val()
+   });
+   input.val("");
+});
 
 /**
- * -------------------------------------------------------------------------------------------------------
-* ---- Static Utility Functions ----
+-------------------------------------------------------------------------------------------------------
+---- Static Utility Functions ----
 -------------------------------------------------------------------------------------------------------
 */
-function displayImageInViewer(cardId) {
-   $("#img-viewer").empty();
-   let button = $("<button id='exit-button'>X</button>");
-   let card = $(imagesHtml[cardId]);
-   $("#img-viewer").append(button);
-   $("#img-viewer").append(card);
-   $("#lightBox").show();
-}
-
-function updateGameObjectFromResponse(serverResponse) {
-   let keys = Object.keys(serverResponse);
-
-   for (let i = 0; i < keys.length; i++) {
-      GameObject[keys[i]] = serverResponse[keys[i]];
-   }
-}
 
 function clearBoard() {
    const board = $("#board");
    board.empty();
+}
+
+function setDeckUrls(urls) {
+   imageSources = urls;
+}
+
+function getImageHtml(cardIndex) {
+   return `<img src="${imageSources[cardIndex]}" alt="Art Card" border="0" />`;
+};
+
+function updateGameObjectFromResponse(serverResponse) {
+   let keys = Object.keys(serverResponse);
+
+   if (serverResponse.players && serverResponse.players.length != serverResponse.players.length) {
+      GameObject.playerCount = serverResponse.players.length;
+      updatePlayerScores(GameObject.playerCount, GameObject.players);
+   }
+
+   for (let i = 0; i < keys.length; i++) {
+      GameObject[keys[i]] = serverResponse[keys[i]];
+   }
+
+   console.log("GameObject Updated", GameObject);
+}
+
+function displayImageInViewer(cardId) {
+   $("#img-viewer").empty();
+   let button = $("<button id='exit-button'>X</button>");
+   let card = $(getImageHtml(cardId));
+   $("#img-viewer").append(button);
+   $("#img-viewer").append(card);
+   $("#lightBox").show();
 }
 
 function updatePlayerScores(playerCount, playerObjects) {
@@ -589,14 +618,10 @@ function updatePlayerScores(playerCount, playerObjects) {
       let player = playerObjects[i];
 
       let scoreInfo = $(`
-      <div class="row">
-         <div class="col-lg-5 col-md-2">
+      <div class="row m-0">
             <img class="player-icon" src=${iconSources[i]}></img>
-         </div>
-         <div class="col-lg-7 col-md-10">
-            <p id="name-${i + 1}" style="color:${iconColors[i]}; margin-bottom:0">${player.name} </p>
-            <p><span id="score-${i + 1}" style="margin-top:3px">${player.score}</span></p>
-         </div>
+         <span id="name-${i + 1}" style="color:${iconColors[i]}; margin-bottom:0">${player.name} </span>
+         <span id="score-${i + 1}" style="margin-top:3px">${player.score}</span></p>
       </div>`);
 
       scoreBar.append(scoreInfo);
@@ -622,11 +647,13 @@ function displayCards() {
 
       let imgIdentifier = GameObject.hand[i];
       let cardDiv = $("<div>");
-      cardDiv.attr("class", "col-lg-2 col-md-4 col-sm-6 hand-card-div");
+      cardDiv.attr("class", "hand-card-div");
       cardDiv.attr("id", `card-${i}`);
       cardDiv.css({ "z-index": (10 - i).toString() });
 
-      let card = $(imagesHtml[imgIdentifier]);
+      let card = $(getImageHtml(imgIdentifier));
+      console.log("displayingHand", imgIdentifier, getImageHtml(imgIdentifier));
+
 
       card[0].onload = function () {
          console.log(this)
@@ -654,8 +681,6 @@ function displayCards() {
       hand.append(cardDiv);
    }
 }
-
-
 
 function displayBoardError(errorMessage) {
    const board = $("#error-bar");
@@ -692,15 +717,9 @@ function playerNameValidations(playerName) {
    return true;
 }
 
-function setDeckUrls(urls) {
-   imageSources = urls;
-   imagesHtml = imageSources.map(url => `<img src=${url} alt="Art Card" border="0" />`);
-};
 /**
- * Event Listeners
+ * Click Event Listeners
  */
-
-//Clicks
 
 $("#lightBox").on("click", "#exit-button", function (event) {
    $("#lightBox").hide();
@@ -720,7 +739,7 @@ $("#board").on("click", function (event) {
          clearInterval(interval);
          const clue = $("#clue-input").val().trim();
 
-         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerSocketId: playerSocketId, cardIdentifier: cardIdentifier, votes: 0, voterIndexes: [] }] };
+         const roundData = { playersActed: 1, clue: clue, cardArray: [{ playerIndex: playerIndex, cardIdentifier: cardIdentifier, votes: 0, voterIndexes: [] }] };
 
 
 
@@ -860,7 +879,6 @@ $("#hand").on("click", (event) => {
 
    if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameStage === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameStage === "fakeCards" && !fakeCardSubmited)) {
 
-      console.log("dddd")
       if (type == "img") {
          cardIdentifier = GameObject.hand[handNum];
          $("#selected-card").remove();
@@ -879,9 +897,13 @@ $("#hand").on("click", (event) => {
             selectedHandCardIndex = handNum
          }
 
-         let card = $(imagesHtml[cardIdentifier]);
+         let card = $(`
+         <div id="selected-card-container">
+         ${getImageHtml(cardIdentifier)}
+         </div>
+         `);
 
-         card.attr("class", "player-card");
+         // card.attr("class", "player-card");
          card.attr("id", `selected-card`);
 
          $("#board").append(card);
@@ -889,6 +911,18 @@ $("#hand").on("click", (event) => {
 
    }
 
+});
+
+// Toggle show/hide of the scores in the sidebar
+$("#scores-caret").on("click", function (event) {
+   isScores = !isScores;
+   if (isScores) {
+      $("#scores-caret").children(".caret").attr("src", caretSources[1])
+      $(`#scores`).show();
+   } else {
+      $("#scores-caret").children(".caret").attr("src", caretSources[0])
+      $(`#scores`).hide();
+   }
 });
 
 //Prevents more than four characters from being entered in id input
@@ -901,52 +935,10 @@ $("#id-input").on("change", function (event) {
 
 });
 
-//Pertains to dropdown menu
-$(".caret-header").on("click", function (event) {
+/**
+ * Hover Event Listeners
+ */
 
-   const varId = event.currentTarget.id.split("-")[0];
-
-   console.log(event)
-
-   if (varId == "rules") {
-      isRules = !isRules;
-      isChat = false;
-      isScores = false;
-   } else if (varId == "scores") {
-      isScores = !isScores;
-      isChat = false;
-      isRules = false
-   } else if (varId == "chat") {
-      isChat = !isChat;
-      isScores = false;
-      isRules = false
-   }
-
-   if (isRules) {
-      $("#rules-caret").children(".caret").attr("src", caretSources[1])
-      $(`#rules`).show();
-   } else {
-      $("#rules-caret").children(".caret").attr("src", caretSources[0])
-      $(`#rules`).hide();
-   }
-   if (isChat) {
-      $("#chat-caret").children(".caret").attr("src", caretSources[1])
-      $(`#chat`).show();
-   } else {
-      $("#chat-caret").children(".caret").attr("src", caretSources[0])
-      $(`#chat`).hide();
-   }
-   if (isScores) {
-      $("#scores-caret").children(".caret").attr("src", caretSources[1])
-      $(`#scores`).show();
-   } else {
-      $("#scores-caret").children(".caret").attr("src", caretSources[0])
-      $(`#scores`).hide();
-   }
-
-});
-
-//Hovers
 let showCardZoomIconOnHoverJqueryEventConfig = {
    mouseenter: (event) => {
 
@@ -957,21 +949,9 @@ let showCardZoomIconOnHoverJqueryEventConfig = {
       $(`#card-${handIdentifier}`).append(img);
    }
 }
-// $("#board").on(showCardZoomIconOnHoverJqueryEventConfig, ".player-card");
 $("#board").on(showCardZoomIconOnHoverJqueryEventConfig, ".hand-card-div");
 $("#hand").on(showCardZoomIconOnHoverJqueryEventConfig, ".player-card");
+// $("#board").on(showCardZoomIconOnHoverJqueryEventConfig, ".player-card");
 
 
-//Chat event listeners
-$("#chat-form").on("submit", (event) => {
-   event.preventDefault();
-   let currentRoom = gameID || "global-waiting-room-id";
-   let input = $("#chat-input");
-   socket.emit("new-chat-message", {
-      roomId: currentRoom,
-      playerSocketId: (gameID !== "global-waiting-room-id" ? playerSocketId : -1),
-      message: input.val()
-   });
-   input.val("");
-});
 

@@ -56,10 +56,11 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
         </div>
     </div> -->
     <header>
+        <div id="flex-join-spacer" style="min-width: 38em; height: 8em; flex:1"></div>
         <img id="title" src="./images/misc/logo.png" />
         <h1 id="code-label" style="display: none;">
-            Join Code:<br>
-            <span id="code">----</span>
+            <span>Join Code</span><br>
+            <span style="color: #c67d2f; user-select: all;" id="code">----</span>
         </h1>
         <!--
 
@@ -69,7 +70,7 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
 
     <section id="game-start-form" class="row">
         <div class="mini-form">
-            <h2>Start a New Game:</h2>
+            <h2>Start a New Game</h2>
             <input id="newgame-name-input" placeholder="Your Name"></input>
             <br>
             <select name="decks" id="deck-select">
@@ -79,7 +80,7 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
             <button id="create-game-button">Start Game</button>
         </div>
         <div class="mini-form">
-            <h2>Join an Existing Game:</h2>
+            <h2>Join an Existing Game</h2>
             <input id="name-input" placeholder="Your Name"></input>
             <br>
             <input id="id-input" placeholder="Game Id"></input>
@@ -99,12 +100,13 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
 
     </div>
 
-    <div id="board-container" style="display: none;">
+    <div id="game-layout-container" style="flex:1;display: none;">
 
-        <div class="row">
+        <div class="row flex-nowrap m-0 h-100">
             <!-- score aside-->
-            <div class="col-sm-12 col-lg-2" id="sidebar">
+            <div class="d-flex flex-column" id="sidebar">
 
+                <img id="title" class="corner-logo" src="./images/misc/logo.png" />
                 <hr>
                 <span class="caret-header" id="scores-caret"><img class="caret"
                         src="./images/misc/down-caret-symbol.png"></img>
@@ -115,59 +117,30 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
                 </aside>
 
                 <hr>
-                <span class="caret-header" id="chat-caret"><img class="caret"
-                        src="./images/misc/up-caret-symbol.png"></img>
+                <span class="caret-header">
                     <h2>Chat</h2>
                 </span>
-                <aside id="chat" style="display: none;">
-                    <div class="row">
-                        <div class="col-12">
-                            <div id="chat-messages">
+                <aside id="chat" class="d-flex flex-column flex-grow-1 w-100 align-items-stretch">
+                    <div id="chat-messages" class="flex-grow-1">
 
-                            </div>
-                            <form id="chat-form">
-                                <input id="chat-input" type="text"></input>
-                                <button type="submit">Submit</button>
-                            </form>
-                        </div>
                     </div>
+                    <form id="chat-form" class="d-flex flex-column">
+                        <input id="chat-input" type="text"></input>
+                        <button type="submit">Submit</button>
+                    </form>
                 </aside>
-                <hr>
-                <span class="caret-header">
-                    <h2><a href="http://artworksforchange.org" target="_blank" class="learn-link">How To Play</a></h2>
-                </span>
-                <!-- <aside id="rules" style="display: none;">
-                    <p>This is where the rules would be displayed or mabye in a lightBox</p>
-                </aside> -->
-
-                <span class="caret-header">
-                    <h2><a href="http://artworksforchange.org" target="_blank" class="learn-link">Learn More</a></h2>
-                </span>
             </div>
 
-            <div class="col-sm-12 col-lg-10">
-                <!---->
-                <div class="row">
-                    <div class="col-12">
-                        <section id="board">
+            <div class="d-flex flex-column flex-grow-1" style="margin: 15px;">
+                <!-- main board -->
+                <section class="justify-content-center flex-grow-1 d-flex flex-column align-items-center" id="board">
 
 
-                        </section>
-                    </div>
+                </section>
+                <hr>
 
-                </div>
                 <!-- player hand-->
-                <div class="row">
-                    <div class="col-12">
-                        <hr>
-
-                        <div class="row splay-deck" id="hand">
-
-
-                        </div>
-
-
-                    </div>
+                <div class="splay-deck" id="hand">
 
                 </div>
 
@@ -182,8 +155,6 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
         </div>
 
     </div>
-
-
 
     <!-- jQuery and JS bundle w/ Popper.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

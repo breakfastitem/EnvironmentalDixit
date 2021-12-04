@@ -1,21 +1,38 @@
 :root {
-  --main-bg-color: #303030;
+  --main-bg-color: black;
   --boundry-line-color: #808080;
-  --header-color: #c67d2f;
-  --subheader-color: #c79b6d ;
-  --accent-color: #2f8cc6;
+  --header-color: #ffffff;
+  --subheader-color: #c79b6d;
+  --accent-color: #c67d2f;
   --large-body-text-color: #e4e4e4;
   --detail-text-color: white;
   --button-text-color: black;
   --button-bg-color: white;
-  --button-hover-bg-color: #d8945c;
-  --button-click-bg-color: #d76507;
+  --button-hover-bg-color: #c79b6d; /*#d8945c;*/
+  --button-click-bg-color: #c67d2f; /* #d76507; */
+}
+
+::selection {
+  background: #a52222; /* WebKit/Blink Browsers */
+}
+::-moz-selection {
+  background: #a52222; /* Gecko Browsers */
+}
+
+* {
+  user-select: none;
 }
 
 /*General Stylings*/
-html,body {
+html,
+body {
+  display: flex;
   overflow-x: hidden;
+  align-items: stretch;
+  flex-direction: column;
+  justify-content: space-between;
 
+  width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
@@ -23,7 +40,7 @@ html,body {
   color: white;
   background-color: VAR(--main-bg-color);
 
-  font-family: 'Montserrat','Open Sans',sans-serif;
+  font-family: "Montserrat", "Open Sans", sans-serif;
   font-size: 16px;
   font-weight: 400;
   font-style: normal;
@@ -50,6 +67,8 @@ h1 {
 
   color: VAR(--header-color);
   background-color: black;
+
+  font-family: hobo-std, sans-serif;
 }
 
 h2 {
@@ -60,7 +79,15 @@ h2 {
 
 img {
   /* max-width: 100%; */
-  height: 100%;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+#title.corner-logo {
+  position: relative;
 }
 
 hr {
@@ -70,8 +97,8 @@ hr {
 }
 
 button {
-margin: 10px;
-padding: 5px 10px;
+  margin: 10px;
+  padding: 5px 10px;
 
   color: VAR(--button-text-color);
   border-radius: 15px;
@@ -84,7 +111,7 @@ padding: 5px 10px;
 
 button:hover {
   color: white;
-  border-color:  VAR(--accent-color);
+  border-color: VAR(--accent-color);
   background-color: VAR(--button-hover-bg-color);
 }
 
@@ -97,8 +124,19 @@ button:focus {
   outline: none;
 }
 
-.sidebar {
-  padding: 20px;
+#sidebar {
+  flex: 0 1 0;
+
+  padding: 15px;
+
+  border-right-width: 2px;
+  border-right-style: solid;
+  border-right-color: VAR(--boundry-line-color);
+}
+
+.caret-header {
+  cursor: pointer;
+  text-align: center;
 }
 
 /*Class Stylings*/
@@ -107,9 +145,24 @@ button:focus {
   align-items: center;
   justify-content: center;
 
-  padding: 2em 3em;
+  padding: 3px 6px;
 
   text-align: center;
+}
+
+#game-start-form input {
+  margin-top: 0.2em;
+  padding: 3px 6px;
+
+  font-weight: bold;
+}
+
+#game-start-form select {
+  margin-top: 0.2em;
+  padding: 6px 15px;
+  padding: 6px 45px 6px 5px;
+
+  font-weight: bold;
 }
 
 #joined-player-list .joined-player-item {
@@ -131,20 +184,22 @@ button:focus {
 
   color: VAR(--header-color);
 
+  font-family: "Montserrat", "Open Sans", sans-serif;
 }
 
 header {
-    display: flex;
+  position: relative;
+
+  display: flex;
   align-items: center;
   flex-direction: row;
-  justify-content: space-around;
+  flex-wrap: wrap;
+  justify-content: center;
 
-  padding-top: 15px;
+  margin: 15px 20px;
 
   text-align: center;
 }
-
-
 
 .submit-fake-vote {
   display: block;
@@ -163,9 +218,9 @@ header {
 .votesDisplayCard {
   flex: 0 1 auto;
 
-    margin: 0px 10px;
+  margin: 0px 10px;
 
-text-align: center;
+  text-align: center;
 }
 
 .hand-card-div {
@@ -173,9 +228,9 @@ text-align: center;
 
   overflow: hidden;
 
-box-sizing: border-box;
+  box-sizing: border-box;
   max-width: min(calc(100% / 6), 100px);
-height: 160px;
+  height: 160px;
   margin: 0 -20px;
   margin: 10px -10px 0 -10px;
   padding: 0;
@@ -183,7 +238,7 @@ height: 160px;
   cursor: pointer;
   transition: max-width 500ms ease, margin 500ms ease;
 
-    border: 1px solid VAR(--boundry-line-color);
+  border: 1px solid VAR(--boundry-line-color);
   border-radius: 4px;
   box-shadow: 6px 2px 9px 4px #000000;
 }
@@ -210,10 +265,7 @@ height: 160px;
 }
 
 .player-card {
-  float: right;
-
-  width: unset;
-  max-width: unset;
+  height: 100%;
 }
 
 .caret {
@@ -226,11 +278,9 @@ height: 160px;
 }
 
 .player-icon {
-  left: 20px;
-
   width: 45px;
   height: 45px;
-  margin-left: 10px;
+  margin-left: 30px;
 }
 
 .error-message {
@@ -248,26 +298,21 @@ height: 160px;
 }
 
 /*Specific ID stylings*/
-
+#chat
+{
+  overflow: hidden;flex-basis: 0;}
 #chat-messages {
   overflow-y: auto;
 
   min-height: 60px;
-  max-height: 500px;
 }
 
 #board {
-  position: relative;
-  /* height: 600px; */
+  flex-grow: 1;
 
-  width: 100%;
   min-height: 400px;
-  margin-bottom: 10px;
-  padding: 10px;
 
-  border-left-width: 2px;
-  border-left-style: solid;
-  border-left-color: VAR(--boundry-line-color);
+  text-align: center;
 }
 
 #board button {
@@ -275,11 +320,15 @@ height: 160px;
 }
 
 .splay-deck {
+  position: relative;
+
+  display: flex;
+  flex: 0 1 0;
   flex-wrap: nowrap;
   justify-content: center;
 
-  padding-top: 10px;
-  padding-bottom: 10px;
+  box-sizing: border-box;
+  padding: 10px;
 }
 
 #code-label {
@@ -295,15 +344,14 @@ height: 160px;
   font-weight: 600;
 }
 
+
 #selected-card {
-    position: relative;
+  position: relative;
 
-    display: block;
-  float: unset;
+  display: block;
+  flex: 0 1 0px;
 
-  height: 400px;
-    margin: auto;
-  margin-top: 10px;
+  margin-top: 1rem;
 }
 
 #lightBox {
@@ -338,7 +386,7 @@ height: 160px;
 
 #exit-button {
   position: absolute;
-z-index: 2;
+  z-index: 2;
   right: 8px;
 
   width: 50px;
@@ -354,13 +402,20 @@ z-index: 2;
   font-weight: 900;
 }
 
-#exit-button:hover,#exit-button:focus {
+#exit-button:hover,
+#exit-button:focus {
   background-color: rgba(210 105 30 / 81%);
 }
 
 #title {
+  position: absolute;
+  top: 0;
+  left: 50%;
+
   width: 225px;
   height: 112.5px;
+
+  transform: translateX(-50%);
 }
 
 #scores p {

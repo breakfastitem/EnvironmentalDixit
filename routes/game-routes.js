@@ -89,7 +89,7 @@ module.exports = function (app, db) {
                         break;
                     case "join":
 
-                        err = game.addPlayer(stateUpdate.playerName);
+                        err = game.addPlayer(stateUpdate.playerName, stateUpdate.playerSocketId);
 
                         break;
                 }

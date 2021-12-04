@@ -8,16 +8,16 @@ if (process.env.NODE_ENV !== "production") {
 // setup database connection based on current NODE_ENV variable
 if (process.env.NODE_ENV === "production") {
     if (process.env.MONGO_DB_URL) { // use the MONGO_DB_URL environemnt variable if available:
-        mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@${process.env.MONGO_DB_URL}`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+        mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@${process.env.MONGO_DB_URL}`, { useNewUrlParser: true, useUnifiedTopology: true });
     } else {
         // otherwise use the original production heroku server:
-        mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+        mongoose.connect(`mongodb+srv://${process.env.NAME}:${process.env.PASSWORD}@cluster0.jfqke.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true });
     }
 
 } else if (process.env.NODE_ENV === 'development') {
 
     /* ---- For local testing: ----- */
-    mongoose.connect('mongodb://localhost/test?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true });
+    mongoose.connect('mongodb://localhost/test?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
 
 } else if (process.env.NODE_ENV === undefined) {
     console.log("Uh oh! The NODE_ENV environment variable isn't set. Please set it to 'development' for testing or 'production' for the main server. (see the \"For local testing\" comment in server.js for details)")
@@ -57,7 +57,7 @@ io.on('connection', socket => {
     // sends all connected players of the current game the updated game state representation specific to that player
     // TODO: !!!! Make sure only players of the CURRENT/SAME game get sent updates (probably already happens because  getPlayerIndexFromSocketId in getUpdatedGameState will give an error)
     async function broadcastGameUpdate(data) {
-        console.log("broadcasting game update: ", data)
+        console.log("Broadcasting game update: ", data)
         // return all Socket instances
         const sockets = await io.fetchSockets();
         for (const othersocket of sockets) {
@@ -67,7 +67,7 @@ io.on('connection', socket => {
 
                 let theGameState = gameRoutes.getUpdatedGameState(data.gameId, othersocket.id)
                 console.log("sending update to socket " + othersocket.id + ": ", theGameState)
-                if (theGameState && !theGameState.err) othersocket.send("game-update", theGameState)
+                if (theGameState && !theGameState.err) othersocket.emit("game-update", theGameState)
             }
         }
     }
@@ -76,7 +76,8 @@ io.on('connection', socket => {
         data.playerSocketId = socket.id
         gameRoutes.createNewGame(data).then((gameState) => {
             console.log(data, "new game state:", gameState);
-            callback(gameState); // Since no other players exist, no need for broadCast
+            callback(gameState);
+            // Since no other players exist yet, no need for broadcast
         })
     });
 
@@ -85,7 +86,7 @@ io.on('connection', socket => {
         gameRoutes.applyGameStateChange("join", data).then((gameState) => {
             console.log(data, "new game state:", gameState);
             callback(gameState);
-            broadcastGameUpdate(data);
+            broadcastGameUpdate(data).then() // "then" only so the async function gets called and we can use await keyword;;
         })
     });
 
