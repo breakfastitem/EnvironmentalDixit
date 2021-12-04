@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--  TODO: fix new round and add maginfiing glass to vote screen
+voteDiv perviously had caret instead of maginfiing glass ?
+Fix Deck addition url parsing of named flicker users.
+
+Magnifying glass for Zoom needs to be fixed
+For larger images, Zoom is not working well when a wider image is expanded from the card panel
+
+https://www.artworksforchange.org/artist-galleries-ftb-part-ii/
+https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/51081140358/
+
+-->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Fixit</title>
+
+    <!-- CSS -->
+    <!-- Bootstrap links-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+
+    <!--Local Styles-->
+    <link rel="stylesheet" type="text/css" href="./css/styles.css" />
+
+    <!--Font-->
+    <link rel="stylesheet" href="https://use.typekit.net/rrw6rho.css" />
+    <link rel="stylesheet" href="./css/fonts.css" />
+
+    <!--Icon Image-->
+    <link rel="icon" href="./images/playerIcons/Tree.png">
+</head>
+
+<body>
+    <!-- <div class="container-fluid d-flex align-items-stretch h-100 p-0">
+        <div class="col-2" style="background-color: aqua; ">
+            sidebar
+        </div>
+        <div class="col-10 d-flex justify-content-spacearound align-items-stretch"
+            style="background-color: rebeccapurple;">
+            <div class="row h-20 d-flex flex-grow-1 flex-fill justify-content-center align-items-center"
+                style="background-color: rgb(110, 99, 183);">
+                header
+            </div>
+            <div class="row h-60 flex-fill justify-content-center align-items-center"
+                style="background-color: rgb(123, 144, 206);">
+                GameBoard
+            </div>
+            <div class="row h-20 flex-fill justify-content-center align-items-center"
+                style="background-color: rgba(177, 227, 197, 0.619);">
+                Hand
+            </div>
+        </div>
+    </div> -->
+    <header>
+        <div id="flex-join-spacer" style="min-width: 38em; height: 8em; flex:1"></div>
+        <img id="title" src="./images/misc/logo.png" />
+        <h1 id="code-label" style="display: none;">
+            <span>Join Code</span><br>
+            <span style="color: #c67d2f; user-select: all;" id="code">----</span>
+        </h1>
+        <!--
+
+         -->
+
+    </header>
+
+    <section id="game-start-form" class="row">
+        <div class="mini-form">
+            <h2>Start a New Game</h2>
+            <input id="newgame-name-input" placeholder="Your Name"></input>
+            <br>
+            <select name="decks" id="deck-select">
+                <option value="">Choose A Deck</option>
+            </select>
+            <br>
+            <button id="create-game-button">Start Game</button>
+        </div>
+        <div class="mini-form">
+            <h2>Join an Existing Game</h2>
+            <input id="name-input" placeholder="Your Name"></input>
+            <br>
+            <input id="id-input" placeholder="Game Id"></input>
+            <br>
+            <button id="join-existing-game-button">Join Game</button>
+        </div>
+
+    </section>
+
+
+    <div id="start-about-links" class="about-links">
+        <h2><a href="http://artworksforchange.org" target="_blank" class="learn-link">Learn More</a></h2>
+        <h2><a href="http://artworksforchange.org" target="_blank" class="learn-link">How To Play</a></h2>
+    </div>
+
+    <div id="error-bar">
+
+    </div>
+
+    <div id="game-layout-container" style="flex:1;display: none;">
+
+        <div class="row flex-nowrap m-0 h-100">
+            <!-- score aside-->
+            <div class="d-flex flex-column" id="sidebar">
+
+                <img id="title" class="corner-logo" src="./images/misc/logo.png" />
+                <hr>
+                <span class="caret-header" id="scores-caret"><img class="caret"
+                        src="./images/misc/down-caret-symbol.png"></img>
+                    <h2>Scores</h2>
+                </span>
+                <aside id="scores">
+
+                </aside>
+
+                <hr>
+                <span class="caret-header">
+                    <h2>Chat</h2>
+                </span>
+                <aside id="chat" class="d-flex flex-column flex-grow-1 w-100 align-items-stretch">
+                    <div id="chat-messages" class="flex-grow-1">
+
+                    </div>
+                    <form id="chat-form" class="d-flex flex-column">
+                        <input id="chat-input" type="text"></input>
+                        <button type="submit">Submit</button>
+                    </form>
+                </aside>
+            </div>
+
+            <div class="d-flex flex-column flex-grow-1" style="margin: 15px;min-width: 0;">
+                <!-- main board -->
+                <section class="justify-content-center flex-grow-1 d-flex flex-column align-items-center" id="board">
+
+
+                </section>
+                <hr>
+
+                <!-- player hand-->
+                <div class="splay-deck" id="hand">
+
+                </div>
+
+            </div>
+        </div>
+
+        <div id="lightBox">
+
+            <div id="img-viewer">
+                <button id='exit-button'>X</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- jQuery and JS bundle w/ Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- jQuery and moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!--Local-->
+    <script src="./js/index.js"></script>
+
+</body>
+
+</html>

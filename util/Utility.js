@@ -13,7 +13,7 @@ function shuffle(array) {
 //returns players array with updated scores
 function determineScores(players, roundData, tellerIndex) {
 
-    let tempArray = roundData.cardArray.filter(card => card.playerIndex == tellerIndex);
+    let tempArray = roundData.cardArray.filter(card => card.playerSocketId == tellerIndex);
 
     let tellerCard = tempArray[0];
 
@@ -23,14 +23,14 @@ function determineScores(players, roundData, tellerIndex) {
             if (i != tellerIndex) {
                 players[i].score += 2;
                 for (let j = 0; j < roundData.cardArray.length; j++) {
-                    if (roundData.cardArray[j].playerIndex == i) {
+                    if (roundData.cardArray[j].playerSocketId == i) {
                         players[i].score += roundData.cardArray[j].votes;
                     }
                 }
             }
         }
     } else {
-       
+
         players[tellerIndex].score += 3;
         let voterIndexes = tellerCard.voterIndexes;
         //Everyone who voted for correct card also gets points
@@ -42,7 +42,7 @@ function determineScores(players, roundData, tellerIndex) {
         for (let i = 0; i < players.length; i++) {
             if (i != tellerIndex) {
                 for (let j = 0; j < roundData.cardArray.length; j++) {
-                    if (roundData.cardArray[j].playerIndex == i) {
+                    if (roundData.cardArray[j].playerSocketId == i) {
                         players[i].score += roundData.cardArray[j].votes;
                     }
                 }
