@@ -897,11 +897,7 @@ $("#hand").on("click", (event) => {
             selectedHandCardIndex = handNum
          }
 
-         let card = $(`
-         <div id="selected-card-container">
-         ${getImageHtml(cardIdentifier)}
-         </div>
-         `);
+         let card = $(getImageHtml(cardIdentifier));
 
          // card.attr("class", "player-card");
          card.attr("id", `selected-card`);
