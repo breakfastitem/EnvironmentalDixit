@@ -339,9 +339,8 @@ header {
 .learn-link {
   position: relative;
 
-  color: #d8945c;
+  color: var(--accent-color);
 
-  font-size: 17px;
   font-weight: 600;
 }
 
