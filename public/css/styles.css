@@ -214,6 +214,9 @@ header {
   width: unset;
   height: 160px;
 }
+.voteCard img {
+  height: 100%;
+}
 
 .votesDisplayCard {
   flex: 0 1 auto;
