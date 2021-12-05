@@ -28,7 +28,6 @@ let gameID;
 let GameObject = {
    gameId: "",
    playerCount: "0",
-   gameStage: "none",
    players: []
 }
 
@@ -86,6 +85,7 @@ function displayWaitingRoomPhase(isHost) {
 
    startingForm.append(display);
    $("#start-full-game-button").on("click", startFullGame)
+   updatePlayerScores(GameObject.playerCount, GameObject.players);
 }
 
 function hideWaitingRoomPhase() {
@@ -174,11 +174,11 @@ function handleGameUpdate() {
    }).then((serverResponse) => {
 
       if (GameObject != serverResponse) {
-         if (serverResponse.gameStage != GameObject.gameStage) lastGameStage = GameObject.gameStage
+         if (serverResponse.gameState != GameObject.gameState) lastGameStage = GameObject.gameState
 
          updateGameObjectFromResponse(serverResponse);
 
-         switch (GameObject.gameStage) {
+         switch (GameObject.gameState) {
             case "join":
                gameID = GameObject.gameID;
 
@@ -188,7 +188,7 @@ function handleGameUpdate() {
             case "mainCard":
 
                //TODO :: If it is players turn to pick offer them a choice
-               if (boardInstantiated < 1 || lastGameStage == "endDisplay") {
+               if (lastGameStage == "endDisplay") {
                   hideWaitingRoomPhase();
                   fakeCardSubmited = false;
 
@@ -209,7 +209,7 @@ function handleGameUpdate() {
 
                //Everyone but dealer has this display
 
-               if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+               if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
                   //Display board info
                   let board = $("#board");
                   board.empty();
@@ -234,7 +234,7 @@ function handleGameUpdate() {
 
                break;
             case "vote":
-               if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+               if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
                   //Display board info
                   let board = $("#board");
                   board.empty();
@@ -287,7 +287,7 @@ function handleGameUpdate() {
 
                   boardInstantiated++;
 
-               } else if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+               } else if (GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
                   let board = $("#board");
                   board.empty();
 
@@ -331,7 +331,7 @@ function handleGameUpdate() {
                break;
 
             case "endDisplay":
-               if (boardInstantiated < 4) {
+               if (true) {
                   let board = $("#board");
 
                   board.empty();
@@ -374,8 +374,8 @@ function handleGameUpdate() {
 }
 
 function initializeGameUpdateListenerSocket() {
-   socket.on(gameID + "-update", (response) => {
-      handleGameUpdate(response)
+   socket.on(gameID + "-update", () => {
+      handleGameUpdate();
    });
 }
 
@@ -383,7 +383,7 @@ function initializeGameUpdateListenerSocket() {
 
 function displayVoteSelection(cardRoundIndex) {
    //clicks are only enabled when the player is not a dealer
-   if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameStage == "vote") {
+   if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState == "vote") {
       if (voteCardIndex != cardRoundIndex) {
          var card = $(`#vote-${voteCardIndex}`)
          card.parent().removeClass("vote-selected");
@@ -420,7 +420,6 @@ function updateGameObjectFromResponse(serverResponse) {
 
    if (serverResponse.players && serverResponse.players.length != serverResponse.players.length) {
       GameObject.playerCount = serverResponse.players.length;
-      updatePlayerScores(GameObject.playerCount, GameObject.players);
    }
 
    for (let i = 0; i < keys.length; i++) {
@@ -711,7 +710,8 @@ $("#hand").on("click", (event) => {
    }
 
 
-   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameStage === "mainCard") || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameStage === "fakeCards" && !fakeCardSubmited)) {
+   if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard")
+      || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
 
       if (type == "img") {
          cardIdentifier = GameObject.hand[handNum];
@@ -805,8 +805,6 @@ $("#create-game-button").on("click", () => {
    }).then((response) => {
       playerIndex = 0;
 
-
-
       updateGameObjectFromResponse(response);
 
       setDeckUrls(response.cardUrls);
@@ -826,7 +824,6 @@ $("#create-game-button").on("click", () => {
       selection.removeAllRanges();
       selection.addRange(range);
 
-      // updatePlayerScores(GameObject.playerCount, GameObject.players);
       initializeGameUpdateListenerSocket();
 
       displayWaitingRoomPhase(true);
@@ -858,11 +855,6 @@ $("#join-existing-game-button").on("click", function () {
       url: "/game/join",
       data: { gameId: gameID, playerName: playerName }
    }).then((response) => {
-
-      if (response.err) {
-         displayBoardError(response.err);
-         return;
-      }
 
       //Update code display
       $("#code").text(gameID);
