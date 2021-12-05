@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const express = require("express");
 const mongoose = require("mongoose");
+const fetch = require("node-fetch");
 
 
 // setup database connection based on current NODE_ENV variable
@@ -49,7 +50,7 @@ app.use(express.static(__dirname + '/public'));
 
 //routes
 require("./routes/html-routes")(app);
-require("./routes/api-routes")(app, db);
+require("./routes/api-routes")(app, db, fetch);
 require("./routes/game-routes")(app, db, io);
 
 io.on('connection', socket => {

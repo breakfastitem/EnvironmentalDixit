@@ -1,11 +1,9 @@
-import fetch from "node-fetch"
-
 if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
 
 
-module.exports = function (app, db) {
+module.exports = function (app, db, fetch) {
 
     //POST Functions
     app.post("/api/deck", (req, res) => {
