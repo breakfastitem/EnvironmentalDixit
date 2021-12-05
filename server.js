@@ -4,7 +4,6 @@ if (process.env.NODE_ENV !== "production") {
 
 const express = require("express");
 const mongoose = require("mongoose");
-const fetch = require("node-fetch");
 
 
 // setup database connection based on current NODE_ENV variable
