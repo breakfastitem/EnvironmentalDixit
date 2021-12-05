@@ -180,24 +180,30 @@ function handleGameUpdate() {
 
             case "mainCard":
 
-               hideWaitingRoomPhase();
-               fakeCardSubmited = false;
+               console.log("hello");
 
-               displayCards();
-
-               startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-               boardInstantiated++;
-
-               if (boardInstantiated == 4) {
+               if (boardInstantiated > 3) {
                   boardInstantiated = 0;
                }
+
+               if (boardInstantiated < 1) {
+                  hideWaitingRoomPhase();
+                  fakeCardSubmited = false;
+
+                  displayCards();
+
+                  startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+                  boardInstantiated++;
+               }
+
+
 
                break;
             case "fakeCards":
 
                //Everyone but dealer has this display
 
-               if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+               if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
                   //Display board info
                   let board = $("#board");
                   board.empty();
@@ -222,7 +228,7 @@ function handleGameUpdate() {
 
                break;
             case "vote":
-               if (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+               if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
                   //Display board info
                   let board = $("#board");
                   board.empty();
@@ -275,7 +281,7 @@ function handleGameUpdate() {
 
                   boardInstantiated++;
 
-               } else if (GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
+               } else if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex) {
                   let board = $("#board");
                   board.empty();
 
@@ -319,7 +325,7 @@ function handleGameUpdate() {
                break;
 
             case "endDisplay":
-               if (true) {
+               if (boardInstantiated < 4) {
                   let board = $("#board");
 
                   board.empty();
