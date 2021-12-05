@@ -35,7 +35,7 @@ app.use(express.static(__dirname + '/public'));
 //routes
 require("./routes/html-routes")(app);
 require("./routes/api-routes")(app, db);
-require("./routes/game-routes")(app, db);
+require("./routes/game-routes")(app, db, io);
 
 io.on('connection', socket => {
     console.log("a User connected");
@@ -44,6 +44,7 @@ io.on('connection', socket => {
         console.log(message);
         io.emit("message", message);
     });
+
 });
 
 
