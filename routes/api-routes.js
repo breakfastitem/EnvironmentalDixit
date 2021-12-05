@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
 
+const fetch = require("node-fetch");
 
 module.exports = function (app, db) {
 
@@ -10,8 +11,7 @@ module.exports = function (app, db) {
 
         if (req.body.passphrase == "thunderbird") {
             var url = req.body.alblumUrl
-            //
-            console.log(`https://www.flickr.com/services/rest/?method=flickr.urls.lookupUser&api_key=${process.env.API_KEY}&url=${encodeURIComponent(url)}&format=json&nojsoncallback=1`)
+
             fetch(`https://www.flickr.com/services/rest/?method=flickr.urls.lookupUser&api_key=${process.env.API_KEY}&url=${encodeURIComponent(url)}&format=json&nojsoncallback=1`)
                 .then(response => response.json())
                 .then(data => {
