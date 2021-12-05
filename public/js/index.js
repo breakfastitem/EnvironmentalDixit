@@ -880,7 +880,7 @@ $("#join-existing-game-button").on("click", function () {
 
 })
 
-socket.on("broadcast-chat-message", (messageObject) => {
+socket.on("chat-message-posted", (messageObject) => {
    let currentRoom = gameID || "global-waiting-room-id";
    if (messageObject.roomId === currentRoom) {
       let messageHTML = $(`
