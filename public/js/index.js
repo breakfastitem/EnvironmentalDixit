@@ -97,9 +97,6 @@ function hideWaitingRoomPhase() {
 
 
 function startFullGame() {
-   // start a new game:
-   updatePlayerScores(GameObject.playerCount, GameObject.players);
-
 
    $.ajax({
       method: "put",
@@ -114,10 +111,6 @@ function startFullGame() {
       // hide the ui resposible for creating / joining games
       hideWaitingRoomPhase();
       updatePlayerScores(GameObject.playerCount, GameObject.players);
-
-      // Start listening for updates from the server
-      initializeGameUpdateListenerSocket();
-      handleGameUpdate(response);
 
    }).catch(err => {
       if (err.status === 400) {
@@ -187,18 +180,13 @@ function handleGameUpdate() {
 
             case "mainCard":
 
-               //TODO :: If it is players turn to pick offer them a choice
-               if (lastGameStage == "endDisplay") {
-                  hideWaitingRoomPhase();
-                  fakeCardSubmited = false;
+               hideWaitingRoomPhase();
+               fakeCardSubmited = false;
 
-                  displayCards();
+               displayCards();
 
-                  startNewRound(GameObject.turnOrder[GameObject.roundCount]);
-                  boardInstantiated++;
-               }
-
-
+               startNewRound(GameObject.turnOrder[GameObject.roundCount]);
+               boardInstantiated++;
 
                if (boardInstantiated == 4) {
                   boardInstantiated = 0;
