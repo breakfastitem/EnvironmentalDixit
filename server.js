@@ -49,7 +49,7 @@ app.use(express.static(__dirname + '/public'));
 
 //routes
 require("./routes/html-routes")(app);
-require("./routes/api-routes")(app, db, fetch);
+require("./routes/api-routes")(app, db);
 require("./routes/game-routes")(app, db, io);
 
 io.on('connection', socket => {
