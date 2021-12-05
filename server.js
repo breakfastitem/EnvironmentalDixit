@@ -40,9 +40,11 @@ require("./routes/game-routes")(app, db, io);
 io.on('connection', socket => {
     console.log("a User connected");
 
-    socket.on("new-message", (message) => {
+    socket.on("new-chat-message", (message) => {
         console.log(message);
-        io.emit("message", message);
+
+
+        io.emit("chat-message-posted", message);
     });
 
 });
