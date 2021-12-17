@@ -11,18 +11,6 @@ $("#password-form").on("submit", (event) => {
         return;
     }
 
-
-    // let urlArray = $("#url-input").val().trim().split('/');
-    // console.log(urlArray);
-
-
-    // body["passphrase"] = $("#password-input").val().trim();
-    // body["set"] = urlArray[6];
-    // // body["user"] = urlArray[4];
-    // body["name"] = $("#name-input").val().trim();
-
-
-
     body["passphrase"] = $("#password-input").val().trim();
     body["alblumUrl"] = $("#url-input").val().trim()
     body["name"] = $("#name-input").val().trim();

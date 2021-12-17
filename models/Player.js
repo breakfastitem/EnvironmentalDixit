@@ -1,7 +1,7 @@
 /**
  * { name: req.body.playerName, score: 0, handCount: 0, cards: [], host: true }
  */
-class Player {
+ class Player {
 
     //Creates the game as an object. This will match what the current schema calls are doing.
     constructor(playerName, isHost) {

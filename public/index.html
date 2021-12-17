@@ -1,17 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!--  TODO: fix new round and add maginfiing glass to vote screen
-voteDiv perviously had caret instead of maginfiing glass ?
-Fix Deck addition url parsing of named flicker users.
-
-Magnifying glass for Zoom needs to be fixed
-For larger images, Zoom is not working well when a wider image is expanded from the card panel
-
-https://www.artworksforchange.org/artist-galleries-ftb-part-ii/
-https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/51081140358/
-
--->
 
 <head>
     <meta charset="UTF-8">
@@ -35,26 +24,6 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
 </head>
 
 <body>
-    <!-- <div class="container-fluid d-flex align-items-stretch h-100 p-0">
-        <div class="col-2" style="background-color: aqua; ">
-            sidebar
-        </div>
-        <div class="col-10 d-flex justify-content-spacearound align-items-stretch"
-            style="background-color: rebeccapurple;">
-            <div class="row h-20 d-flex flex-grow-1 flex-fill justify-content-center align-items-center"
-                style="background-color: rgb(110, 99, 183);">
-                header
-            </div>
-            <div class="row h-60 flex-fill justify-content-center align-items-center"
-                style="background-color: rgb(123, 144, 206);">
-                GameBoard
-            </div>
-            <div class="row h-20 flex-fill justify-content-center align-items-center"
-                style="background-color: rgba(177, 227, 197, 0.619);">
-                Hand
-            </div>
-        </div>
-    </div> -->
     <header>
         <div id="flex-join-spacer" style="min-width: 38em; height: 8em; flex:1"></div>
         <img id="title" src="./images/misc/logo.png" />
@@ -62,10 +31,6 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
             <span>Join Code</span><br>
             <span style="color: #c67d2f; user-select: all;" id="code">----</span>
         </h1>
-        <!--
-
-         -->
-
     </header>
 
     <section id="game-start-form" class="row">
@@ -124,7 +89,7 @@ https://www.flickr.com/photos/157415988@N06/albums/72157718812911143/with/510811
                     <div id="chat-messages" class="flex-grow-1">
 
                     </div>
-                    <form id="chat-form" class="d-flex flex-column">
+                    <form id="chat-form" autocomplete="off" class="d-flex flex-column">
                         <input id="chat-input" type="text"></input>
                         <button type="submit">Submit</button>
                     </form>

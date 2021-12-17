@@ -2,6 +2,8 @@ if (process.env.NODE_ENV !== "production") {
     require("dotenv").config();
 }
 
+const fetch = require("node-fetch");
+
 
 module.exports = function (app, db) {
 
@@ -10,21 +12,15 @@ module.exports = function (app, db) {
 
         if (req.body.passphrase == "thunderbird") {
             var url = req.body.alblumUrl
-            //
-            console.log(`https://www.flickr.com/services/rest/?method=flickr.urls.lookupUser&api_key=${process.env.API_KEY}&url=${encodeURIComponent(url)}&format=json&nojsoncallback=1`)
+
             fetch(`https://www.flickr.com/services/rest/?method=flickr.urls.lookupUser&api_key=${process.env.API_KEY}&url=${encodeURIComponent(url)}&format=json&nojsoncallback=1`)
                 .then(response => response.json())
                 .then(data => {
                     var userId, setName;
-                    // try {
+
                     userId = data.user.id
                     setName = url.split("/")[6];
-                    // } catch (err) {
-                    //     throw (err);
-                    // }
 
-                    // https://www.webfx.com/tools/idgettr/
-                    // https://www.flickr.com/photos/riceimages/albums/72157624738589194
 
                     console.log(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${setName}&user_id=${userId}&format=json&nojsoncallback=1`)
                     return fetch(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${setName}&user_id=${userId}&format=json&nojsoncallback=1`)
