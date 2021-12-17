@@ -77,6 +77,11 @@ h2 {
   font-family: hobo-std, sans-serif;
 }
 
+h2 .inline {
+  font-family: "Montserrat", "Open Sans", sans-serif;
+font-weight: bold;
+}
+
 img {
   /* max-width: 100%; */
   -webkit-user-drag: none;
