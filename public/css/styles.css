@@ -283,7 +283,19 @@ header {
 .player-icon {
   width: 45px;
   height: 45px;
-  margin-left: 30px;
+  margin-left: 10px;
+}
+.player-name {
+  flex: 1;
+
+  margin: 0 10px;
+
+  font-weight: bold;
+}
+.player-score {
+  margin-top: 3px;
+
+  font-size: 1.5em;
 }
 
 .error-message {
@@ -301,9 +313,10 @@ header {
 }
 
 /*Specific ID stylings*/
-#chat
-{
-  overflow: hidden;flex-basis: 0;}
+#chat {
+  overflow: hidden;
+  flex-basis: 0;
+}
 #chat-messages {
   overflow-y: auto;
 
@@ -311,7 +324,7 @@ header {
 }
 
 #board {
-  flex:1 1 0;
+  flex: 1 1 0;
 
   min-width: 0;
   min-height: 400px;
@@ -346,7 +359,6 @@ header {
 
   font-weight: 600;
 }
-
 
 #selected-card {
   position: relative;

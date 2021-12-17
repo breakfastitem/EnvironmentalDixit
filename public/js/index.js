@@ -618,10 +618,10 @@ function updatePlayerScores(playerCount, playerObjects) {
       let player = playerObjects[i];
 
       let scoreInfo = $(`
-      <div class="row m-0">
+      <div style="margin: 7px 0;" class="row align-items-center">
             <img class="player-icon" src=${iconSources[i]}></img>
-         <span id="name-${i + 1}" style="color:${iconColors[i]}; margin-bottom:0">${player.name} </span>
-         <span id="score-${i + 1}" style="margin-top:3px">${player.score}</span></p>
+         <span id="name-${i + 1}" class="player-name" style="color:${iconColors[i]}; margin-bottom:0">${player.name} </span>
+         <span id="score-${i + 1}" class="player-score">${player.score}</span></p>
       </div>`);
 
       scoreBar.append(scoreInfo);
