@@ -10,8 +10,11 @@ const deckSchema = new Schema({
     cardUrls: {
         type: [String],
         required: true
+    },
+    cardInfoArray: {
+        type: [{ title: String, description: String, artist: String }],
+        required: false
     }
-
 });
 
 const deckModel = mongoose.model("Deck", deckSchema)

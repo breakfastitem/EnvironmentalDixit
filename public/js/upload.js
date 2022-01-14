@@ -1,13 +1,13 @@
 /**
  * event listner
  */
-$("#password-form").on("submit", (event) => {
+$("#add-deck-form").on("submit", (event) => {
     event.preventDefault();
     let body = {};
     body["name"] = $("#name-input").val().trim();
 
     if (body.name == "") {
-        console.log("Please input Deck name.");
+        alert("Please input a deck name.");
         return;
     }
 
@@ -17,7 +17,7 @@ $("#password-form").on("submit", (event) => {
 
     $.ajax({
         method: "POST",
-        url: "/api/deck",
+        url: "/api/add_deck",
         data: body
     })
         .then(data => {
@@ -34,3 +34,53 @@ $("#password-form").on("submit", (event) => {
             console.log(err.status);
         });
 });
+
+/**
+ * event listner
+ */
+$("#del-deck-form").on("submit", (event) => {
+    event.preventDefault();
+    let body = {};
+    body["passphrase"] = $("#password-input").val().trim();
+    body["deckName"] = $("#deck-select").val();
+
+    if (body["deckName"] === "") {
+        alert("Please Select a Deck");
+        return;
+    }
+
+    $.ajax({
+        method: "POST",
+        url: "/api/delete_deck",
+        data: body
+    })
+        .then(() => {
+            alert("Success");
+            getDecks();
+        })
+        .catch(err => {
+            if (err.status == 400) {
+                alert("incorrect password");
+            } else {
+                alert("Error Deleting Deck: " + err.status);
+            }
+        });
+});
+
+
+function getDecks() {
+    //get deck from database
+    let selector = $("#deck-select");
+    selector.empty();
+    $.ajax({
+        method: "GET",
+        url: "/api/decks"
+    }).then(data => {
+
+        data.forEach(deck => {
+            let option = $(`<option value="${deck.name}">${deck.name}</option>`);
+            selector.append(option);
+        });
+    });
+}
+getDecks();

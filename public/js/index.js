@@ -255,7 +255,7 @@ function handleGameUpdate() {
                      card[0].onload = function () {
                         cardDiv.on("mouseenter", () => {
                            cardDiv.addClass("hand-card-active");
-                           cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+                           cardDiv.css({ "max-width": `${this.width}px`, "flex": "flex: 1 0 100%;" });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
                         });
                         cardDiv.on("mouseleave", () => {
                            if (i == voteCardIndex) return;
@@ -333,7 +333,7 @@ function handleGameUpdate() {
                   let header = $(`<h2> Votes This Round </h2>
                      <p>${dealerName} was the StoryTeller</p>`);
                   board.append(header);
-                  let row = $("<div class='row' style='justify-content: center;'></div>");
+                  let row = $("<div class='row m-0' style='justify-content: center;'></div>");
 
                   //Display cards with owner and votes
                   for (let i = 0; i < GameObject.playerCount; i++) {
@@ -351,7 +351,7 @@ function handleGameUpdate() {
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
                   //if host
                   if (playerIndex == 0) {
-                     let button = $(`<button id="new-Round">next round</button>`);
+                     let button = $(`<button id="new-Round">Next Round</button><button id="card-learn">Reveal Stories</button>`);
                      board.append(button);
                   }
                   boardInstantiated++;
@@ -482,7 +482,7 @@ function displayCards() {
 
          cardDiv.on("mouseenter", () => {
             cardDiv.addClass("hand-card-active");
-            cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
+            cardDiv.css({ "max-width": `${this.width}px`, "flex": "flex: 1 0 100%;" });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
          });
          cardDiv.on("mouseleave", () => {
             if (i == selectedHandCardIndex) return;

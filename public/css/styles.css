@@ -72,7 +72,7 @@ h1 {
 }
 
 input {
-  user-select: all!important;
+  /* user-select: all!important; */
 }
 
 h2 {
@@ -83,11 +83,12 @@ h2 {
 
 h2 .inline {
   font-family: "Montserrat", "Open Sans", sans-serif;
-font-weight: bold;
+  font-weight: bold;
 }
 
 img {
-  /* max-width: 100%; */
+  max-width: 100%;
+
   -webkit-user-drag: none;
   -khtml-user-drag: none;
   -moz-user-drag: none;
@@ -225,14 +226,16 @@ header {
   margin-right: 5px;
   margin-left: 5px; */
   width: unset;
-  height: 160px;
 }
 .voteCard img {
   height: 100%;
 }
 
 .votesDisplayCard {
-  flex: 0 1 auto;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: space-evenly;
 
   margin: 0px 10px;
 
@@ -243,16 +246,16 @@ header {
   position: relative;
 
   overflow: hidden;
+  flex: 0 100 auto;
 
   box-sizing: border-box;
-  max-width: min(calc(100% / 6), 100px);
+  max-width: fit-content;
   height: 160px;
-  margin: 0 -20px;
-  margin: 10px -10px 0 -10px;
+  margin-top: 10px;
   padding: 0;
 
   cursor: pointer;
-  transition: max-width 500ms ease, margin 500ms ease;
+  transition: flex 500ms ease, margin 500ms ease;
 
   border: 1px solid VAR(--boundry-line-color);
   border-radius: 4px;
@@ -260,7 +263,13 @@ header {
 }
 
 .hand-card-div.hand-card-active {
-  margin: 0px 20px 10px 20px;
+  flex: 100 0 auto;
+
+  margin: 0px 10px 10px 10px;
+}
+
+#hand:hover .vote-selected:not(.hand-card-active) {
+  flex: 0 100 auto;
 }
 
 .lightbox-button {
@@ -281,6 +290,7 @@ header {
 }
 
 .player-card {
+  max-width: unset;
   height: 100%;
 }
 
@@ -368,7 +378,7 @@ header {
 .learn-link {
   position: relative;
 
-  color: var(--accent-color)!important;
+  color: var(--accent-color) !important;
 
   font-weight: 600;
 }
