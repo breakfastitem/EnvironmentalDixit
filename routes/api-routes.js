@@ -17,20 +17,14 @@ module.exports = function (app, db) {
                 .then(response => response.json())
                 .then(data => {
                     var userId, setName;
-                    console.log("LookupUser", data)
                     userId = data.user.id
                     setName = url.split("/")[6];
 
-
-                    console.log(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${setName}&user_id=${userId}&extras=description,tags,url_o&format=json&nojsoncallback=1`)
                     return fetch(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${setName}&user_id=${userId}&extras=description,tags,url_o&format=json&nojsoncallback=1`)
                 }).then(response => response.json())
                 .then(data => {
-                    console.log("GetPhotos", data)
                     let cardUrlsArray = data.photoset.photo.map(photo => {
-                        console.log("Photos", photo)
                         return photo.url_o
-                        //`https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg`;
                     });
                     let cardInfoArray = data.photoset.photo.map(photo => {
                         let tag = photo.tags.tag ? photo.tags.tag[0].raw : photo.tags.split(" ")[0]

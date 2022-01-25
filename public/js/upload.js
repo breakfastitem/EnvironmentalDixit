@@ -7,7 +7,7 @@ $("#add-deck-form").on("submit", (event) => {
     body["name"] = $("#name-input").val().trim();
 
     if (body.name == "") {
-        alert("Please input a deck name.");
+        displayBoardError("Please input a deck name.");
         return;
     }
 
@@ -21,7 +21,7 @@ $("#add-deck-form").on("submit", (event) => {
         data: body
     })
         .then(data => {
-            console.log("Success");
+            displayBoardError("Success!", true);
             data.forEach(img => {
                 let imgHTML = $(`<img src=${img} alt="Confirmation of upload" />`)
                 $("#success-section").append(imgHTML);
@@ -29,9 +29,9 @@ $("#add-deck-form").on("submit", (event) => {
         })
         .catch(err => {
             if (err.status == 400) {
-                console.log("incorrect password");
+                displayBoardError("incorrect password");
             }
-            console.log(err.status);
+            console.warn("/api/add_deck error:", err);
         });
 });
 
@@ -55,18 +55,39 @@ $("#del-deck-form").on("submit", (event) => {
         data: body
     })
         .then(() => {
-            alert("Success");
+            displayBoardError("Success!", true);
             getDecks();
         })
         .catch(err => {
             if (err.status == 400) {
-                alert("incorrect password");
+                displayBoardError("incorrect password");
             } else {
-                alert("Error Deleting Deck: " + err.status);
+                displayBoardError("Error Deleting Deck: " + err.status);
+                console.warn("/api/delete_deck error:", err);
             }
         });
 });
 
+function displayBoardError(errorMessage, goodMessage) {
+    const board = $("#error-bar");
+
+    const messageDiv = $(`
+
+    <div class="col-12 ${goodMessage ? 'alert-success' : 'error-message'}">
+       <hr class="error-line">
+          <p> ${errorMessage} </p>
+       <hr class="error-line">
+    </div>
+   `);
+
+
+    board.append(messageDiv);
+
+    let timeout = setTimeout(() => {
+        board.children().last().remove(".error-message");
+    }, 10000);
+
+}
 
 function getDecks() {
     //get deck from database
@@ -76,11 +97,10 @@ function getDecks() {
         method: "GET",
         url: "/api/decks"
     }).then(data => {
-
         data.forEach(deck => {
             let option = $(`<option value="${deck.name}">${deck.name}</option>`);
             selector.append(option);
         });
     });
 }
-getDecks();
+getDecks()
