@@ -42,7 +42,7 @@ module.exports = function (app, db) {
                     })
 
 
-                    let newDeckDBDocument = { name: req.body.name, cardUrls: cardUrlsArray, cardInfoList: cardInfoArray }
+                    let newDeckDBDocument = { name: req.body.name, cardUrls: cardUrlsArray, cardInfoArray: cardInfoArray }
                     console.log(newDeckDBDocument)
                     const deck = new db.Deck(newDeckDBDocument);
                     deck.save().catch(err => console.log(err))

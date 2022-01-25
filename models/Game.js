@@ -13,6 +13,8 @@ class Game {
 
         this.deckUrls = deck.cardUrls;
 
+        this.cardInfoArray = deck.cardInfoArray;
+
         this.deckName = deck.name;
 
         this.gameID = gameID;
@@ -123,7 +125,7 @@ class Game {
 
             if (this.roundData.playersActed == this.playerCount) {
 
-                //Randomizes so host card isnt displayed first 
+                //Randomizes so host card isnt displayed first
 
                 this.roundData.playersActed = 1;
                 this.gameState = "vote";
@@ -182,11 +184,12 @@ class Game {
 
         return false;
     }
+
     sendData(playerIndex) {
         let data;
         switch (this.gameState) {
             case "join":
-                data = { cardUrls: this.deckUrls, gameID: this.gameID, gameState: this.gameState, playerCount: this.playerCount, players: [] };
+                data = { cardUrls: this.deckUrls, cardInfoArray: this.cardInfoArray, gameID: this.gameID, gameState: this.gameState, playerCount: this.playerCount, players: [] };
 
                 for (let i = 0; i < this.playerCount; i++) {
                     data.players.push({ name: this.players[i].name, score: this.players[i].score });
