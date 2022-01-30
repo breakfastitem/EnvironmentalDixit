@@ -26,23 +26,32 @@
 <body>
 
     <div class="container">
-        <h1>
-            <img id="title" src="https://lh3.google.com/u/0/d/133df7rJq05g9kTMtStK11egHFLqwaJJD" />
-        </h1>
+
+            <img id="title" style="position: relative;" src="../images/misc/logo.png" />
 
 
-        <h2>Deck Upload</h2>
+            <div id="error-bar">
+
+            </div>
 
         <div id="dynamic-area">
-            <form id="password-form">
-                <p>Please input WebAdmin Password</p>
-                <input placeholder="password" id="password-input"></input>
+            <p>Please input WebAdmin Password</p>
+            <input placeholder="password" id="password-input"></input>
+            <hr>
+            <form id="add-deck-form">
+                <h2>Add Flickr Deck</h2>
                 <input placeholder="Deck Name" id="name-input"></input>
                 <input placeholder="flickr album URL" id="url-input"></input>
+                <button type="submit">Add Deck</button>
+                </form>
 
-                <button type="submit">Submit</button>
-
+            <hr>
+            <form id="del-deck-form">
+                <h2>Remove Deck</h2>
+                <select placeholder="Deck Name" id="deck-select"></select>
+                <button type="submit">Remove Deck</button>
             </form>
+            <hr>
 
             <div id="success-section">
 

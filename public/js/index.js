@@ -32,7 +32,7 @@ let GameObject = {
 }
 
 // filled after join and deck information is given
-let imageSources;
+let imageSources, cardInfoArray;
 
 //Holds shuffled card values
 let cardOrder = [];
@@ -139,8 +139,6 @@ function startNewRound(dealerIndex) {
 
       //Auto Displays first card in selcted area.
       let card = $(getImageHtml(cardIdentifier));
-
-      card.attr("class", "voteCard");
       card.attr("id", `selected-card`);
       //Appends information to board
       board.append(display);
@@ -216,7 +214,7 @@ function handleGameUpdate() {
                   cardIdentifier = GameObject.hand[0];
                   let card = $(getImageHtml(cardIdentifier));
 
-                  card.attr("class", "player-card hand-card-active");
+                  card.attr("class", "player-card-img");
                   card.attr("id", `selected-card`);
 
                   board.append(display);
@@ -252,23 +250,11 @@ function handleGameUpdate() {
                      cardDiv.css({ "z-index": (10 - i).toString() });
 
                      let card = $(getImageHtml(GameObject.roundCards[i]));
-                     card[0].onload = function () {
-                        cardDiv.on("mouseenter", () => {
-                           cardDiv.addClass("hand-card-active");
-                           cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-                        });
-                        cardDiv.on("mouseleave", () => {
-                           if (i == voteCardIndex) return;
-                           cardDiv.removeClass("hand-card-active");
-                           cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-                        });
-                     }
-                     card.attr("class", "voteCard ");
+                     card.attr("class", "player-card-img ");
                      card.attr("id", `vote-${i}`);
 
                      if (i == 0) {
                         cardDiv.addClass("vote-selected");
-                        cardDiv.addClass("hand-card-active")
                         voteCardIndex = 0;
                      }
 
@@ -300,18 +286,7 @@ function handleGameUpdate() {
                      cardDiv.css({ "z-index": (10 - i).toString() });
 
                      let card = $(getImageHtml(GameObject.roundCards[i]));
-                     card[0].onload = function () {
-                        cardDiv.on("mouseenter", () => {
-                           cardDiv.addClass("hand-card-active");
-                           cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-                        });
-                        cardDiv.on("mouseleave", () => {
-                           if (i == voteCardIndex) return;
-                           cardDiv.removeClass("hand-card-active");
-                           cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-                        });
-                     }
-                     card.attr("class", "voteCard ");
+                     card.attr("class", "player-card-img");
                      card.attr("id", `vote-${i}`);
 
                      cardDiv.append(card);
@@ -333,7 +308,7 @@ function handleGameUpdate() {
                   let header = $(`<h2> Votes This Round </h2>
                      <p>${dealerName} was the StoryTeller</p>`);
                   board.append(header);
-                  let row = $("<div class='row' style='justify-content: center;'></div>");
+                  let row = $("<div class='row m-0' style='justify-content: center;max-width: 60%;'></div>");
 
                   //Display cards with owner and votes
                   for (let i = 0; i < GameObject.playerCount; i++) {
@@ -349,11 +324,15 @@ function handleGameUpdate() {
                   $("#board").append(row);
 
                   updatePlayerScores(GameObject.playerCount, GameObject.players);
-                  //if host
-                  if (playerIndex == 0) {
-                     let button = $(`<button id="new-Round">next round</button>`);
+
+                  let button = $(`<button id="learn-about-cards-btn">Reveal Stories</button>`);
+                  board.append(button);
+
+                  if (playerIndex == 0) {    //if host
+                     let button = $(`<button id="new-Round">Next Round</button>`);
                      board.append(button);
                   }
+
                   boardInstantiated++;
                }
 
@@ -381,16 +360,12 @@ function displayVoteSelection(cardRoundIndex) {
       if (voteCardIndex != cardRoundIndex) {
          var card = $(`#vote-${voteCardIndex}`)
          card.parent().removeClass("vote-selected");
-         card.parent().removeClass("hand-card-active");
-         card.parent().css({ "max-width": '' });
 
          //if random var will from different variable
          voteCardIndex = cardRoundIndex;
 
          card = $(`#vote-${voteCardIndex}`)
          card.parent().addClass("vote-selected");
-         card.parent().addClass("hand-card-active");
-         card.parent().css({ "max-width": `${card.width}px` });
       }
    }
 };
@@ -401,8 +376,9 @@ function clearBoard() {
    board.empty();
 }
 
-function setDeckUrls(urls) {
+function setDeckUrls(urls, cardInfoList) {
    imageSources = urls;
+   cardInfoArray = cardInfoList;
 }
 
 function getImageHtml(cardIndex) {
@@ -422,12 +398,14 @@ function updateGameObjectFromResponse(serverResponse) {
 
 }
 
-function displayImageInViewer(cardId) {
-   $("#img-viewer").empty();
-   let button = $("<button id='exit-button'>X</button>");
-   let card = $(getImageHtml(cardId));
-   $("#img-viewer").append(button);
-   $("#img-viewer").append(card);
+function displayImageInViewer(cardIndex, showCardInfo) {
+   $('#lightBox').empty();
+   let imgViewer = $(`<div id="img-viewer" class="${showCardInfo ? 'info-shown' : ''}">${getImageHtml(cardIndex)}<button id='exit-button'>X</button></div>`);
+   $("#lightBox").append(imgViewer);
+   if (showCardInfo) {
+      let cardInfoElements = $(`<h2>${cardInfoArray[cardIndex].title}</h2><h3>${cardInfoArray[cardIndex].author}</h3><p>${cardInfoArray[cardIndex].description}</p>`)
+      $("#lightBox").append(cardInfoElements)
+   }
    $("#lightBox").show();
 }
 
@@ -442,10 +420,10 @@ function updatePlayerScores(playerCount, playerObjects) {
       let player = playerObjects[i];
 
       let scoreInfo = $(`
-      <div class="row m-0">
+      <div style="margin: 7px 0;" class="row align-items-center">
             <img class="player-icon" src=${iconSources[i]}></img>
-         <span id="name-${i + 1}" style="color:${iconColors[i]}; margin-bottom:0">${player.name} </span>
-         <span id="score-${i + 1}" style="margin-top:3px">${player.score}</span></p>
+         <span id="name-${i + 1}" class="player-name" style="color:${iconColors[i]}; margin-bottom:0">${player.name} </span>
+         <span id="score-${i + 1}" class="player-score">${player.score}</span></p>
       </div>`);
 
       scoreBar.append(scoreInfo);
@@ -477,25 +455,11 @@ function displayCards() {
 
       let card = $(getImageHtml(imgIdentifier));
 
-
-      card[0].onload = function () {
-
-         cardDiv.on("mouseenter", () => {
-            cardDiv.addClass("hand-card-active");
-            cardDiv.css({ "max-width": `${this.width}px` });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-         });
-         cardDiv.on("mouseleave", () => {
-            if (i == selectedHandCardIndex) return;
-            cardDiv.removeClass("hand-card-active");
-            cardDiv.css({ "max-width": '' });//"margin-left": `${100 - this.width}px` //`calc(${90 - this.width}px - 100% / 6 + 120px)`
-         });
-      }
       if (i == 0) {
          cardDiv.addClass("vote-selected");
-         cardDiv.addClass("hand-card-active");
       }
 
-      card.attr("class", "player-card");
+      card.attr("class", "player-card-img");
       card.attr("id", `img-${i}`);
 
       cardDiv.append(card);
@@ -655,6 +619,7 @@ $("#board").on("click", (event) => {
          });
 
          break;
+
       case "new-Round":
          clearInterval(interval);
 
@@ -675,6 +640,19 @@ $("#board").on("click", (event) => {
          });
 
          break;
+
+      case "learn-about-cards-btn":
+         $(".voteCard").each(function () { // must not be arrow function for scope
+            $(this).children('img').first().attr("id", "card-learn-button");
+            $(this).addClass("learn-btn-highlight");
+            $(this).append($('<button></button>'));
+         });
+         break;
+
+      case "card-learn-button":
+         const cardPosition = event.target.parentElement.id.split("-")[1];
+         let cardIndex = GameObject.roundData.cardArray[cardPosition].cardIdentifier
+         displayImageInViewer(cardIndex, true)
 
       //light button handler
       default:
@@ -699,10 +677,10 @@ $("#hand").on("click", (event) => {
    const targetID = event.target.id;
    let type = targetID.split("-")[0];
    handNum = targetID.split("-")[1];
+   console.log(handNum, type);
    if (type == "lbutton") {
       displayImageInViewer(GameObject.hand[handNum]);
    }
-
 
    if ((GameObject.turnOrder[GameObject.roundCount] - 1 == playerIndex && GameObject.gameState === "mainCard")
       || (GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex && GameObject.gameState === "fakeCards" && !fakeCardSubmited)) {
@@ -714,20 +692,12 @@ $("#hand").on("click", (event) => {
          if (selectedHandCardIndex != handNum) {
             var handCard = $(`#card-${selectedHandCardIndex}`)
             handCard.removeClass("vote-selected");
-            handCard.removeClass("hand-card-active");
-            handCard.css({ "max-width": '' });
-
             var handCard = $(`#card-${handNum}`)
             handCard.addClass("vote-selected");
-            handCard.addClass("hand-card-active");
-            handCard.css({ "max-width": `${handCard.children().first().width}px` });
-
             selectedHandCardIndex = handNum
          }
 
          let card = $(getImageHtml(cardIdentifier));
-
-         // card.attr("class", "player-card");
          card.attr("id", `selected-card`);
 
          $("#board").append(card);
@@ -770,7 +740,7 @@ let showCardZoomIconOnHoverJqueryEventConfig = {
    }
 }
 $("#board").on(showCardZoomIconOnHoverJqueryEventConfig, ".hand-card-div");
-$("#hand").on(showCardZoomIconOnHoverJqueryEventConfig, ".player-card");
+$("#hand").on(showCardZoomIconOnHoverJqueryEventConfig, ".player-card-img");
 
 // Handle Player Clicking the Create Game Button and create a new game room.
 $("#create-game-button").on("click", () => {
@@ -801,7 +771,7 @@ $("#create-game-button").on("click", () => {
 
       updateGameObjectFromResponse(response);
 
-      setDeckUrls(response.cardUrls);
+      setDeckUrls(response.cardUrls, response.cardInfoArray);
 
       //Get gameId from server
       gameID = GameObject.gameID;
@@ -849,13 +819,12 @@ $("#join-existing-game-button").on("click", function () {
       url: "/game/join",
       data: { gameId: gameID, playerName: playerName }
    }).then((response) => {
-
       //Update code display
       $("#code").text(gameID);
       $("#code-label").show();
 
       updateGameObjectFromResponse(response);
-      setDeckUrls(response.cardUrls);
+      setDeckUrls(response.cardUrls, response.cardInfoArray);
 
       playerIndex = GameObject.playerCount - 1;
 

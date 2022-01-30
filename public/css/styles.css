@@ -19,10 +19,6 @@
   background: #a52222; /* Gecko Browsers */
 }
 
-* {
-  user-select: none;
-}
-
 /*General Stylings*/
 html,
 body {
@@ -77,8 +73,14 @@ h2 {
   font-family: hobo-std, sans-serif;
 }
 
+h2 .inline {
+  font-family: "Montserrat", "Open Sans", sans-serif;
+  font-weight: bold;
+}
+
 img {
-  /* max-width: 100%; */
+  max-width: 100%;
+
   -webkit-user-drag: none;
   -khtml-user-drag: none;
   -moz-user-drag: none;
@@ -173,6 +175,10 @@ button:focus {
   text-align: center;
 }
 
+.joined-player-item .player-icon {
+  margin: 0;
+}
+
 .mini-form {
   padding: 2em 3em;
 }
@@ -207,16 +213,11 @@ header {
   font-size: 30px;
 }
 
-.voteCard {
-  /* margin-top: 10px;
-  margin-right: 5px;
-  margin-left: 5px; */
-  width: unset;
-  height: 160px;
-}
-
 .votesDisplayCard {
-  flex: 0 1 auto;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: space-evenly;
 
   margin: 0px 10px;
 
@@ -227,24 +228,36 @@ header {
   position: relative;
 
   overflow: hidden;
+  flex: 1 4 auto;
 
   box-sizing: border-box;
-  max-width: min(calc(100% / 6), 100px);
+  max-width: fit-content;
   height: 160px;
-  margin: 0 -20px;
-  margin: 10px -10px 0 -10px;
+  margin-top: 10px;
   padding: 0;
 
   cursor: pointer;
-  transition: max-width 500ms ease, margin 500ms ease;
+  transition: flex 500ms ease, margin 500ms ease;
 
   border: 1px solid VAR(--boundry-line-color);
   border-radius: 4px;
   box-shadow: 6px 2px 9px 4px #000000;
 }
 
-.hand-card-div.hand-card-active {
-  margin: 0px 20px 10px 20px;
+.hand-card-div:hover,
+.hand-card-div:focus {
+  flex: 4 1 auto !important;
+  /* margin: 0px 2px 0 3px; */
+
+  border: 2px solid white;
+}
+
+#hand:hover .vote-selected {
+  flex: 1 4 auto;
+}
+
+#hand:not(:hover) .vote-selected {
+  flex: 3 1 auto;
 }
 
 .lightbox-button {
@@ -264,8 +277,54 @@ header {
   position: static;
 }
 
-.player-card {
+.player-card-img {
+  float: right;
+
+  max-width: unset;
   height: 100%;
+}
+
+.voteCard {
+  position: relative;
+
+  flex: 1 1 0px;
+}
+
+.voteCard img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+.learn-btn-highlight button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: 60px;
+  height: 60px;
+
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+
+  border-radius: 10px;
+  background: white;
+  background-image: url("/images/misc/outline_lightbulb_black_24dp.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 80%;
+  box-shadow: 0px 3px 7px #0000007d;
+}
+
+.learn-btn-highlight img {
+  cursor: pointer;
+
+  opacity: 1;
+}
+
+.learn-btn-highlight:hover img {
+  opacity: 1;
 }
 
 .caret {
@@ -280,7 +339,21 @@ header {
 .player-icon {
   width: 45px;
   height: 45px;
-  margin-left: 30px;
+  margin-left: 10px;
+}
+
+.player-name {
+  flex: 1;
+
+  margin: 0 10px;
+
+  font-weight: bold;
+}
+
+.player-score {
+  margin-top: 3px;
+
+  font-size: 1.5em;
 }
 
 .error-message {
@@ -292,15 +365,16 @@ header {
 }
 
 .vote-selected {
-  border-width: 5px;
-  border-style: solid;
-  border-color: VAR(--accent-color);
+  border-width: 5px !important;
+  border-style: solid !important;
+  border-color: VAR(--accent-color) !important;
 }
 
 /*Specific ID stylings*/
-#chat
-{
-  overflow: hidden;flex-basis: 0;}
+#chat {
+  overflow: hidden;
+  flex-basis: 0;
+}
 #chat-messages {
   overflow-y: auto;
 
@@ -308,7 +382,7 @@ header {
 }
 
 #board {
-  flex:1 1 0;
+  flex: 1 1 0;
 
   min-width: 0;
   min-height: 400px;
@@ -329,7 +403,8 @@ header {
   justify-content: center;
 
   box-sizing: border-box;
-  padding: 10px;
+  max-width: 100%;
+  margin: 10px;
 }
 
 #code-label {
@@ -339,11 +414,10 @@ header {
 .learn-link {
   position: relative;
 
-  color: var(--accent-color);
+  color: var(--accent-color) !important;
 
   font-weight: 600;
 }
-
 
 #selected-card {
   position: relative;
@@ -364,11 +438,22 @@ header {
   z-index: 10;
   top: 0;
 
+  overflow-y: scroll;
+
   width: 100%;
   height: 100%;
   padding: 10px;
 
+  text-align: center;
+
   background-color: black;
+}
+
+#img-viewer {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
 }
 
 #img-viewer img {
@@ -384,15 +469,20 @@ header {
   object-fit: contain;
 }
 
+#img-viewer.info-shown {
+   height: 80%;
+   margin-bottom: 16px;
+}
+
 #clue-input {
   width: 100%;
   height: 50px;
 }
 
 #exit-button {
-  position: absolute;
+  position: fixed;
   z-index: 2;
-  right: 8px;
+  right: 12px;
 
   width: 50px;
   height: 49px;
