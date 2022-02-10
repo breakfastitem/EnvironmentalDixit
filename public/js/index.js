@@ -729,16 +729,21 @@ $("#id-input").on("change", function (event) {
 
 });
 
-let showCardZoomIconOnHoverJqueryEventConfig = {
+const showCardZoomIconOnHoverJqueryEventConfig = {
    mouseenter: (event) => {
-
       let handIdentifier = event.target.id.split("-")[1];
       $(`.lightbox-button`).remove();
 
       let img = $(`<img class='lightbox-button' id="lbutton-${handIdentifier}" src='./images/misc/zoom.jpg'></img>`);
-      $(`#card-${handIdentifier}`).append(img);
+      if (event.currentTarget.className.includes("voteDiv")) {
+         $(`#voteDiv-${handIdentifier}`).append(img);
+      } else {
+         $(`#card-${handIdentifier}`).append(img);
+      }
+
    }
 }
+
 $("#board").on(showCardZoomIconOnHoverJqueryEventConfig, ".hand-card-div");
 $("#hand").on(showCardZoomIconOnHoverJqueryEventConfig, ".player-card-img");
 
