@@ -506,8 +506,6 @@ function playerNameValidations(playerName) {
 /**
  * Event Listeners
  */
-
-
 $("#lightBox").on("click", "#exit-button", (event) => {
    $("#lightBox").hide();
 });
