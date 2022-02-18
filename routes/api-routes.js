@@ -10,46 +10,47 @@ module.exports = function (app, db) {
     //POST Functions
     app.post("/api/add_deck", (req, res) => {
 
-        if (req.body.passphrase == "thunderbird") {
-            var url = req.body.alblumUrl
+        try {
+            if (req.body.passphrase == "thunderbird") {
+                var url = req.body.alblumUrl
 
-            fetch(`https://www.flickr.com/services/rest/?method=flickr.urls.lookupUser&api_key=${process.env.API_KEY}&url=${encodeURIComponent(url)}&format=json&nojsoncallback=1`)
-                .then(response => response.json())
-                .then(data => {
-                    var userId, setName;
-                    userId = data.user.id
-                    setName = url.split("/")[6];
+                fetch(`https://www.flickr.com/services/rest/?method=flickr.urls.lookupUser&api_key=${process.env.API_KEY}&url=${encodeURIComponent(url)}&format=json&nojsoncallback=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const userId = data.user.id
+                        const setName = url.split("/")[6];
 
-                    return fetch(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${setName}&user_id=${userId}&extras=description,tags,url_o&format=json&nojsoncallback=1`)
-                }).then(response => response.json())
-                .then(data => {
-                    let cardUrlsArray = data.photoset.photo.map(photo => {
-                        return photo.url_o
-                    });
-                    let cardInfoArray = data.photoset.photo.map(photo => {
-                        let tag = photo.tags.tag ? photo.tags.tag[0].raw : photo.tags.split(" ")[0]
-                        return {
-                            title: photo.title,
-                            description: photo.description._content,
-                            artist: tag.replace(/([A-Z])/g, " $1").trim()
-                        }
+                        return fetch(`https://www.flickr.com/services/rest/?method=flickr.photosets.getPhotos&api_key=${process.env.API_KEY}&photoset_id=${setName}&user_id=${userId}&extras=description,tags,url_o&format=json&nojsoncallback=1`)
+                    }).then(response => response.json())
+                    .then(data => {
+                        let cardUrlsArray = data.photoset.photo.map(photo => {
+                            return photo.url_o
+                        });
+                        let cardInfoArray = data.photoset.photo.map(photo => {
+                            // let tag = photo.tags.tag ? photo.tags.tag[0].raw : photo.tags.split(" ")[0]
+                            return {
+                                title: photo.title,
+                                description: photo.description._content,
+                            }
+                        })
+
+
+                        let newDeckDBDocument = { name: req.body.name, cardUrls: cardUrlsArray, cardInfoArray: cardInfoArray }
+                        console.log(newDeckDBDocument)
+                        const deck = new db.Deck(newDeckDBDocument);
+                        deck.save().catch(err => console.log(err))
+
+                        res.send(cardUrlsArray);
+
                     })
-
-
-                    let newDeckDBDocument = { name: req.body.name, cardUrls: cardUrlsArray, cardInfoArray: cardInfoArray }
-                    console.log(newDeckDBDocument)
-                    const deck = new db.Deck(newDeckDBDocument);
-                    deck.save().catch(err => console.log(err))
-
-                    res.send(cardUrlsArray);
-
-                })
-                .catch(err => {
-                    console.log("Deck api or Flicker api error:", err);
-                    res.sendStatus(err.code);
-                });
-        } else {
-            res.sendStatus(400);
+                    .catch(err => {
+                        console.log("Deck api or Flicker api error:", err);
+                        res.sendStatus(err.code);
+                    });
+            }
+        } catch (error) {
+            console.error("Deck api error:", error);
+            res.sendStatus(500);
         }
 
     });

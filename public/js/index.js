@@ -122,6 +122,10 @@ function startFullGame() {
 
 function startNewRound(dealerIndex) {
 
+   if (imageLightboxOpen) {
+      displayBoardError("A new round is begining in the main game!", $("#lightBox"));
+   }
+
    clearBoard();
    const board = $("#board");
 
@@ -178,7 +182,7 @@ function handleGameUpdate() {
 
             case "mainCard":
 
-               console.log("hello");
+
 
                if (boardInstantiated > 3) {
                   boardInstantiated = 0;
@@ -201,7 +205,14 @@ function handleGameUpdate() {
 
                //Everyone but dealer has this display
 
+
+
                if (boardInstantiated < 2 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+
+                  if (imageLightboxOpen) {
+                     displayBoardError("Clue is ready! Pick your card in the main game.", $("#lightBox"));
+                  }
+
                   //Display board info
                   let board = $("#board");
                   board.empty();
@@ -227,6 +238,11 @@ function handleGameUpdate() {
                break;
             case "vote":
                if (boardInstantiated < 3 && GameObject.turnOrder[GameObject.roundCount] - 1 != playerIndex) {
+
+                  if (imageLightboxOpen) {
+                     displayBoardError("Cards have been picked! Go vote on the cards in the main game.", $("#lightBox"));
+                  }
+
                   //Display board info
                   let board = $("#board");
                   board.empty();
@@ -301,6 +317,11 @@ function handleGameUpdate() {
 
             case "endDisplay":
                if (boardInstantiated < 4) {
+
+                  if (imageLightboxOpen) {
+                     displayBoardError("The scores are tallied! Go check them out in the main game.", $("#lightBox"));
+                  }
+
                   let board = $("#board");
 
                   board.empty();
@@ -398,15 +419,31 @@ function updateGameObjectFromResponse(serverResponse) {
 
 }
 
+var imageLightboxOpen = false
 function displayImageInViewer(cardIndex, showCardInfo) {
-   $('#lightBox').empty();
+   $("#lightBox").empty();
+   imageLightboxOpen = true;
    let imgViewer = $(`<div id="img-viewer" class="${showCardInfo ? 'info-shown' : ''}">${getImageHtml(cardIndex)}<button id='exit-button'>X</button></div>`);
    $("#lightBox").append(imgViewer);
    if (showCardInfo) {
-      let cardInfoElements = $(`<h2>${cardInfoArray[cardIndex].title}</h2><h3>${cardInfoArray[cardIndex].author}</h3><p>${cardInfoArray[cardIndex].description}</p>`)
+      let cardInfo = cardInfoArray[cardIndex];
+      let cardInfoBreakdown = cardInfo.description.split('\n').filter((text) => text != "").map(text => text.trim())
+      let artworkDetail = cardInfoBreakdown[0], story = cardInfoBreakdown[1];
+      let cardInfoElements = $(`<h2 class="inline p-3">${cardInfo.title || ""}</h2><h3 class="subtitle px-3">${artworkDetail || ""}</h3><p class="art-story p-3">${story || ""}</p>`)
       $("#lightBox").append(cardInfoElements)
    }
    $("#lightBox").show();
+
+
+   function closeLightbox() {
+      $("#lightBox").hide();
+      imageLightboxOpen = false;
+   }
+   /**  CLOSE LIGHTBOX Event Listeners **/
+   $("#lightBox").on("click", "#exit-button", closeLightbox);
+   $(document).on('keydown', function (event) {
+      if (event.key == "Escape") closeLightbox();
+   });
 }
 
 function updatePlayerScores(playerCount, playerObjects) {
@@ -468,11 +505,10 @@ function displayCards() {
    }
 }
 
-function displayBoardError(errorMessage) {
-   const board = $("#error-bar");
+function displayBoardError(errorMessage, element) {
+   const errorContainer = element || $("#error-bar");
 
    const messageDiv = $(`
-
    <div class="col-12 error-message">
       <hr class="error-line">
          <p> ${errorMessage} </p>
@@ -481,12 +517,11 @@ function displayBoardError(errorMessage) {
   `);
 
 
-   board.append(messageDiv);
+   errorContainer.prepend(messageDiv);
 
    let timeout = setTimeout(() => {
-      board.children().last().remove(".error-message");
+      messageDiv.remove();
    }, 10000);
-
 }
 
 function playerNameValidations(playerName) {
@@ -502,13 +537,6 @@ function playerNameValidations(playerName) {
 
    return true;
 }
-
-/**
- * Event Listeners
- */
-$("#lightBox").on("click", "#exit-button", (event) => {
-   $("#lightBox").hide();
-});
 
 
 // Chat event listeners

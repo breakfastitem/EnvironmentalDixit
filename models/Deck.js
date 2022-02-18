@@ -12,7 +12,7 @@ const deckSchema = new Schema({
         required: true
     },
     cardInfoArray: {
-        type: [{ title: String, description: String, artist: String }],
+        type: [{ title: String, description: String }],
         required: false
     }
 });

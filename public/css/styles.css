@@ -73,9 +73,29 @@ h2 {
   font-family: hobo-std, sans-serif;
 }
 
-h2 .inline {
+h2.inline {
   font-family: "Montserrat", "Open Sans", sans-serif;
   font-weight: bold;
+}
+
+h3.subtitle {
+  max-width: 900px;
+  margin: auto;
+  padding: 0 2rem 2rem 2rem;
+
+  font-style: oblique;
+}
+
+p.art-story {
+  max-width: 900px;
+  margin: auto;
+  padding: 0 2rem;
+
+  text-align: left;
+  white-space: pre-wrap;
+
+  font-size: 1.6rem;
+  line-height: 2.3rem;
 }
 
 img {
@@ -364,6 +384,16 @@ header {
   border-color: red;
 }
 
+#lightBox .error-message {
+  position: fixed;
+  z-index: 1;
+
+  margin-top: -10px;
+  padding: 0;
+
+  background: black;
+}
+
 .vote-selected {
   border-width: 5px !important;
   border-style: solid !important;
@@ -414,9 +444,15 @@ header {
 .learn-link {
   position: relative;
 
-  color: var(--accent-color) !important;
+  color: var(--subheader-color) !important;
 
   font-weight: 600;
+}
+
+.learn-link:hover,
+.learn-link:focus,
+.learn-link:active {
+  color: #c67d2f !important;
 }
 
 #selected-card {
@@ -470,8 +506,8 @@ header {
 }
 
 #img-viewer.info-shown {
-   height: 80%;
-   margin-bottom: 16px;
+  height: 80%;
+  margin-bottom: 16px;
 }
 
 #clue-input {
