@@ -13,10 +13,10 @@
 }
 
 ::selection {
-  background: #a52222; /* WebKit/Blink Browsers */
+  background: #7e1919;/* WebKit/Blink Browsers */
 }
 ::-moz-selection {
-  background: #a52222; /* Gecko Browsers */
+  background: #7e1919; /* Gecko Browsers */
 }
 
 /*General Stylings*/
@@ -110,6 +110,13 @@ img {
 
 #title.corner-logo {
   position: relative;
+top: 0;
+bottom: unset;
+left: 50%;
+
+height: 112px;
+
+transform: translate(-50%,0);
 }
 
 hr {
@@ -117,7 +124,12 @@ hr {
 
   border-color: VAR(--boundry-line-color);
 }
+#start-full-game-button
+{
+  margin: 0px 0 30px 0;
 
+  font-size: 34px;
+}
 button {
   margin: 10px;
   padding: 5px 10px;
@@ -213,18 +225,34 @@ button:focus {
   font-family: "Montserrat", "Open Sans", sans-serif;
 }
 
+.about-links h2 {
+display: inline;
+
+padding: 20px;
+
+white-space: nowrap;
+}
+
 header {
   position: relative;
 
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
+flex-basis: 190px;
+flex-grow: 0;
+flex-shrink: 1;
 
-  margin: 15px 20px;
+  width: 100%;
+  padding: 15px 20px;
 
   text-align: center;
+}
+
+img.cover-art-deck {
+flex-grow: 0;
+flex-shrink: 1;
+
+  width: 1000px;
+max-width: fit-content;
+padding: 0 30px;
 }
 
 .submit-fake-vote {
@@ -330,7 +358,7 @@ header {
 
   border-radius: 10px;
   background: white;
-  background-image: url("/images/misc/outline_lightbulb_black_24dp.png");
+  background-image: url("/images/misc/visibility_black_24dp.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: 80%;
@@ -378,6 +406,10 @@ header {
 
 .error-message {
   color: red;
+}
+
+#lightBox .error-message {
+  cursor: pointer;
 }
 
 .error-message hr {
@@ -438,6 +470,19 @@ header {
 }
 
 #code-label {
+  position: fixed;
+top: 10px;
+right: 10px;
+
+padding: 5px 10px;
+
+text-align: right;
+
+color: VAR(--header-color);
+border-radius: 10px;
+background-color: black;
+
+font-family: hobo-std, sans-serif;
   font-weight: 600;
 }
 
@@ -538,15 +583,25 @@ header {
   background-color: rgba(210 105 30 / 81%);
 }
 
+#landing_page_container {
+  display: flex;
+align-items: center;
+flex: 1;
+flex-direction: column;
+justify-content: center;
+
+max-height: 100vh;
+}
+
 #title {
   position: absolute;
-  top: 0;
-  left: 50%;
+top: 20px;
+left: 50%;
 
-  width: 225px;
-  height: 112.5px;
+height: 150px;
 
-  transform: translateX(-50%);
+transform: translateX(-50%) scale(2);
+transform-origin: center center;
 }
 
 #scores p {

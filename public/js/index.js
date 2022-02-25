@@ -78,7 +78,7 @@ function displayWaitingRoomPhase(isHost) {
    let display;
 
    if (isHost) {
-      display = $(`<div><p>Click start when all players have joined.<br/><button id="start-full-game-button">Start Game</button></p><div id="joined-player-list"></div></div>`);
+      display = $(`<div><div id="joined-player-list"></div><button id="start-full-game-button">Start Game</button><p>Click start when all players have joined.</p></div>`);
    } else {
       display = $(`<div><p>Waiting For the Host...</p><div id="joined-player-list"></div></div>`);
    }
@@ -89,9 +89,7 @@ function displayWaitingRoomPhase(isHost) {
 }
 
 function hideWaitingRoomPhase() {
-   $("header").hide()
-   $("#game-start-form").hide()
-   $("#start-about-links").hide()
+   $("#landing_page_container").hide()
    $("#game-layout-container").show();
 }
 
@@ -321,6 +319,7 @@ function handleGameUpdate() {
                   if (imageLightboxOpen) {
                      displayBoardError("The scores are tallied! Go check them out in the main game.", $("#lightBox"));
                   }
+                  $("hand-separator-line").hide();
 
                   let board = $("#board");
 
@@ -334,7 +333,9 @@ function handleGameUpdate() {
                   //Display cards with owner and votes
                   for (let i = 0; i < GameObject.playerCount; i++) {
                      let cardData = GameObject.roundData.cardArray[i];
-                     let display = $(`<div class="votesDisplayCard"><p>${GameObject.players[cardData.playerIndex].name}</p>
+                     let playerName = GameObject.players[cardData.playerIndex].name
+                     let playerColor = iconColors[cardData.playerIndex]
+                     let display = $(`<div class="votesDisplayCard" style="color:${playerColor}"><p>${playerName}</p>
                            <div class="voteCard" id="vote-${i}">${getImageHtml(cardData.cardIdentifier)}</div>
                            <p>Votes: ${cardData.votes}</p></div>`);
 
@@ -481,6 +482,8 @@ function displayCards() {
    const hand = $("#hand");
    hand.empty();
 
+   $("hand-separator-line").show()
+
    let lastCardImgElement = null;
    for (let i = 0; i < GameObject.hand.length; i++) {
 
@@ -516,6 +519,10 @@ function displayBoardError(errorMessage, element) {
    </div>
   `);
 
+   messageDiv.on("click", function () {
+      $("#lightBox").hide();
+      imageLightboxOpen = false;
+   })
 
    errorContainer.prepend(messageDiv);
 

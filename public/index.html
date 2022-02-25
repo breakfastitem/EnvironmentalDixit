@@ -24,19 +24,20 @@
 </head>
 
 <body>
-    <header>
-        <div id="flex-join-spacer" style="min-width: 38em; height: 8em; flex:1"></div>
-        <img id="title" src="./images/misc/logo.png" />
-        <h1 id="code-label" style="display: none;">
-            <span>Join Code</span><br>
-            <span style="color: #c67d2f; user-select: all;" id="code">----</span>
-        </h1>
-    </header>
+<div id="landing_page_container">
+    <h1 id="code-label" style="display: none;">
+        <span>Join Code</span><br>
+        <span style="color: #c67d2f; user-select: all;" id="code">----</span>
+    </h1>
+        <header>
+            <img id="title" src="./images/misc/logo-shadow.png" />
 
+            </header>
+        <img src="./images/misc/cover-art-deck.png" class="cover-art-deck">
     <section id="game-start-form" class="row">
         <div class="mini-form">
             <h2>Start a New Game</h2>
-            <input id="newgame-name-input" placeholder="Your Name"></input>
+            <input id="newgame-name-input" placeholder="Your Name" />
             <br>
             <select name="decks" id="deck-select">
                 <option value="">Choose A Deck</option>
@@ -46,24 +47,22 @@
         </div>
         <div class="mini-form">
             <h2>Join an Existing Game</h2>
-            <input id="name-input" placeholder="Your Name"></input>
+            <input id="name-input" placeholder="Your Name" />
             <br>
-            <input id="id-input" placeholder="Game Id"></input>
+            <input id="id-input" placeholder="Game Id" />
             <br>
             <button id="join-existing-game-button">Join Game</button>
         </div>
-
     </section>
-
-
     <div id="start-about-links" class="about-links">
         <h2><a href="http://artworksforchange.org" target="_blank" class="learn-link">Learn More</a></h2>
         <h2><a href="http://artworksforchange.org" target="_blank" class="learn-link">How To Play</a></h2>
     </div>
-
-    <div id="error-bar">
+        <div id="error-bar">
 
     </div>
+</div>
+
 
     <div id="game-layout-container" style="flex:1;display: none;">
 
@@ -102,13 +101,11 @@
 
 
                 </section>
-                <hr>
+<hr id="hand-separator-line" />
 
                 <!-- player hand-->
                 <div class="splay-deck" id="hand">
-
-                </div>
-
+            </div>
             </div>
         </div>
 
