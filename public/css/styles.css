@@ -246,13 +246,8 @@ flex-shrink: 1;
   text-align: center;
 }
 
-img.cover-art-deck {
-flex-grow: 0;
-flex-shrink: 1;
-
-  width: 1000px;
-max-width: fit-content;
-padding: 0 30px;
+img.home-page-banner {
+  width: 900px;
 }
 
 .submit-fake-vote {
@@ -588,7 +583,7 @@ font-family: hobo-std, sans-serif;
 align-items: center;
 flex: 1;
 flex-direction: column;
-justify-content: center;
+justify-content: start;
 
 max-height: 100vh;
 }
